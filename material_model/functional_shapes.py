@@ -63,16 +63,34 @@ def residual(parameters, *args):
 
 
 if __name__ == '__main__':
+    fig = plt.figure(0)
     data = sun_et_al_16.get_data(f=5., p=[10, 30, 60])
     # par = fmin(residual, [5.67, 6.344e-7, 100, 1, 7.5, 13], args=(data, ), maxfun=1e6, maxiter=1e6)
-    par = np.array([5.19502802e+00, 7.64481869e-07, 4.70091315e+01, 1.34948445e-13,
-                    1.14929617e+01, 1.12439205e+01])
+    # par = np.array([5.19502802e+00, 7.64481869e-07, 4.70091315e+01, 1.34948445e-13,
+    #               1.14929617e+01, 1.12439205e+01])
+    par = np.array([3.78059234e+00, 2.28236862e-06,  8.14579983e+01, -9.66505289e-13,   6.80152840e+00,
+                    1.28249309e+01])
     N = np.exp(np.linspace(0, np.log(1e6)))
-    for experiment in data:
-        plt.semilogx(experiment.cycles, experiment.strain, '-', lw=2)
+    color = ['r', 'b', 'g', 'k']
+    for experiment, c in zip(data, color):
+        print experiment.p, experiment.q
         model_strain = permanent_strain(experiment.cycles, experiment.p, experiment.q, par)
-        plt.semilogx(experiment.cycles, model_strain, '--', lw=2)
-
-    model_strain = permanent_strain(experiment.cycles, 10, 100, par)
-    plt.semilogx(experiment.cycles, model_strain, '--', lw=2)
+        if c == 'k':
+            plt.semilogx(experiment.cycles, experiment.strain, '-' + c, lw=2, label='Experiment (Sun et. al 2016)')
+            plt.semilogx(experiment.cycles, model_strain, '--' + c, lw=2, label='Model')
+        else:
+            plt.semilogx(experiment.cycles, experiment.strain, '-' + c, lw=2)
+            plt.semilogx(experiment.cycles, model_strain, '--' + c, lw=2)
+    # plt.ylim(0, 0.15)
+    plt.xlim(0, 5e5)
+    fig.set_size_inches(10, 8., forward=True)
+    plt.legend(loc='best')
+    plt.text(3e3, 0.02, '$p=60$ kPa, $q=230$ kPa')
+    plt.text(3e3, 0.085, '$p=60$ kPa, $q=370$ kPa', color='g')
+    plt.text(3e3, 0.045, '$p=30$ kPa, $q=230$ kPa', color='r')
+    plt.text(1200, 0.11, '$p=10$ kPa, $q=230$ kPa', color='b')
+    plt.xlabel('Cycles $N$')
+    plt.ylabel(r'Permanent strain $\varepsilon_p$')
+    plt.tight_layout()
+    plt.savefig('../Figures/permanent_strain_10_60.png')
     plt.show()
