@@ -46,7 +46,6 @@ if __name__ == '__main__':
                 job_list.append((permanent_strain, [],
                                  {"p": pressure[i], "q": von_Mises[i], 'parameters': material_parameters}))
             ep = direction*multi_processer(job_list, delay=0., timeout=3600, cpus=8)
-            ep = direction*permanent_strain(cycles, p=pressure, q=von_Mises, parameters=material_parameters)
             print(np.max(np.max(ep, 1)))
         else:
             ep = 0*deviator
