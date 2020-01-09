@@ -44,11 +44,10 @@ if __name__ == '__main__':
             print(instance_name)
             job_list = []
             for i in range(pressure.shape[0]):
-                permanent_strain(cycles, pressure[i], von_Mises[i], material_parameters)
-                # job_list.append((permanent_strain, [],
-                #                  {"cycles": cycles, "p": pressure[i], "q": von_Mises[i],
-                #                  'parameters': material_parameters}))
-            # result = multi_processer(job_list, delay=0., timeout=3600, cpus=8)
+                job_list.append((permanent_strain, [],
+                                 {"cycles": cycles, "p": pressure[i], "q": von_Mises[i],
+                                 'parameters': material_parameters}))
+            result = multi_processer(job_list, delay=0., timeout=3600, cpus=8)
             for i, val in enumerate(result):
                 ep[i, :] = val*direction[i, :]
             print(np.max(np.max(ep, 1)))
