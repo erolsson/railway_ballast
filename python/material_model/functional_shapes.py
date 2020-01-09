@@ -20,6 +20,10 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
 
 
 def permanent_strain(cycles, p, q, parameters):
+    scalar = False
+    if not isinstance(cycles, np.ndarray):
+        cycles = np.array(cycles)
+        scalar = True
     strain = 0*cycles
     parameters = abs(parameters)
 
@@ -51,6 +55,8 @@ def permanent_strain(cycles, p, q, parameters):
             strain[i] = solution.y[0][-1]
         else:
             strain[i] = 1.
+    if scalar:
+        strain = strain[0]
     return strain
 
 
