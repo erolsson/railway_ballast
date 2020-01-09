@@ -39,6 +39,7 @@ if __name__ == '__main__':
         for i in range(6):
             direction[:, i] /= von_Mises
         if "BALLAST" in instance_name:
+            print(instance_name)
             ep = direction*permanent_strain(cycles, p=pressure, q=deviator, parameters=material_parameters)
             print(np.max(np.max(ep, 1)))
         else:
