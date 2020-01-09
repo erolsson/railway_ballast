@@ -1,7 +1,11 @@
-import numpy as np
+import sys
+import set_path  # noqa
 
-from scipy.integrate import solve_ivp
-from scipy.optimize import fmin
+import numpy as np
+import common
+
+from common.scipy.integrate import solve_ivp
+from common.scipy.optimize import fmin
 
 import matplotlib.pyplot as plt
 import matplotlib.style
