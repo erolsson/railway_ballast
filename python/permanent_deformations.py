@@ -39,6 +39,7 @@ if __name__ == '__main__':
         direction = 1.5*deviator
         for i in range(6):
             direction[:, i] /= von_Mises
+        ep = 0*deviator
         if "BALLAST" in instance_name:
             print(instance_name)
             job_list = []
@@ -46,7 +47,9 @@ if __name__ == '__main__':
                 job_list.append((permanent_strain, [],
                                  {"cycles": cycles, "p": pressure[i], "q": von_Mises[i],
                                   'parameters': material_parameters}))
-            ep = direction*multi_processer(job_list, delay=0., timeout=3600, cpus=8)
+            result = multi_processer(job_list, delay=0., timeout=3600, cpus=8)
+            for i, val in enumerate(result):
+                ep[i, :] = val*direction[i, :]
             print(np.max(np.max(ep, 1)))
-        else:
-            ep = 0*deviator
+
+
