@@ -31,7 +31,8 @@ if __name__ == '__main__':
         stress = read_field_from_odb(field_id='S', odb_file_name=stress_odb_filename, instance_name=instance_name)
         pressure = -np.sum(stress[:, 0:3], 1)
         deviator = np.copy(stress)
-        deviator[:, 0:3] -= pressure
+        for i in range(3):
+            deviator[:, i] -= pressure
         von_Mises = np.sqrt(np.sum(stress[:, 0:3]**2, 1)  - stress[:, 0]*stress[:, 1] -
                             stress[:, 0]*stress[:, 2] - stress[:, 1]*stress[:, 2]+ 3*np.sum(stress[:, 3:]**2, 1))
         direction = 1.2*deviator/von_Mises
