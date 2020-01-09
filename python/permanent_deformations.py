@@ -35,6 +35,8 @@ if __name__ == '__main__':
             deviator[:, i] -= pressure
         von_Mises = np.sqrt(np.sum(stress[:, 0:3]**2, 1)  - stress[:, 0]*stress[:, 1] -
                             stress[:, 0]*stress[:, 2] - stress[:, 1]*stress[:, 2]+ 3*np.sum(stress[:, 3:]**2, 1))
-        direction = 1.2*deviator/von_Mises
+        direction = 1.5*deviator
+        for i in range(6):
+            direction[:, i] /= von_Mises
         ep = direction*permanent_strain(cycles, p=pressure, q=deviator, parameters=material_parameters)
         print(np.max(np.max(ep, 1)))
