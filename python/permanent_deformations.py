@@ -9,6 +9,7 @@ from abaqus_functions.create_empty_odb import create_empty_odb
 from abaqus_functions.odb_io_functions import read_field_from_odb
 
 from material_model.functional_shapes import permanent_strain
+from multiprocesser.multiprocesser import multi_processer
 
 if __name__ == '__main__':
     cycles = 1e5
@@ -40,6 +41,11 @@ if __name__ == '__main__':
             direction[:, i] /= von_Mises
         if "BALLAST" in instance_name:
             print(instance_name)
+            job_list = []
+            for i in range(pressure.shape[0]):
+                job_list.append((permanent_strain, [],
+                                 {"p": pressure[i], "q": von_Mises[i], 'parameters': material_parameters}))
+            ep = direction*multi_processer(job_list, delay=0., timeout=3600, cpus=8)
             ep = direction*permanent_strain(cycles, p=pressure, q=von_Mises, parameters=material_parameters)
             print(np.max(np.max(ep, 1)))
         else:
