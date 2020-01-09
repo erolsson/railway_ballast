@@ -1,5 +1,5 @@
 import sys
-import set_path  # noqa
+import find_modules  # noqa
 
 import numpy as np
 import common
