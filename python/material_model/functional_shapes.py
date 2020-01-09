@@ -32,6 +32,7 @@ def permanent_strain(cycles, p, q, parameters):
         a0 = parameters[1]
         a1 = parameters[2]
         a2 = parameters[3]
+        print np.min(1 + a1*p + a2*p**2)
         f = (q/np.sqrt(1 + a1*p + a2*p**2) - hf(ep))
         # f = (q/p - hf(ep))
         e = 0*f
