@@ -3,7 +3,6 @@ import find_modules  # noqa
 
 from common import numpy as np
 from common import scipy
-import common
 
 from scipy.integrate import solve_ivp
 from scipy.optimize import fmin
