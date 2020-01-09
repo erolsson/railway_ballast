@@ -25,7 +25,7 @@ def permanent_strain(cycles, p, q, parameters):
         cycles = np.array([cycles])
         scalar = True
     strain = 0*cycles
-    print strain.shape
+
     parameters = abs(parameters)
 
     def dedn(n, ep):
@@ -60,6 +60,7 @@ def permanent_strain(cycles, p, q, parameters):
             strain[i] = 1.
     if scalar:
         strain = strain[0]
+    print strain
     return strain
 
 
