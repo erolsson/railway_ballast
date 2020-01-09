@@ -10,7 +10,7 @@ if __name__ == '__main__':
     simulation_directory = os.path.expanduser('~/railway_ballast/abaqus2014/')
     stress_odb_filename = simulation_directory + '/embankment_EO.odb'
     results_odb_filename = simulation_directory + '/results.odb'
-    if os.path.exists(results_odb_filename):
+    if not os.path.exists(results_odb_filename):
         print("Creating new odb with name:")
         print("\t" + results_odb_filename)
         create_empty_odb(results_odb_filename, stress_odb_filename)
