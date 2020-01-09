@@ -10,8 +10,6 @@ from scipy.optimize import fmin
 import matplotlib.pyplot as plt
 import matplotlib.style
 
-from experimental_results.experimental_results import sun_et_al_16
-
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)
 plt.rc('font', serif='Computer Modern Roman')
@@ -67,6 +65,7 @@ def residual(parameters, *args):
 
 
 if __name__ == '__main__':
+    from experimental_results.experimental_results import sun_et_al_16
     fig = plt.figure(0)
     data = sun_et_al_16.get_data(f=5., p=[10, 30, 60])
     # par = fmin(residual, [5.67, 6.344e-7, 100, 1, 7.5, 13], args=(data, ), maxfun=1e6, maxiter=1e6)
