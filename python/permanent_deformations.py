@@ -9,8 +9,10 @@ from abaqus_functions.odb_io_functions import read_field_from_odb
 if __name__ == '__main__':
     simulation_directory = os.path.expanduser('~/railway_ballast/abaqus2014/')
     stress_odb_filename = simulation_directory + '/embankment_EO.odb'
-    results_odb_filename = simulation_directory + 'results.odb'
+    results_odb_filename = simulation_directory + '/results.odb'
     if os.path.exists(results_odb_filename):
+        print("Creating new odb with name:")
+        print("\t" + results_odb_filename)
         create_empty_odb(results_odb_filename, stress_odb_filename)
 
     # Looking through the instances to find ballast instances in stress odb
