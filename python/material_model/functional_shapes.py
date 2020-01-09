@@ -34,7 +34,8 @@ def permanent_strain(cycles, p, q, parameters):
         a1 = parameters[2]
         a2 = parameters[3]
         arg = 1 + a1*p + a2*p**2
-        arg[arg < 1e-6] = 1e-6
+        if arg < 1e-6:
+            arg = 1e-6
         f = (q/np.sqrt(arg) - hf(ep))
         # f = (q/p - hf(ep))
         e = 0*f
