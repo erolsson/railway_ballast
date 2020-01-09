@@ -2,10 +2,11 @@ import sys
 import find_modules  # noqa
 
 from common import numpy as np
+from common import scipy
 import common
 
-from common.scipy.integrate import solve_ivp
-from common.scipy.optimize import fmin
+from scipy.integrate import solve_ivp
+from scipy.optimize import fmin
 
 import matplotlib.pyplot as plt
 import matplotlib.style
