@@ -1,6 +1,8 @@
 from __future__ import print_function
 
 import imp
+import pickle
 
-print(imp.find_module('numpy'))
-print(imp.find_module('scipy'))
+python_modules = {name: imp.find_module(name) for name in ['numpy', 'scipy']}
+with open('python_modules.pkl', 'w') as pickle_handle:
+    pickle.dump(python_modules, pickle_handle)

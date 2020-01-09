@@ -1,6 +1,15 @@
+import imp
+import os
+import pickle
 import subprocess
 
 
+work_dir = os.getcwd()
+os.chdir(os.path.dirname(__file__))
+print os.getcwd()
+subprocess.Popen('python find_numpy.py', shell=True)
+with open('python_modules.pkl') as module_pickle:
+    modules = pickle.load(module_pickle)
+numpy = imp.load_module('numpy', modules['numpy'][0], modules['numpy'][1], modules['numpy'][2])
 
-import numpy as np
-import scipy
+os.chdir(work_dir)
