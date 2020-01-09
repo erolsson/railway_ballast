@@ -1,7 +1,7 @@
 import sys
 import find_modules  # noqa
 
-import numpy as np
+from common import numpy as np
 import common
 
 from common.scipy.integrate import solve_ivp
