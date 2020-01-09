@@ -3,10 +3,13 @@ import odbAccess
 
 import os
 
+import numpy as np
+
 from abaqus_functions.create_empty_odb import create_empty_odb
 from abaqus_functions.odb_io_functions import read_field_from_odb
 
 if __name__ == '__main__':
+    cycles = 1e5
     simulation_directory = os.path.expanduser('~/railway_ballast/abaqus2014/')
     stress_odb_filename = simulation_directory + '/embankment_EO.odb'
     results_odb_filename = simulation_directory + '/results.odb'
@@ -20,4 +23,5 @@ if __name__ == '__main__':
     instance_names = stress_odb.rootAssembly.instances.keys()
     for instance_name in instance_names:
         stress = read_field_from_odb(field_id='S', odb_file_name=stress_odb_filename, instance_name=instance_name)
-        print(stress.shape)
+        pressure = - np.sum(stress[:, 0:3], 1)
+        print(pressure.shape)
