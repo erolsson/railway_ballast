@@ -6,7 +6,8 @@ import subprocess
 
 work_dir = os.getcwd()
 os.chdir(os.path.abspath(os.path.dirname(__file__)))
-subprocess.Popen('python find_numpy.py', shell=True)
+process = subprocess.Popen('python find_numpy.py', shell=True)
+process.wait()
 with open('python_modules.pkl') as module_pickle:
     modules = pickle.load(module_pickle)
 print modules
