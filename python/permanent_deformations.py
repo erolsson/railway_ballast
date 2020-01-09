@@ -44,7 +44,8 @@ if __name__ == '__main__':
             job_list = []
             for i in range(pressure.shape[0]):
                 job_list.append((permanent_strain, [],
-                                 {"p": pressure[i], "q": von_Mises[i], 'parameters': material_parameters}))
+                                 {"cycles": cycles, "p": pressure[i], "q": von_Mises[i],
+                                  'parameters': material_parameters}))
             ep = direction*multi_processer(job_list, delay=0., timeout=3600, cpus=8)
             print(np.max(np.max(ep, 1)))
         else:
