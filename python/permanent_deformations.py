@@ -28,7 +28,7 @@ if __name__ == '__main__':
     stress_odb = odbAccess.openOdb(stress_odb_filename, readOnly=True)
     instance_names = stress_odb.rootAssembly.instances.keys()
     for instance_name in instance_names:
-        stress = read_field_from_odb(field_id='S', odb_file_name=stress_odb_filename, instance_name=instance_name)
+        stress = read_field_from_odb(field_id='S', odb_file_name=stress_odb_filename, instance_name=instance_name)/1e6
         pressure = -np.sum(stress[:, 0:3], 1)
         deviator = np.copy(stress)
         for i in range(3):
