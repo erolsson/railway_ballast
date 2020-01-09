@@ -5,8 +5,8 @@ import common
 
 import os
 
-import common.numpy as np
-import common.scipy
+from common import numpy as np
+from common import scipy
 
 from abaqus_functions.create_empty_odb import create_empty_odb
 from abaqus_functions.odb_io_functions import read_field_from_odb
