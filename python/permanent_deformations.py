@@ -50,6 +50,8 @@ if __name__ == '__main__':
             result = multi_processer(job_list, delay=0., timeout=3600, cpus=8)
             for i, val in enumerate(result):
                 ep[i, :] = val*direction[i, :]
-            print(np.max(np.max(ep, 1)))
+            max_idx = np.argmax(np.max(ep, 1))
+            print("Maximum permanent strain is ", ep[max_idx], "The pressure is ", pressure[max_idx],
+                  " and von Mises is ", von_Mises[max_idx])
 
 
