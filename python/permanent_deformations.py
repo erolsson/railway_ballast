@@ -1,10 +1,12 @@
 from __future__ import print_function
 import odbAccess
 
+import common
+
 import os
 
-import numpy as np
-import scipy
+import common.numpy as np
+import common.scipy
 
 from abaqus_functions.create_empty_odb import create_empty_odb
 from abaqus_functions.odb_io_functions import read_field_from_odb
