@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import sys
 import find_modules  # noqa
 
@@ -71,7 +73,7 @@ def residual(parameters, *args):
     for dataset in datasets:
         model_e = permanent_strain(dataset.cycles, dataset.p, dataset.q, parameters)
         r += np.sum((dataset.strain - model_e)**2)
-    print parameters, r
+    print(parameters, r)
     return r
 
 
@@ -87,7 +89,7 @@ if __name__ == '__main__':
     N = np.exp(np.linspace(0, np.log(1e6)))
     color = ['r', 'b', 'g', 'k']
     for experiment, c in zip(data, color):
-        print experiment.p, experiment.q
+        print(experiment.p, experiment.q)
         model_strain = permanent_strain(experiment.cycles, experiment.p, experiment.q, par)
         if c == 'k':
             plt.semilogx(experiment.cycles, experiment.strain, '-' + c, lw=2, label='Experiment (Sun et. al 2016)')
