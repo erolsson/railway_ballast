@@ -28,30 +28,32 @@ if __name__ == '__main__':
     # Looking through the instances to find ballast instances in stress odb
     stress_odb = odbAccess.openOdb(stress_odb_filename, readOnly=True)
     instance_names = stress_odb.rootAssembly.instances.keys()
+    stress_odb.close()
     for instance_name in instance_names:
         stress = read_field_from_odb(field_id='S', odb_file_name=stress_odb_filename, instance_name=instance_name)/1e6
-        pressure = -np.sum(stress[:, 0:3], 1)
-        deviator = np.copy(stress)
-        for i in range(3):
-            deviator[:, i] -= pressure
-        von_Mises = np.sqrt(np.sum(stress[:, 0:3]**2, 1) - stress[:, 0]*stress[:, 1] -
-                            stress[:, 0]*stress[:, 2] - stress[:, 1]*stress[:, 2] + 3*np.sum(stress[:, 3:]**2, 1))
-        direction = 1.5*deviator
-        for i in range(6):
-            direction[:, i] /= von_Mises
-        ep = 0*deviator
+        ep = 0*stress
         if "BALLAST" in instance_name:
+            pressure = -np.sum(stress[:, 0:3], 1)
+            deviator = np.copy(stress)
+            for i in range(3):
+                deviator[:, i] -= pressure
+            von_Mises = np.sqrt(np.sum(stress[:, 0:3]**2, 1) - stress[:, 0]*stress[:, 1] -
+                                stress[:, 0]*stress[:, 2] - stress[:, 1]*stress[:, 2] + 3*np.sum(stress[:, 3:]**2, 1))
+            direction = 1.5*deviator
+            for i in range(6):
+                direction[:, i] /= von_Mises
+            ep = 0*deviator
+
             print(instance_name)
             job_list = []
             for i in range(pressure.shape[0]):
                 job_list.append((permanent_strain, [],
                                  {"cycles": cycles, "p": pressure[i], "q": von_Mises[i],
                                  'parameters': material_parameters}))
-            result = multi_processer(job_list, delay=0., timeout=3600, cpus=8)
-            for i, val in enumerate(result):
-                ep[i, :] = val*direction[i, :]
+            ep_magnitude = np.array(multi_processer(job_list, delay=0., timeout=3600, cpus=8))
+            ep_magnitude[ep_magnitude > 5.] = 5.
+            for i in range(6):
+                ep[:, i] = ep_magnitude*direction
             max_idx = np.argmax(np.max(ep, 1))
-            print("Maximum permanent strain is ", ep[max_idx], "The pressure is ", pressure[max_idx],
-                  " and von Mises is ", von_Mises[max_idx])
-
-
+            print("Maximum permanent strain is", ep[max_idx], "The pressure is", pressure[max_idx],
+                  "and von Mises is", von_Mises[max_idx])
