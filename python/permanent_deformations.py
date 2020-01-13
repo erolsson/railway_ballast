@@ -7,6 +7,7 @@ import os
 
 from abaqus_functions.create_empty_odb import create_empty_odb
 from abaqus_functions.odb_io_functions import read_field_from_odb
+from abaqus_functions.odb_io_functions import write_field_to_odb
 
 from material_model.functional_shapes import permanent_strain
 from multiprocesser.multiprocesser import multi_processer
@@ -52,7 +53,11 @@ if __name__ == '__main__':
                                  'parameters': material_parameters}))
             ep_magnitude = np.array(multi_processer(job_list, delay=0., timeout=3600, cpus=8))
             ep_magnitude[ep_magnitude > 5.] = 5.
-            sp = ep_magnitude*direction
+            for i in range(6):
+                ep[:, i] = -ep_magnitude*direction[:, i]
             max_idx = np.argmax(np.max(ep, 1))
             print("Maximum permanent strain is", ep[max_idx], "The pressure is", pressure[max_idx],
                   "and von Mises is", von_Mises[max_idx])
+
+        write_field_to_odb(field_data=ep, field_id='EP', odb_file_name=results_odb_filename,
+                           step_name=str(cycles) + '_cycles', instance_name=instance_name)
