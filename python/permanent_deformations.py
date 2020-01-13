@@ -55,7 +55,7 @@ if __name__ == '__main__':
             ep_magnitude[ep_magnitude > 5.] = 5.
             for i in range(6):
                 ep[:, i] = ep_magnitude*direction[:, i]
-            max_idx = np.argmax(np.max(ep, 1))
+            max_idx = np.argmax(ep_magnitude)
             print("Maximum permanent strain is", ep[max_idx], "The pressure is", pressure[max_idx],
                   "and von Mises is", von_Mises[max_idx])
 
