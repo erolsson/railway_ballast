@@ -54,7 +54,7 @@ if __name__ == '__main__':
             ep_magnitude = np.array(multi_processer(job_list, delay=0., timeout=3600, cpus=8))
             ep_magnitude[ep_magnitude > 5.] = 5.
             for i in range(6):
-                ep[:, i] = -ep_magnitude*direction[:, i]
+                ep[:, i] = ep_magnitude*direction[:, i]
             max_idx = np.argmax(np.max(ep, 1))
             print("Maximum permanent strain is", ep[max_idx], "The pressure is", pressure[max_idx],
                   "and von Mises is", von_Mises[max_idx])
