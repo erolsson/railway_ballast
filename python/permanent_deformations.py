@@ -34,10 +34,10 @@ if __name__ == '__main__':
         stress = read_field_from_odb(field_id='S', odb_file_name=stress_odb_filename, instance_name=instance_name)/1e6
         ep = 0*stress
         if "BALLAST" in instance_name:
-            pressure = -np.sum(stress[:, 0:3], 1)
+            pressure = -np.sum(stress[:, 0:3], 1)/3
             deviator = np.copy(stress)
             for i in range(3):
-                deviator[:, i] -= pressure
+                deviator[:, i] += pressure
             von_Mises = np.sqrt(np.sum(stress[:, 0:3]**2, 1) - stress[:, 0]*stress[:, 1] -
                                 stress[:, 0]*stress[:, 2] - stress[:, 1]*stress[:, 2] + 3*np.sum(stress[:, 3:]**2, 1))
             direction = 1.5*deviator
@@ -60,4 +60,4 @@ if __name__ == '__main__':
                   "and von Mises is", von_Mises[max_idx])
 
         write_field_to_odb(field_data=ep, field_id='EP', odb_file_name=results_odb_filename,
-                           step_name=str(cycles) + '_cycles', instance_name=instance_name)
+                           step_name=str(cycles) + '_cycles', instance_name=instance_name, frame_number=0)
