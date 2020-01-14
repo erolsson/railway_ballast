@@ -2,6 +2,7 @@ from __future__ import print_function
 from common.scipy.sparse import coo_matrix
 
 import odbAccess
+from abaqusConstants import ELEMENT_NODAL
 
 import os
 
@@ -18,3 +19,5 @@ if __name__ == '__main__':
     for step_name in step_names:
         for instance_name in instance_names:
             ep = read_field_from_odb('EP', results_odb_filename, step_name=step_name, instance_name=instance_name)
+            _, _, node_labels = read_field_from_odb('EP', results_odb_filename, step_name=step_name,
+                                                    instance_name=instance_name, position=ELEMENT_NODAL)
