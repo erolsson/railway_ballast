@@ -57,6 +57,7 @@ def create_empty_odb(new_odb_file_name, old_odb_file_name):
         _copy_node_and_elements(new_part, old_part)
         _copy_sets(new_part, old_part)
         new_odb.update()
+        new_odb.save()
 
     # Copying the instances and copying the nodes
     print(old_odb.rootAssembly.instances.keys())
