@@ -1,11 +1,13 @@
 from __future__ import print_function
-
+import os
 import imp
 import pickle
 import sys
 
+package_path = os.path.dirname(__file__)
+print(package_path)
 try:
-    with open('python_modules.pkl') as module_pickle:
+    with open(package_path + '/python_modules.pkl') as module_pickle:
         modules = pickle.load(module_pickle)
 except IOError:
     print("python_modules not set!")
