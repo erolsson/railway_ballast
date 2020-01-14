@@ -7,7 +7,6 @@ import os
 
 def _copy_node_and_elements(to_odb_base, from_odb_base):
     nodal_data = from_odb_base.nodes
-    print(len(nodal_data))
     if len(nodal_data) > 0:
         node_labels = []
         nodal_coordinates = []
@@ -75,6 +74,7 @@ def create_empty_odb(new_odb_file_name, old_odb_file_name):
         # Copying the instance nodes to the part with the same name
         _copy_node_and_elements(new_part, old_instance)
         new_odb.update()
+        new_odb.save()
         new_instance = new_odb.rootAssembly.Instance(name=instance_name, object=new_odb.parts[instance_name])
         _copy_sets(new_instance, old_instance)
 
