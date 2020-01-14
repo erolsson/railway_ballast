@@ -50,7 +50,6 @@ def create_empty_odb(new_odb_file_name, old_odb_file_name):
     new_odb = odbAccess.Odb(name=os.path.basename(new_odb_file_name), path=new_odb_file_name)
     old_odb = odbAccess.openOdb(old_odb_file_name, readOnly=True)
     # Copying the part and copying the nodes in that part
-    print(old_odb.parts.keys())
     for part_name in old_odb.parts.keys():
         old_part = old_odb.parts[part_name]
         new_part = new_odb.Part(name=part_name, embeddedSpace=THREE_D, type=old_part.type)
@@ -60,7 +59,6 @@ def create_empty_odb(new_odb_file_name, old_odb_file_name):
         new_odb.save()
 
     # Copying the instances and copying the nodes
-    print(old_odb.rootAssembly.instances.keys())
     for instance_name in old_odb.rootAssembly.instances.keys():
         old_instance = old_odb.rootAssembly.instances[instance_name]
         try:
