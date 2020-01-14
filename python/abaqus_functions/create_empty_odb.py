@@ -7,6 +7,7 @@ import os
 
 def _copy_node_and_elements(to_odb_base, from_odb_base):
     nodal_data = from_odb_base.nodes
+    print(len(nodal_data))
     if len(nodal_data) > 0:
         node_labels = []
         nodal_coordinates = []
