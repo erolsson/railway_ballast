@@ -72,6 +72,9 @@ def create_empty_odb(new_odb_file_name, old_odb_file_name):
             except KeyError:
                 new_part = new_odb.Part(name=instance_name, embeddedSpace=THREE_D, type=DEFORMABLE_BODY)
 
+        new_odb.update()
+        new_odb.save()
+
         # Copying the instance nodes to the part with the same name
         _copy_node_and_elements(new_part, old_instance)
         new_odb.update()
