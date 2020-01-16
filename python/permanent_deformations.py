@@ -43,5 +43,9 @@ if __name__ == '__main__':
                 for j, gp in enumerate(C3D8.gauss_points):
                     B = element.B(*gp)
                     for comp in range(6):
-                        col[8*6*i+6*j+comp:8*6*i+6*j+comp+8] = element.node_labels
+                        try:
+                            col[8*6*i+6*j+comp:8*6*i+6*j+comp+8] = element.node_labels
+                        except ValueError:
+                            print(i, j, comp, 8*6*i + 6*j + comp, 8*6*i + 6*j + comp + 8)
+                            print(col[(8*6*i + 6*j + comp):(8*6*i + 6*j + comp + 8)], element.node_labels)
             print(col)
