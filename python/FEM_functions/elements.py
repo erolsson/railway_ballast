@@ -27,6 +27,7 @@ class C3D8:
         self.xe = np.zeros((8, 3))
         for i in range(3):
             self.xe[:, i] = [n.coordinates[i] for n in nodes]
+            self.node_labels = [n.label for n in nodes]
 
     def d(self, xi, eta, zeta):
         """

@@ -24,11 +24,9 @@ if __name__ == '__main__':
     for step_name in step_names:
         for instance_name in instance_names:
             elements = {}
-            ep, element_labels, _ = read_field_from_odb('EP', results_odb_filename, step_name=step_name,
-                                                        instance_name=instance_name, get_position_numbers=True)
-            _, _, node_labels = read_field_from_odb('EP', results_odb_filename, step_name=step_name,
-                                                    instance_name=instance_name, position=ELEMENT_NODAL,
-                                                    get_position_numbers=True)
+            permanent_strain, element_labels, _ = read_field_from_odb('EP', results_odb_filename, step_name=step_name,
+                                                                      instance_name=instance_name,
+                                                                      get_position_numbers=True)
 
             results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
             instance = results_odb.rootAssembly.instances[instance_name]
@@ -36,4 +34,14 @@ if __name__ == '__main__':
                 element = instance.elements[e_label - 1]
                 element_nodes = [instance.nodes[n] for n in element.connectivity]
                 elements[e_label] = C3D8(element_nodes)
-        print(len(elements))
+            row = np.linspace(0, permanent_strain.shape[0]*6)
+            col = np.zeros(permanent_strain.shape[0]*6)
+            values = np.zeros(permanent_strain.shape[0]*6)
+
+            for i in range(permanent_strain.shape[0]/8):
+                element = elements[element_labels[8*i]]
+                for j, gp in enumerate(C3D8.gauss_points):
+                    B = element.B(*gp)
+                    for comp in range(6):
+                        col[8*6*i+6*j:8*6*i+6*j+comp] = element.node_labels
+            print(col)
