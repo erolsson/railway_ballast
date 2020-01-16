@@ -1,5 +1,5 @@
 from __future__ import print_function
-from common import scipy
+from common import scipy.sparse
 
 import odbAccess
 from abaqusConstants import ELEMENT_NODAL
