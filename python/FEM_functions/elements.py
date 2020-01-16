@@ -39,9 +39,12 @@ class C3D8:
 
         d_matrix = np.zeros((3, 8))
         for i in range(8):
-            d_matrix[0, i] = (1. + eta*self.xe[i, 1])*(1. + zeta*self.xe[i, 2])*self.xe[i, 0]/8
-            d_matrix[1, i] = (1. + xi*self.xe[i, 0])*(1. + zeta*self.xe[i, 2])*self.xe[i, 1]/8
-            d_matrix[2, i] = (1. + xi*self.xe[i, 0])*(1. + eta*self.xe[i, 1])*self.xe[i, 2]/8
+            d_matrix[0, i] = (1. + eta*self.local_nodal_pos[i, 1]) * \
+                             (1. + zeta*self.local_nodal_pos[i, 2])*self.local_nodal_pos[i, 0]/8
+            d_matrix[1, i] = (1. + xi*self.local_nodal_pos[i, 0]) * \
+                             (1. + zeta*self.local_nodal_pos[i, 2])*self.local_nodal_pos[i, 1]/8
+            d_matrix[2, i] = (1. + xi*self.local_nodal_pos[i, 0]) * \
+                             (1. + eta*self.local_nodal_pos[i, 1])*self.local_nodal_pos[i, 2]/8
         return d_matrix
 
     def J(self, xi, eta, zeta):

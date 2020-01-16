@@ -52,7 +52,7 @@ if __name__ == '__main__':
                                  {"cycles": cycles, "p": pressure[i], "q": von_Mises[i],
                                  'parameters': material_parameters}))
             ep_magnitude = np.array(multi_processer(job_list, delay=0., timeout=3600, cpus=8))
-            ep_magnitude[ep_magnitude > 5.] = 5.
+            ep_magnitude[ep_magnitude > 1.] = 1.
             for i in range(6):
                 ep[:, i] = ep_magnitude*direction[:, i]
             max_idx = np.argmax(ep_magnitude)
