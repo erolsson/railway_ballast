@@ -24,7 +24,7 @@ if __name__ == '__main__':
     for step_name in step_names:
         for instance_name in instance_names:
             elements = {}
-            permanent_strain, element_labels, _ = read_field_from_odb('EP', results_odb_filename, step_name=step_name,
+            permanent_strain, _, element_labels = read_field_from_odb('EP', results_odb_filename, step_name=step_name,
                                                                       instance_name=instance_name,
                                                                       get_position_numbers=True)
 
