@@ -1,5 +1,5 @@
 from __future__ import print_function
-from common.scipy.sparse import coo_matrix
+from common import scipy
 
 import odbAccess
 from abaqusConstants import ELEMENT_NODAL
