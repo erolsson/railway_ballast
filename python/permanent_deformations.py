@@ -37,7 +37,7 @@ if __name__ == '__main__':
             row = np.linspace(0, permanent_strain.shape[0]*6)
             col = np.zeros(permanent_strain.shape[0]*6)
             values = np.zeros(permanent_strain.shape[0]*6)
-
+            print(permanent_strain.shape, len(element_labels))
             for i in range(permanent_strain.shape[0]/8):
                 element = elements[element_labels[8*i]]
                 for j, gp in enumerate(C3D8.gauss_points):
