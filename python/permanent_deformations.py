@@ -14,7 +14,7 @@ from FEM_functions.elements import C3D8
 simulation_directory = os.path.expanduser('~/railway_ballast/abaqus2014/')
 results_odb_filename = simulation_directory + '/results.odb'
 
-instance_names = ['BALLAST_2', 'BALLAST_1']
+instance_names = ['BALLAST_2', 'BALLAST-1']
 
 if __name__ == '__main__':
     results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
