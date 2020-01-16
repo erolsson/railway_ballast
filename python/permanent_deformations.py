@@ -32,7 +32,7 @@ if __name__ == '__main__':
             instance = results_odb.rootAssembly.instances[instance_name]
             for e_label in np.unique(element_labels):
                 element = instance.elements[e_label - 1]
-                element_nodes = [instance.nodes[n] for n in element.connectivity]
+                element_nodes = [instance.nodes[n-1] for n in element.connectivity]
                 elements[e_label] = C3D8(element_nodes)
             row = np.linspace(0, permanent_strain.shape[0]*6)
             col = np.zeros(permanent_strain.shape[0]*6)
