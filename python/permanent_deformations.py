@@ -51,6 +51,7 @@ if __name__ == '__main__':
                                 dispalcement_comp[3*k+1] = 3*(n - 1) + 1
                                 dispalcement_comp[3*k + 2] = 3*(n - 1) + 2
                             print(dispalcement_comp)
+                            print(element.node_labels)
                             sadasdasda
                             col[8*6*i+6*j+comp:8*6*i+6*j+comp+8] = element.node_labels
                         except ValueError:
