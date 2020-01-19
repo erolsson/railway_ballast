@@ -14,7 +14,7 @@ from abaqus_functions.odb_io_functions import read_field_from_odb
 from FEM_functions.elements import C3D8
 
 simulation_directory = os.path.expanduser('~/railway_ballast/abaqus2014/')
-results_odb_filename = simulation_directory + '/results_20200119.odb'
+results_odb_filename = simulation_directory + '/Job-14.odb'
 
 BoundaryCondition = namedtuple('BoundaryCondition', ['set_name', 'type', 'component'])
 
@@ -39,6 +39,19 @@ if __name__ == '__main__':
 
             results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
             instance = results_odb.rootAssembly.instances[instance_name]
+            print(len(instance.nodes))
+            permanent_deformations = np.zeros(len(instance.nodes)*3)
+            bc_displacements = set()
+            for bc in boundary_conditions:
+                if bc.type == 'surface':
+                    base = results_odb.rootAssembly.surfaces[bc.set_name]
+                elif bc.type == 'node_set':
+                    base = results_odb.rootAssembly.nodeSets[bc.set_name]
+                idx = base.instances.index(instance)
+                nodes = base.nodes[idx]
+                for n in nodes:
+                    bc_displacements.add(3*(n.label - 1) + bc.component - 1)
+            print(len(bc_displacements))
             for e_label in np.unique(element_labels):
                 element = instance.elements[e_label - 1]
                 element_nodes = [instance.nodes[n-1] for n in element.connectivity]
