@@ -17,7 +17,7 @@ results_odb_filename = simulation_directory + '/results.odb'
 
 if __name__ == '__main__':
     results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
-    instance_names = odb.rootAssembly.instances.keys()
+    instance_names = results_odb.rootAssembly.instances.keys()
     instance_names = [name for name in instance_names if 'BALLAST' in name]
     step_names = results_odb.steps.keys()
     results_odb.close()
