@@ -77,6 +77,8 @@ def create_empty_odb(new_odb_file_name, old_odb_file_name):
         _copy_sets(new_instance, old_instance)
         new_odb.update()
         new_odb.save()
+        new_odb.close()
+        old_odb.close()
 
 
 if __name__ == '__main__':
