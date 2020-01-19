@@ -42,7 +42,7 @@ if __name__ == '__main__':
             instance = results_odb.rootAssembly.instances[instance_name]
             print(len(instance.nodes))
             permanent_deformations = np.zeros(len(instance.nodes)*3)
-            bc_displacements = set()
+            bc_dofs = []
             for bc in boundary_conditions:
                 if bc.type == 'surface':
                     base = results_odb.rootAssembly.surfaces[bc.set_name]
@@ -52,8 +52,9 @@ if __name__ == '__main__':
                 nodes = base.nodes[idx]
                 print(len(nodes), "in set", bc.set_name)
                 for n in nodes:
-                    bc_displacements.add(3*(n.label - 1) + bc.component - 1)
-            print(len(bc_displacements))
+                    bc_dofs.append(3*(n.label - 1) + bc.component - 1)
+            print(len(bc_dofs))
+            print(len(set(bc_dofs)))
             for e_label in np.unique(element_labels):
                 element = instance.elements[e_label - 1]
                 element_nodes = [instance.nodes[n-1] for n in element.connectivity]
