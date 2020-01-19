@@ -34,7 +34,7 @@ if __name__ == '__main__':
         static_stress = read_field_from_odb(field_id='S', odb_file_name=stress_odb_filename,
                                             instance_name=instance_name, step_name='gravity')/1e3
         stress2 = read_field_from_odb(field_id='S', odb_file_name=stress_odb_filename,
-                                      instance_name=instance_name, step_name='gravity')/1e3
+                                      instance_name=instance_name, step_name='train')/1e3
         ep = 0*static_stress
         if "BALLAST" in instance_name:
             cyclic_stress = stress2 - static_stress
