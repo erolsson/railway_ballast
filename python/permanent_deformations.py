@@ -52,7 +52,7 @@ if __name__ == '__main__':
                 nodes = base.nodes[idx]
                 print(len(nodes), "in set", bc.set_name)
                 for n in nodes:
-                    print(3*(n.label - 1) + bc.component - 1)
+                    print(n.label, 3*(n.label - 1) + bc.component - 1)
                     bc_dofs.append(3*(n.label - 1) + bc.component - 1)
             print(len(bc_dofs))
             print(len(set(bc_dofs)))
