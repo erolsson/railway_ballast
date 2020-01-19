@@ -39,6 +39,7 @@ if __name__ == '__main__':
             col = np.zeros(permanent_strain.shape[0]*6*24)
             values = np.zeros(permanent_strain.shape[0]*6*24)
             print(permanent_strain.shape, len(element_labels))
+            strain_line = 0
             for i in range(permanent_strain.shape[0]/8):
                 element = elements[element_labels[8*i]]
                 for j, gp in enumerate(C3D8.gauss_points):
@@ -50,11 +51,9 @@ if __name__ == '__main__':
                                 dispalcement_comp[3*k] = 3*(n-1)
                                 dispalcement_comp[3*k+1] = 3*(n - 1) + 1
                                 dispalcement_comp[3*k + 2] = 3*(n - 1) + 2
-                            print(dispalcement_comp)
-                            print(element.node_labels)
-                            sadasdasda
-                            col[8*6*i+6*j+comp:8*6*i+6*j+comp+8] = element.node_labels
+                            col[strain_line*24:strain_line*24+24] = dispalcement_comp
                         except ValueError:
-                            print(i, j, comp, 8*6*i + 6*j + comp, 8*6*i + 6*j + comp + 8)
-                            print(col[(8*6*i + 6*j + comp):(8*6*i + 6*j + comp + 8)], element.node_labels)
+                            print(strain_line, len(row), permanent_strain.shape)
+                            sdfdsfsdffs
+                        strain_line += 1
             print(col)
