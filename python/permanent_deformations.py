@@ -12,7 +12,7 @@ from abaqus_functions.odb_io_functions import read_field_from_odb
 from FEM_functions.elements import C3D8
 
 simulation_directory = os.path.expanduser('~/railway_ballast/abaqus2014/')
-results_odb_filename = simulation_directory + '/results.odb'
+results_odb_filename = simulation_directory + '/results_20200119.odb'
 
 
 if __name__ == '__main__':
@@ -35,23 +35,26 @@ if __name__ == '__main__':
                 element = instance.elements[e_label - 1]
                 element_nodes = [instance.nodes[n-1] for n in element.connectivity]
                 elements[e_label] = C3D8(element_nodes)
-            row = np.linspace(0, permanent_strain.shape[0]*6*24)
+            row = np.zeros(permanent_strain.shape[0]*6*24)
             col = np.zeros(permanent_strain.shape[0]*6*24)
             values = np.zeros(permanent_strain.shape[0]*6*24)
             print(permanent_strain.shape, len(element_labels))
             strain_line = 0
+            dispalcement_comp = np.zeros(24)
             for i in range(permanent_strain.shape[0]/8):
                 element = elements[element_labels[8*i]]
                 for j, gp in enumerate(C3D8.gauss_points):
                     B = element.B(*gp)
                     for comp in range(6):
                         try:
-                            dispalcement_comp = np.zeros(24)
                             for k, n in enumerate(element.node_labels):
                                 dispalcement_comp[3*k] = 3*(n-1)
                                 dispalcement_comp[3*k+1] = 3*(n - 1) + 1
                                 dispalcement_comp[3*k + 2] = 3*(n - 1) + 2
+
                             col[strain_line*24:strain_line*24+24] = dispalcement_comp
+                            row[strain_line*24:strain_line*24 + 24] = strain_line
+                            values[strain_line*24:strain_line*24 + 24] = B[comp, :]
                         except ValueError:
                             print(strain_line, len(row), permanent_strain.shape)
                             sdfdsfsdffs
