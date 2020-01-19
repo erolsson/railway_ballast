@@ -50,6 +50,7 @@ if __name__ == '__main__':
                     base = results_odb.rootAssembly.nodeSets[bc.set_name]
                 idx = base.instances.index(instance)
                 nodes = base.nodes[idx]
+                print(len(nodes), "in set", bc.set_name)
                 for n in nodes:
                     bc_displacements.add(3*(n.label - 1) + bc.component - 1)
             print(len(bc_displacements))
