@@ -28,7 +28,7 @@ if __name__ == '__main__':
     instance_names = results_odb.rootAssembly.instances.keys()
     instance_names = [name for name in instance_names if 'BALLAST' in name]
     step_names = results_odb.steps.keys()
-    step_names = [step_name for step_name in step_names if step_name not in ['gravity', 'train']]
+    step_names = [step_name for step_name in step_names if step_name.lower() not in ['gravity', 'train']]
     results_odb.close()
 
     for step_name in step_names:
