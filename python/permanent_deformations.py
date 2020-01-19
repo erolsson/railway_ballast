@@ -40,7 +40,6 @@ if __name__ == '__main__':
 
             results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
             instance = results_odb.rootAssembly.instances[instance_name]
-            print(len(instance.nodes))
             permanent_deformations = np.zeros(len(instance.nodes)*3)
             bc_dofs = []
             for bc in boundary_conditions:
@@ -55,9 +54,7 @@ if __name__ == '__main__':
                 for n in nodes:
                     set_nodes.append(3*(n.label - 1) + bc.component - 1)
                     bc_dofs.append(3*(n.label - 1) + bc.component - 1)
-                    print(len(set_nodes), len(set(set_nodes)), set_nodes[-4:], n.label)
-            print(len(bc_dofs))
-            print(len(set(bc_dofs)))
+
             for e_label in np.unique(element_labels):
                 element = instance.elements[e_label - 1]
                 element_nodes = [instance.nodes[n-1] for n in element.connectivity]
@@ -65,9 +62,8 @@ if __name__ == '__main__':
             row = np.zeros(permanent_strain.shape[0]*6*24)
             col = np.zeros(permanent_strain.shape[0]*6*24)
             values = np.zeros(permanent_strain.shape[0]*6*24)
-            print(permanent_strain.shape, len(element_labels))
             strain_line = 0
-            dispalcement_comp = np.zeros(24)
+            displacement_comp = np.zeros(24)
             for i in range(permanent_strain.shape[0]/8):
                 element = elements[element_labels[8*i]]
                 for j, gp in enumerate(C3D8.gauss_points):
@@ -75,11 +71,11 @@ if __name__ == '__main__':
                     for comp in range(6):
                         try:
                             for k, n in enumerate(element.node_labels):
-                                dispalcement_comp[3*k] = 3*(n-1)
-                                dispalcement_comp[3*k+1] = 3*(n - 1) + 1
-                                dispalcement_comp[3*k + 2] = 3*(n - 1) + 2
+                                displacement_comp[3*k] = 3*(n - 1)
+                                displacement_comp[3*k + 1] = 3*(n - 1) + 1
+                                displacement_comp[3*k + 2] = 3*(n - 1) + 2
 
-                            col[strain_line*24:strain_line*24+24] = dispalcement_comp
+                            col[strain_line*24:strain_line*24+24] = displacement_comp
                             row[strain_line*24:strain_line*24 + 24] = strain_line
                             values[strain_line*24:strain_line*24 + 24] = B[comp, :]
                         except ValueError:
