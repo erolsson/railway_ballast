@@ -48,7 +48,7 @@ if __name__ == '__main__':
                                        - cyclic_stress[:, 0]*cyclic_stress[:, 2]
                                        - cyclic_stress[:, 1]*cyclic_stress[:, 2]
                                        + 3*np.sum(cyclic_stress[:, 3:]**2, 1))
-
+            print(von_Mises_cyclic[0:10])
             direction = 1.5*deviator
             for i in range(6):
                 direction[:, i] /= von_Mises_cyclic
