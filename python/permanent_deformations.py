@@ -14,10 +14,11 @@ from FEM_functions.elements import C3D8
 simulation_directory = os.path.expanduser('~/railway_ballast/abaqus2014/')
 results_odb_filename = simulation_directory + '/results.odb'
 
-instance_names = ['BALLAST_2', 'BALLAST-1']
 
 if __name__ == '__main__':
     results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
+    instance_names = odb.rootAssembly.instances.keys()
+    instance_names = [name for name in instance_names if 'BALLAST' in name]
     step_names = results_odb.steps.keys()
     results_odb.close()
 
@@ -34,9 +35,9 @@ if __name__ == '__main__':
                 element = instance.elements[e_label - 1]
                 element_nodes = [instance.nodes[n-1] for n in element.connectivity]
                 elements[e_label] = C3D8(element_nodes)
-            row = np.linspace(0, permanent_strain.shape[0]*6)
-            col = np.zeros(permanent_strain.shape[0]*6)
-            values = np.zeros(permanent_strain.shape[0]*6)
+            row = np.linspace(0, permanent_strain.shape[0]*6*24)
+            col = np.zeros(permanent_strain.shape[0]*6*24)
+            values = np.zeros(permanent_strain.shape[0]*6*24)
             print(permanent_strain.shape, len(element_labels))
             for i in range(permanent_strain.shape[0]/8):
                 element = elements[element_labels[8*i]]
@@ -44,6 +45,13 @@ if __name__ == '__main__':
                     B = element.B(*gp)
                     for comp in range(6):
                         try:
+                            dispalcement_comp = np.zeros(24)
+                            for k, n in enumerate(element.node_labels):
+                                dispalcement_comp[3*k] = 3*(n-1)
+                                dispalcement_comp[3*k+1] = 3*(n - 1) + 1
+                                dispalcement_comp[3*k + 2] = 3*(n - 1) + 2
+                            print(dispalcement_comp)
+                            sadasdasda
                             col[8*6*i+6*j+comp:8*6*i+6*j+comp+8] = element.node_labels
                         except ValueError:
                             print(i, j, comp, 8*6*i + 6*j + comp, 8*6*i + 6*j + comp + 8)
