@@ -1,4 +1,5 @@
 from __future__ import print_function
+from collections import namedtuple
 from common import scipy
 from common import numpy as np
 from scipy.sparse import coo_matrix
@@ -7,6 +8,7 @@ import odbAccess
 from abaqusConstants import ELEMENT_NODAL
 
 import os
+import sys
 
 from abaqus_functions.odb_io_functions import read_field_from_odb
 from FEM_functions.elements import C3D8
@@ -14,8 +16,14 @@ from FEM_functions.elements import C3D8
 simulation_directory = os.path.expanduser('~/railway_ballast/abaqus2014/')
 results_odb_filename = simulation_directory + '/results_20200119.odb'
 
+BoundaryCondition = namedtuple('BoundaryCondition', ['set_name', 'type', 'component'])
 
 if __name__ == '__main__':
+    boundary_conditions = [BoundaryCondition(set_name='M_SURF_BALLAST2', type='surface', component=2),
+                           BoundaryCondition(set_name='SET-CENTER', type='node_set', component=1),
+                           BoundaryCondition(set_name='SET-FRONT', type='node_set', component=3),
+                           BoundaryCondition(set_name='SET-BACK', type='node_set', component=3)]
+
     results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
     instance_names = results_odb.rootAssembly.instances.keys()
     instance_names = [name for name in instance_names if 'BALLAST' in name]
@@ -56,7 +64,8 @@ if __name__ == '__main__':
                             row[strain_line*24:strain_line*24 + 24] = strain_line
                             values[strain_line*24:strain_line*24 + 24] = B[comp, :]
                         except ValueError:
-                            print(strain_line, len(row), permanent_strain.shape)
-                            sdfdsfsdffs
+                            print("strange things happening")
+                            print(sys.exit())
                         strain_line += 1
+
             print(col)
