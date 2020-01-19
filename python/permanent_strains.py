@@ -19,8 +19,8 @@ if __name__ == '__main__':
                                     1.14929617e+01, 1.12439205e+01])
 
     simulation_directory = os.path.expanduser('~/railway_ballast/abaqus2014/')
-    stress_odb_filename = simulation_directory + '/embankment_EO.odb'
-    results_odb_filename = simulation_directory + '/embankment_EO.odb'
+    stress_odb_filename = simulation_directory + '/JOb-14.odb'
+    results_odb_filename = simulation_directory + '/results_20200119.odb'
     if not os.path.exists(results_odb_filename):
         print("Creating new odb with name:")
         print("\t" + results_odb_filename)
