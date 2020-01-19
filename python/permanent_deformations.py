@@ -55,7 +55,7 @@ if __name__ == '__main__':
                 for n in nodes:
                     set_nodes.append(3*(n.label - 1) + bc.component - 1)
                     bc_dofs.append(3*(n.label - 1) + bc.component - 1)
-                    print(len(set_nodes), len(set(set_nodes)), set_nodes[-4:])
+                    print(len(set_nodes), len(set(set_nodes)), set_nodes[-4:], n.label)
             print(len(bc_dofs))
             print(len(set(bc_dofs)))
             for e_label in np.unique(element_labels):
