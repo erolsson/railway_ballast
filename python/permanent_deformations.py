@@ -44,6 +44,7 @@ if __name__ == '__main__':
             permanent_deformations = np.zeros(len(instance.nodes)*3)
             bc_dofs = []
             for bc in boundary_conditions:
+                set_nodes = []
                 if bc.type == 'surface':
                     base = results_odb.rootAssembly.surfaces[bc.set_name]
                 elif bc.type == 'node_set':
@@ -52,8 +53,10 @@ if __name__ == '__main__':
                 nodes = base.nodes[idx]
                 print(len(nodes), "in set", bc.set_name)
                 for n in nodes:
-                    print(n.label, 3*(n.label - 1) + bc.component - 1)
+                    set_nodes.append(3*(n.label - 1) + bc.component - 1)
                     bc_dofs.append(3*(n.label - 1) + bc.component - 1)
+                    print(len(set_nodes))
+                    print(len(set(set_nodes)))
             print(len(bc_dofs))
             print(len(set(bc_dofs)))
             for e_label in np.unique(element_labels):
