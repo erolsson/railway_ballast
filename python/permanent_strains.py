@@ -31,33 +31,41 @@ if __name__ == '__main__':
     instance_names = stress_odb.rootAssembly.instances.keys()
     stress_odb.close()
     for instance_name in instance_names:
-        stress = read_field_from_odb(field_id='S', odb_file_name=stress_odb_filename, instance_name=instance_name)/1e3
-        ep = 0*stress
+        static_stress = read_field_from_odb(field_id='S', odb_file_name=stress_odb_filename,
+                                            instance_name=instance_name, step_name='gravity')/1e3
+        stress2 = read_field_from_odb(field_id='S', odb_file_name=stress_odb_filename,
+                                      instance_name=instance_name, step_name='gravity')/1e3
+        ep = 0*static_stress
         if "BALLAST" in instance_name:
-            pressure = -np.sum(stress[:, 0:3], 1)/3
-            deviator = np.copy(stress)
+            cyclic_stress = stress2 - static_stress
+            pressure_static = -np.sum(static_stress[:, 0:3], 1)/3
+            pressure_cyclic = -np.sum(cyclic_stress[:, 0:3], 1)/3
+            deviator = np.copy(cyclic_stress)
             for i in range(3):
-                deviator[:, i] += pressure
-            von_Mises = np.sqrt(np.sum(stress[:, 0:3]**2, 1) - stress[:, 0]*stress[:, 1] -
-                                stress[:, 0]*stress[:, 2] - stress[:, 1]*stress[:, 2] + 3*np.sum(stress[:, 3:]**2, 1))
+                deviator[:, i] += pressure_cyclic
+
+            von_Mises_cyclic = np.sqrt(np.sum(cyclic_stress[:, 0:3]**2, 1) - cyclic_stress[:, 0]*cyclic_stress[:, 1]
+                                       - cyclic_stress[:, 0]*cyclic_stress[:, 2]
+                                       - cyclic_stress[:, 1]*cyclic_stress[:, 2]
+                                       + 3*np.sum(cyclic_stress[:, 3:]**2, 1))
+
             direction = 1.5*deviator
             for i in range(6):
-                direction[:, i] /= von_Mises
-            ep = 0*deviator
+                direction[:, i] /= von_Mises_cyclic
 
             print(instance_name)
             job_list = []
-            for i in range(pressure.shape[0]):
+            for i in range(pressure_static.shape[0]):
                 job_list.append((permanent_strain, [],
-                                 {"cycles": cycles, "p": pressure[i], "q": von_Mises[i],
+                                 {"cycles": cycles, "p": pressure_static[i], "q": von_Mises_cyclic[i],
                                  'parameters': material_parameters}))
             ep_magnitude = np.array(multi_processer(job_list, delay=0., timeout=3600, cpus=8))
             ep_magnitude[ep_magnitude > 1.] = 1.
             for i in range(6):
                 ep[:, i] = ep_magnitude*direction[:, i]
             max_idx = np.argmax(ep_magnitude)
-            print("Maximum permanent strain is", ep[max_idx], "The pressure is", pressure[max_idx],
-                  "and von Mises is", von_Mises[max_idx])
+            print("Maximum permanent strain is", ep[max_idx], "The pressure is", pressure_static[max_idx],
+                  "and von Mises is", von_Mises_cyclic[max_idx])
 
         write_field_to_odb(field_data=ep, field_id='EP', odb_file_name=results_odb_filename,
                            step_name=str(cycles) + '_cycles', instance_name=instance_name, frame_number=0)
