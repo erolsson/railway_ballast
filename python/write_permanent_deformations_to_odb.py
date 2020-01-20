@@ -1,21 +1,15 @@
 from __future__ import print_function
-import pickle
 from collections import namedtuple
-from common import scipy
 import pickle
 from common import numpy as np
-from scipy.sparse import coo_matrix
-from scipy.sparse.linalg import lsqr
 
 from abaqusConstants import NODAL
 import odbAccess
 
 import os
-import sys
 
 from abaqus_functions.odb_io_functions import read_field_from_odb
 from abaqus_functions.odb_io_functions import write_field_to_odb
-from FEM_functions.elements import C3D8
 
 simulation_directory = os.path.expanduser('~/railway_ballast/abaqus2014/')
 results_odb_filename = simulation_directory + '/Job-14.odb'
