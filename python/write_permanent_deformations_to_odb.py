@@ -61,9 +61,9 @@ if __name__ == '__main__':
             print(np.mean(up_red))
             bc_set = set(bc_dofs)
             j = 0
+            print(up.shape[0], up_red.shape[0], up_red.shape[0] + len(bc_set))
             for i in range(up.shape[0]):
                 if i not in bc_set:
-                    print(up_red[j])
                     up[i] = up_red[j]
                     j += 1
 
