@@ -66,7 +66,7 @@ if __name__ == '__main__':
                 if i not in bc_set:
                     up[i] = up_red[j]
                     j += 1
-
+            print(up[0:20])
             print(np.mean(up))
             counter = 0
             for i, n in enumerate(nodes):
