@@ -66,9 +66,12 @@ if __name__ == '__main__':
                     up[i] = up_red[j]
                     j += 1
 
+            print(np.mean(up))
             counter = 0
             for i, n in enumerate(nodes):
                 permanent_deformation[i, :] = up[3*(n.label-1):3*n.label]
+            for i in range(3):
+                print(np.min(permanent_deformation[:, i]), np.max(permanent_deformation[:, i]))
             results_odb.close()
             write_field_to_odb(permanent_deformation, 'UP', results_odb_filename, step_name,
                                instance_name=instance_name, position=NODAL, set_name='BALLAST')
