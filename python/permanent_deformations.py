@@ -37,7 +37,7 @@ if __name__ == '__main__':
             elements = {}
             permanent_strain, _, element_labels = read_field_from_odb('EP', results_odb_filename, step_name=step_name,
                                                                       instance_name=instance_name,
-                                                                      get_position_numbers=True)
+                                                                      get_position_numbers=True, frame_number=0)
 
             results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
             instance = results_odb.rootAssembly.instances[instance_name]
