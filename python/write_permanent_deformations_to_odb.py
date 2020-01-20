@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     for step_name in step_names:
         for instance_name in instance_names:
-            permanent_deformation, nodes, _ = read_field_from_odb('U', results_odb_filename, step_name=step_name,
+            permanent_deformation, nodes, _ = read_field_from_odb('U', results_odb_filename, step_name='gravity',
                                                                   instance_name=instance_name,
                                                                   get_position_numbers=True, position=NODAL)
 
