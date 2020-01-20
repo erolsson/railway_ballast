@@ -53,7 +53,7 @@ if __name__ == '__main__':
                 for n in nodes:
                     set_nodes.append(3*(n.label - 1) + bc.component - 1)
                     bc_dofs.append(3*(n.label - 1) + bc.component - 1)
-
+            results_odb.close()
             bc_dofs = np.unique(np.array(bc_dofs))
 
             with open('up.pkl') as pickle_handle:

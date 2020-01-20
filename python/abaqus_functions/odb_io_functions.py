@@ -4,7 +4,7 @@ import odbAccess
 import numpy as np
 
 from abaqusConstants import INTEGRATION_POINT, ELEMENT_NODAL, NODAL, CYLINDRICAL, CENTROID, ELEMENT_FACE, TIME
-from abaqusConstants import SCALAR, TENSOR_3D_FULL
+from abaqusConstants import SCALAR, TENSOR_3D_FULL, VECTOR
 
 
 CoordinateSystem = namedtuple('CoordinateSystem', ['name', 'origin', 'point1', 'point2', 'system_type'])
@@ -188,7 +188,7 @@ def write_field_to_odb(field_data, field_id, odb_file_name, step_name, instance_
     for obj in objects:
         object_numbers.append(obj.label)
 
-    field_types = {1: SCALAR, 6: TENSOR_3D_FULL}
+    field_types = {1: SCALAR, 6: TENSOR_3D_FULL, 3: VECTOR}
 
     if len(field_data.shape) == 1:
         field_data = field_data[:, np.newaxis]
