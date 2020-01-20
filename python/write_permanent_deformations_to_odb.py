@@ -34,11 +34,11 @@ if __name__ == '__main__':
             permanent_deformation, nodes, _ = read_field_from_odb('U', results_odb_filename, step_name='gravity',
                                                                   instance_name=instance_name,
                                                                   set_name='BALLAST_ALL.BALLAST',
-                                                                  get_position_numbers=True, position=NODAL)
+                                                                  get_position_numbers=True, position=NODAL)*0
 
             results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
             instance = results_odb.rootAssembly.instances[instance_name]
-            permanent_deformations = np.zeros(len(instance.nodes)*3)
+            up = np.zeros(len(instance.nodes)*3)
             bc_dofs = []
             for bc in boundary_conditions:
                 set_nodes = []
@@ -56,15 +56,15 @@ if __name__ == '__main__':
             bc_dofs = np.unique(np.array(bc_dofs))
 
             with open('up.pkl') as pickle_handle:
-                up = pickle.load(pickle_handle)
+                up_red = pickle.load(pickle_handle)
+
             bc_set = set(bc_dofs)
+            for i in up.shape[0]:
+                if i not in bc_set:
+                    up[i] = up_red[i]
+
             counter = 0
-            for line in permanent_deformation.shape[0]:
-                disp = np.zeros(3)
-                for i in range(3):
-                    if 3*line + i not in bc_set:
-                        disp[i] = up[counter]
-                        counter += 1
-                permanent_deformation[line, :] = disp
+            for i, n in enumerate(nodes):
+                permanent_deformation[i, :] = up[3*(n-1):3*n]
             write_field_to_odb(permanent_deformation, 'UP', results_odb_filename, step_name,
                                instance_name=instance_name, position=NODAL)

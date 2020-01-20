@@ -52,18 +52,29 @@ def read_field_from_odb(field_id, odb_file_name, step_name=None, frame_number=-1
 
     if instance_name is None:
         if len(odb.rootAssembly.instances) == 1:
-            element_base = odb.rootAssembly.instances[odb.rootAssembly.instances.keys()[0]]
+            base = odb.rootAssembly.instances[odb.rootAssembly.instances.keys()[0]]
         else:
             raise ValueError('odb has multiple instances, please specify an instance')
     else:
-        element_base = odb.rootAssembly.instances[instance_name]
-    if set_name is None:
-        if 'ALL_ELEMENTS' not in element_base.elementSets:
-            elements = element_base.elements
-            element_base.ElementSet(name='ALL_ELEMENTS', elements=elements)
-        element_set = element_base.elementSets['ALL_ELEMENTS']
+        base = odb.rootAssembly.instances[instance_name]
+    if position in [INTEGRATION_POINT, CENTROID, ELEMENT_NODAL, ELEMENT_FACE]:
+        set_dict = base.elementSets
+        set_func = base.ElementSet
+        all_name = 'ALL_ELEMENTS'
+        object_list = base.elements
     else:
-        element_set = element_base.elementSets[set_name]
+        set_dict = base.nodeSets
+        set_func = base.NodeSet
+        all_name = 'ALL_NODES'
+        object_list = base.nodes
+
+    if set_name is None:
+        if all_name not in set_dict:
+            objects = object_list
+            set_func(name=all_name, elements=objects)
+        element_set = set_dict[all_name]
+    else:
+        element_set = set_dict[set_name]
 
     if step_name is None:
         step_name = odb.steps.keys()[-1]
