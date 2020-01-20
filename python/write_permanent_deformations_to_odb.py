@@ -60,9 +60,11 @@ if __name__ == '__main__':
                 up_red = pickle.load(pickle_handle)
 
             bc_set = set(bc_dofs)
+            j = 0
             for i in range(up.shape[0]):
                 if i not in bc_set:
-                    up[i] = up_red[i]
+                    up[i] = up_red[j]
+                    j += 1
 
             counter = 0
             for i, n in enumerate(nodes):
