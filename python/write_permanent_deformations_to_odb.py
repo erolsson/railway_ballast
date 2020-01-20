@@ -64,7 +64,9 @@ if __name__ == '__main__':
                 if i not in bc_set:
                     up[i] = up_red[j]
                     j += 1
-            counter = 0
+            idx = np.argmin(up[1::3])
+            print(idx)
+
             for i, n in enumerate(node_labels):
                 permanent_deformation[i, :] = up[3*(n-1):3*n]
             results_odb.close()
