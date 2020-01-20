@@ -5,7 +5,6 @@ from common import numpy as np
 from scipy.sparse import coo_matrix
 
 import odbAccess
-from abaqusConstants import ELEMENT_NODAL
 
 import os
 import sys
@@ -66,6 +65,7 @@ if __name__ == '__main__':
             values = np.zeros(permanent_strain.shape[0]*6*24)
             strain_line = 0
             displacement_comp = np.zeros(24)
+            ep = np.zeros(permanent_strain.shape[0]*6)
             for i in range(permanent_strain.shape[0]/8):
                 element = elements[element_labels[8*i]]
                 for k, n in enumerate(element.node_labels):
@@ -75,6 +75,7 @@ if __name__ == '__main__':
                 for j, gp in enumerate(C3D8.gauss_points):
                     B = element.B(*gp)
                     for comp in range(6):
+                        ep[i*8+j + comp] = permanent_strain[i*8+j, comp]
                         col[strain_line*24:strain_line*24+24] = displacement_comp
                         row[strain_line*24:strain_line*24 + 24] = strain_line
                         values[strain_line*24:strain_line*24 + 24] = B[comp, :]
@@ -87,4 +88,6 @@ if __name__ == '__main__':
             cols_to_keep = np.where(np.logical_not(np.in1d(all_cols, bc_dofs)))[0]
 
             B_red = B_matrix[:, cols_to_keep]
-            print('BG_red shape', B_matrix.shape)
+            print('BG_red shape', B_red.shape)
+            up_red = scipy.sparse.linalg.lsqr(B_red, ep)
+            print(np.max(up_red), np.min(up_red))
