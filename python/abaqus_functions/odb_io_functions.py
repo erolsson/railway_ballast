@@ -187,11 +187,12 @@ def write_field_to_odb(field_data, field_id, odb_file_name, step_name, instance_
     object_numbers = []
     for obj in objects:
         object_numbers.append(obj.label)
-
+    print(len(object_numbers))
     field_types = {1: SCALAR, 6: TENSOR_3D_FULL, 3: VECTOR}
 
     if len(field_data.shape) == 1:
         field_data = field_data[:, np.newaxis]
+    print(field_data.shape)
     field_type = field_types[field_data.shape[1]]
     field_data_to_frame = tuple(field_data[:, :])
     if frame_value is None:
