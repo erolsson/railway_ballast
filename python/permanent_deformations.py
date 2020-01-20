@@ -90,5 +90,5 @@ if __name__ == '__main__':
 
             B_red = B_matrix[:, cols_to_keep]
             print('BG_red shape', B_red.shape)
-            up_red = lsqr(B_red, ep)
+            up_red = lsqr(B_red, ep, show=True)
             print(np.max(up_red), np.min(up_red))
