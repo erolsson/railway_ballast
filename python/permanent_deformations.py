@@ -4,6 +4,7 @@ from common import scipy
 from common import numpy as np
 from scipy.sparse import coo_matrix
 from scipy.sparse.linalg import lsqr
+from scipy.sparse.linalg import spsolve
 
 import odbAccess
 
@@ -90,5 +91,11 @@ if __name__ == '__main__':
 
             B_red = B_matrix[:, cols_to_keep]
             print('BG_red shape', B_red.shape)
-            up_red = lsqr(B_red, ep, show=True)
+            print("Computing system matrix")
+            ata = B_red.transpose()*B_red
+            print("Computing rhs")
+            atb = B_red.transpose()*ep
+
+            print("Solving system")
+            up_red = spsolve(B_red, atb)
             print(np.max(up_red), np.min(up_red))
