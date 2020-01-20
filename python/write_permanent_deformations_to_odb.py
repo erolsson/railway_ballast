@@ -1,5 +1,5 @@
-import pickle
 from __future__ import print_function
+import pickle
 from collections import namedtuple
 from common import scipy
 import pickle
