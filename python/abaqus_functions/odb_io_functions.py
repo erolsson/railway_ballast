@@ -74,7 +74,6 @@ def read_field_from_odb(field_id, odb_file_name, step_name=None, frame_number=-1
             set_func(name=all_name, elements=objects)
         element_set = set_dict[all_name]
     else:
-        print(set_dict)
         element_set = set_dict[set_name]
 
     if step_name is None:
