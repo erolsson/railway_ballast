@@ -58,7 +58,7 @@ if __name__ == '__main__':
 
             with open('up.pkl') as pickle_handle:
                 up_red = pickle.load(pickle_handle)
-
+            print(np.mean(up_red))
             bc_set = set(bc_dofs)
             j = 0
             for i in range(up.shape[0]):
