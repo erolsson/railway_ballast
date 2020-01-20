@@ -7,6 +7,7 @@ from common import numpy as np
 from scipy.sparse import coo_matrix
 from scipy.sparse.linalg import lsqr
 
+from abaqusConstants import NODAL
 import odbAccess
 
 import os
@@ -38,7 +39,7 @@ if __name__ == '__main__':
         for instance_name in instance_names:
             permanent_deformation, nodes, _ = read_field_from_odb('U', results_odb_filename, step_name=step_name,
                                                                   instance_name=instance_name,
-                                                                  get_position_numbers=True)
+                                                                  get_position_numbers=True, position=NODAL)
 
             results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
             instance = results_odb.rootAssembly.instances[instance_name]
@@ -71,4 +72,4 @@ if __name__ == '__main__':
                         counter += 1
                 permanent_deformation[line, :] = disp
             write_field_to_odb(permanent_deformation, 'UP', results_odb_filename, step_name,
-                               instance_name=instance_name)
+                               instance_name=instance_name, position=NODAL)
