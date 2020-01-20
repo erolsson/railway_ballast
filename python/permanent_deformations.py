@@ -3,6 +3,7 @@ from collections import namedtuple
 from common import scipy
 from common import numpy as np
 from scipy.sparse import coo_matrix
+from scipy.sparse.linalg import lsqr
 
 import odbAccess
 
@@ -89,5 +90,5 @@ if __name__ == '__main__':
 
             B_red = B_matrix[:, cols_to_keep]
             print('BG_red shape', B_red.shape)
-            up_red = scipy.sparse.linalg.lsqr(B_red, ep)
+            up_red = lsqr(B_red, ep)
             print(np.max(up_red), np.min(up_red))
