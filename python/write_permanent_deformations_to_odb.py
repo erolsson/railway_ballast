@@ -31,10 +31,10 @@ if __name__ == '__main__':
 
     for step_name in step_names:
         for instance_name in instance_names:
-            permanent_deformation, nodes, _ = read_field_from_odb('U', results_odb_filename, step_name='gravity',
-                                                                  instance_name=instance_name,
-                                                                  set_name='BALLAST',
-                                                                  get_position_numbers=True, position=NODAL)
+            permanent_deformation, node_labels, _ = read_field_from_odb('U', results_odb_filename, step_name='gravity',
+                                                                        instance_name=instance_name,
+                                                                        set_name='BALLAST',
+                                                                        get_position_numbers=True, position=NODAL)
             permanent_deformation *= 0
 
             results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
@@ -65,9 +65,8 @@ if __name__ == '__main__':
                     up[i] = up_red[j]
                     j += 1
             counter = 0
-            for i, n in enumerate(nodes):
-                print(up[3*(n.label-1):3*n.label], 3*(n.label-1), 3*n.label)
-                permanent_deformation[i, :] = up[3*(n.label-1):3*n.label]
+            for i, n in enumerate(node_labels):
+                permanent_deformation[i, :] = up[3*(n-1):3*n]
             results_odb.close()
             write_field_to_odb(permanent_deformation, 'UP', results_odb_filename, step_name,
                                instance_name=instance_name, position=NODAL, set_name='BALLAST')
