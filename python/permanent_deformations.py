@@ -77,7 +77,7 @@ if __name__ == '__main__':
                 for j, gp in enumerate(C3D8.gauss_points):
                     B = element.B(*gp)
                     for comp in range(6):
-                        ep[i*8+j + comp] = permanent_strain[i*8+j, comp]
+                        ep[i*8*6 + j*6 + comp] = permanent_strain[i*8+j, comp]
                         col[strain_line*24:strain_line*24+24] = displacement_comp
                         row[strain_line*24:strain_line*24 + 24] = strain_line
                         values[strain_line*24:strain_line*24 + 24] = B[comp, :]
