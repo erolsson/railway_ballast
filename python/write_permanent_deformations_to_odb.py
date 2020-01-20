@@ -69,6 +69,7 @@ if __name__ == '__main__':
             print(np.mean(up))
             counter = 0
             for i, n in enumerate(nodes):
+                print(up[3*(n.label-1):3*n.label])
                 permanent_deformation[i, :] = up[3*(n.label-1):3*n.label]
             for i in range(3):
                 print(np.min(permanent_deformation[:, i]), np.max(permanent_deformation[:, i]),
