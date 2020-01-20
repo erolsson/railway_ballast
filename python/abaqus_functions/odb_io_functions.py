@@ -160,7 +160,7 @@ def write_field_to_odb(field_data, field_id, odb_file_name, step_name, instance_
     :return:                        Nothing
     """
     odb = odbAccess.openOdb(odb_file_name, readOnly=False)
-
+    print("Starting write field")
     if step_name not in odb.steps:
         step = odb.Step(name=step_name, description=step_description, domain=TIME, timePeriod=1)
     else:
