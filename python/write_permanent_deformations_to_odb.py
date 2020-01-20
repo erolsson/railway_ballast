@@ -53,7 +53,7 @@ if __name__ == '__main__':
                 for n in nodes:
                     set_nodes.append(3*(n.label - 1) + bc.component - 1)
                     bc_dofs.append(3*(n.label - 1) + bc.component - 1)
-            results_odb.close()
+
             bc_dofs = np.unique(np.array(bc_dofs))
 
             with open('up.pkl') as pickle_handle:
@@ -69,5 +69,6 @@ if __name__ == '__main__':
             counter = 0
             for i, n in enumerate(nodes):
                 permanent_deformation[i, :] = up[3*(n.label-1):3*n.label]
+            results_odb.close()
             write_field_to_odb(permanent_deformation, 'UP', results_odb_filename, step_name,
                                instance_name=instance_name, position=NODAL, set_name='BALLAST')
