@@ -55,6 +55,8 @@ if __name__ == '__main__':
                     set_nodes.append(3*(n.label - 1) + bc.component - 1)
                     bc_dofs.append(3*(n.label - 1) + bc.component - 1)
 
+            bc_dofs = np.unique(np.array(bc_dofs))
+            print(bc_dofs[0:10])
             for e_label in np.unique(element_labels):
                 element = instance.elements[e_label - 1]
                 element_nodes = [instance.nodes[n-1] for n in element.connectivity]
@@ -66,21 +68,23 @@ if __name__ == '__main__':
             displacement_comp = np.zeros(24)
             for i in range(permanent_strain.shape[0]/8):
                 element = elements[element_labels[8*i]]
+                for k, n in enumerate(element.node_labels):
+                    displacement_comp[3*k] = 3*(n - 1)
+                    displacement_comp[3*k + 1] = 3*(n - 1) + 1
+                    displacement_comp[3*k + 2] = 3*(n - 1) + 2
                 for j, gp in enumerate(C3D8.gauss_points):
                     B = element.B(*gp)
                     for comp in range(6):
-                        try:
-                            for k, n in enumerate(element.node_labels):
-                                displacement_comp[3*k] = 3*(n - 1)
-                                displacement_comp[3*k + 1] = 3*(n - 1) + 1
-                                displacement_comp[3*k + 2] = 3*(n - 1) + 2
-
-                            col[strain_line*24:strain_line*24+24] = displacement_comp
-                            row[strain_line*24:strain_line*24 + 24] = strain_line
-                            values[strain_line*24:strain_line*24 + 24] = B[comp, :]
-                        except ValueError:
-                            print("strange things happening")
-                            print(sys.exit())
+                        col[strain_line*24:strain_line*24+24] = displacement_comp
+                        row[strain_line*24:strain_line*24 + 24] = strain_line
+                        values[strain_line*24:strain_line*24 + 24] = B[comp, :]
                         strain_line += 1
 
-            print(col)
+            B_matrix = coo_matrix((values, (row, col)),
+                                  shape=(permanent_strain.shape[0]*6, permanent_deformations.shape[0])).tocsc()
+            print('BG shape', B_matrix.shape)
+            all_cols = np.arange(permanent_deformations.shape[0])
+            cols_to_keep = np.where(np.logical_not(np.in1d(all_cols, bc_dofs)))[0]
+
+            B_red = B_matrix[:, cols_to_keep]
+            print('BG_red shape', B_matrix.shape)
