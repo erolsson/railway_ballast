@@ -68,6 +68,6 @@ if __name__ == '__main__':
 
             counter = 0
             for i, n in enumerate(nodes):
-                permanent_deformation[i, :] = up[3*(n-1):3*n]
+                permanent_deformation[i, :] = up[3*(n.label-1):3*n.label]
             write_field_to_odb(permanent_deformation, 'UP', results_odb_filename, step_name,
                                instance_name=instance_name, position=NODAL, set_name='BALLAST')
