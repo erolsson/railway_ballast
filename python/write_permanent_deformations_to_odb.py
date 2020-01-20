@@ -34,7 +34,8 @@ if __name__ == '__main__':
             permanent_deformation, nodes, _ = read_field_from_odb('U', results_odb_filename, step_name='gravity',
                                                                   instance_name=instance_name,
                                                                   set_name='BALLAST',
-                                                                  get_position_numbers=True, position=NODAL)*0
+                                                                  get_position_numbers=True, position=NODAL)
+            permanent_deformation *= 0
 
             results_odb = odbAccess.openOdb(results_odb_filename, readOnly=True)
             instance = results_odb.rootAssembly.instances[instance_name]
