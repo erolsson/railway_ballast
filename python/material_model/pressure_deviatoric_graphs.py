@@ -44,8 +44,8 @@ for fig in [0, 1]:
     plt.tight_layout()
     
 plt.figure(0)
-plt.savefig('../Figures/pressure.png')
+plt.savefig('../../Figures/pressure.png')
 
 plt.figure(1)
-plt.savefig('../Figures/deviatoric.png')
+plt.savefig('../../Figures/deviatoric.png')
 plt.show()

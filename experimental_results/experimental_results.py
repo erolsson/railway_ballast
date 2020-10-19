@@ -14,8 +14,8 @@ class Experiment:
         self.f = f
 
         data = np.genfromtxt(filename, delimiter=',')
-        if data[-1, 0] < data[0, 0]:
-            data = np.flipud(data)
+        idx = np.argsort(data[:, 0])
+        data = data[idx, :]
         self.cycles = data[:, 0]
         self.strain = data[:, 1]
 
@@ -36,6 +36,8 @@ class ExperimentalResults:
         os.chdir(curr_dir)
 
     def get_data(self, p=None, q=None, f=None):
+        if p is None and q is None and f is None:
+            return self.data
         sub_set = []
         if isinstance(p, Number):
             p = [p]
