@@ -8,16 +8,35 @@ import numpy as np
 
 
 class Experiment:
-    def __init__(self, p, q, f, filename):
+    def __init__(self, p, q, f, filename, num_points=100):
         self.p = p
         self.q = q
         self.f = f
 
+        # Reading axial data
         data = np.genfromtxt(filename, delimiter=',')
         idx = np.argsort(data[:, 0])
         data = data[idx, :]
-        self.cycles = data[:, 0]
-        self.strain = data[:, 1]
+        axial_cycles = np.log(data[:, 0])
+        axial_strain = data[:, 1]
+
+        volumetric_filename = 'volumetric_strain_' + filename.lstrip('axial_strain_')
+        data = np.genfromtxt(volumetric_filename, delimiter=',')
+        idx = np.argsort(data[:, 0])
+        data = data[idx, :]
+        volumetric_cycles = np.log(data[:, 0])
+        volumetric_strain = data[:, 1]
+
+        self.cycles = np.linspace(np.max([axial_cycles[0], volumetric_cycles[0]]),
+                                  np.min([axial_cycles[-1], volumetric_cycles[-1]]),
+                                  num_points)
+
+        self.axial_strain = np.interp(self.cycles, axial_cycles, axial_strain)
+        self.volumetric_strain = np.interp(self.cycles, volumetric_cycles, volumetric_strain)
+        self.cycles = np.exp(self.cycles)
+
+    def deviatoric_axial_strain(self):
+        return self.axial_strain - self.volumetric_strain/3
 
 
 class ExperimentalResults:

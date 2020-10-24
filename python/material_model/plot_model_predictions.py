@@ -45,8 +45,9 @@ par = np.array([ 1.35966478e+00,  2.68774845e-05,  2.25879758e+03, -3.81948760e-
                  1.08065068e+00, -9.13254681e-02,  1.42448926e+01,  1.26502963e+00,
                  1.80823494e+00,  2.45840273e+00])
 
-par = np.array([ 1.48793286e+00,  2.23887423e-08,  3.47498051e-02, -1.31835549e-03,
-                1.05564935e+00, -1.30507801e-01,  1.52408961e+01,   1.24832180e+00,  1.76638543e+00,  2.29595102e+00])
+par = np.array([ 1.96480747e+00,  1.55660457e-08,  7.07970796e-02, -5.67108023e-04,
+  1.87331136e+00,  9.11559029e+02,  1.17602961e+00,  1.65231904e+00,
+  2.19735329e+00])
 
 # f = 40 Hz
 # par = np.array([1.90166096e+00,  1.39154106e-09,  1.86960565e-01,  2.69030714e-02,
@@ -57,8 +58,8 @@ for i, freq in enumerate([5., 10., 20., 40]):
     experimental_data = sun_et_al_16.get_data(f=freq)
     for experiment in experimental_data:
         plt.figure(i)
-        plt.semilogx(experiment.cycles, experiment.strain)
-        e0 = experiment.strain[0]
+        plt.semilogx(experiment.cycles, experiment.axial_strain)
+        e0 = experiment.axial_strain[0]
         cycles = np.exp(np.linspace(np.log(1), np.log(5e5), 100))
         model_strain = permanent_strain(cycles, experiment.p, experiment.q, freq, par, e0=0)
         plt.semilogx(cycles, model_strain + e0, '--x')
