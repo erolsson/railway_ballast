@@ -118,7 +118,7 @@ def main():
            2.58121336e+00]
     with warnings.catch_warnings():
         warnings.simplefilter('error')
-        for i in range(20)
+        for i in range(20):
             par = fmin(residual, par, args=(data,), maxfun=1e3, maxiter=1e3)
     # par = np.array([3.26067740e+00  1.64682732e-06  6.24063749e+01 -7.27014619e-13
     #   8.67609593e+00  1.35453333e+01])
