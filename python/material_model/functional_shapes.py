@@ -77,14 +77,18 @@ def permanent_strain(cycles, p, q, freq, parameters, e0=0):
 
 
 def calc_residual_for_dataset(data, par):
-    e_dev = data.deviatoric_axial_strain()
+    e_exp = data.axial_strain
+    ev_exp = data.volumetric_strain
     static_stress = -data.p*np.array([1, 1, 1, 0, 0, 0])
     cyclic_stress = -data.q*np.array([1, 0, 0, 0, 0, 0])
     model = MaterialModel(parameters=par, frequency=data.f)
     model.update(data.cycles, cyclic_stress, static_stress)
-    model_e = -model.deviatoric_strain()[:, 0]
-    e_exp = e_dev - e_dev[0]
-    return np.sum((model_e - e_exp)**2)/e_exp[-1]**2
+    model_e = -model.strain[:, 0]
+    model_ev = -model.volumetric_strain()
+    e_exp = e_exp - e_exp[0]
+    ev_exp -= ev_exp[0]
+    return (np.sum((model_e - e_exp)**2*np.log(data.cycles)) +
+            np.sum((model_ev - ev_exp)**2*np.log(data.cycles)))
 
 
 def residual(parameters, datasets):
@@ -112,10 +116,11 @@ def main():
                       'monospace': ['Computer Modern Typewriter']})
     from experimental_results.experimental_results import sun_et_al_16
     fig = plt.figure(0)
-    data = sun_et_al_16.get_data(f=[5, 10, 20, 40])
-    par = [1.13847893e+00, 7.40275103e-04, 4.47010135e+03, 2.00166341e+01,
-           1.04049163e+00, 7.70807716e+00, 1.17546092e+00, 1.91101114e+00,
-           2.58121336e+00]
+    data = sun_et_al_16.get_data(f=[5., 10., 20])
+    par = [1.68537609e+00,  1.56718859e-06,  3.52233209e+00,  3.89026887e-02,
+           1.00444102e+00,  2.25692628e+02,  1.23093625e+00,  1.71304473e+00,
+           6.25646586e+05, -3.33784776e-02, -3.32303031e-03,  1.93785318e-06,
+           0]
     with warnings.catch_warnings():
         warnings.simplefilter('error')
         for i in range(20):

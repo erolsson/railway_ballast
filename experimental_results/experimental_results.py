@@ -28,15 +28,19 @@ class Experiment:
         volumetric_strain = data[:, 1]
 
         self.cycles = np.linspace(np.max([axial_cycles[0], volumetric_cycles[0]]),
-                                  np.min([axial_cycles[-1], volumetric_cycles[-1]]),
-                                  num_points)
+                                  np.log(4e5), num_points)
+        idx = self.cycles < min(axial_cycles[-1], volumetric_cycles[-1])
 
-        self.axial_strain = np.interp(self.cycles, axial_cycles, axial_strain)
-        self.volumetric_strain = np.interp(self.cycles, volumetric_cycles, volumetric_strain)
+        self.axial_strain = 0*self.cycles + 1 + axial_strain[0]
+        self.volumetric_strain = 0*self.cycles + 1. + volumetric_strain[0]
+        self.axial_strain[idx] = np.interp(self.cycles[idx], axial_cycles, axial_strain)
+        self.volumetric_strain[idx] = np.interp(self.cycles[idx], volumetric_cycles, volumetric_strain)
         self.cycles = np.exp(self.cycles)
 
     def deviatoric_axial_strain(self):
-        return self.axial_strain - self.volumetric_strain/3
+        edev = self.axial_strain - self.volumetric_strain/3
+        edev[edev > 0.3] = 1. + edev[0]
+        return edev
 
 
 class ExperimentalResults:
@@ -74,3 +78,39 @@ class ExperimentalResults:
 
 sun_et_al_16 = ExperimentalResults()
 sun_et_al_16.read(os.path.expanduser('~/railway_ballast/experimental_results/sun_et_al_16'))
+
+
+def main():
+    from collections import namedtuple
+    import matplotlib.pyplot as plt
+    import matplotlib.style
+    matplotlib.style.use('classic')
+    plt.rc('text', usetex=True)
+    plt.rc('font', serif='Computer Modern Roman')
+    plt.rcParams.update({'font.size': 20})
+    plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
+    plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
+                      'monospace': ['Computer Modern Typewriter']})
+
+    symbols = {5: 's', 10: 'o', 20: '^', 30: 'v', 40: 'D', 50: '<', 60: '>'}
+
+    Figure = namedtuple('Figure', ['number', 'p', 'q'])
+    figures = [Figure(number=0, p=[10], q=[230]),
+               Figure(number=1, p=[30], q=[230, 276]),
+               Figure(number=2, p=[60], q=[230]),
+               Figure(number=3, p=[60], q=[370., 460.])]
+    for figure in figures:
+
+        experimental_data = sun_et_al_16.get_data(p=figure.p, q=figure.q)
+        for data_set in experimental_data:
+            plt.figure(2*figure.number)
+            plt.semilogx(data_set.cycles, data_set.axial_strain, '-' + symbols[data_set.f], lw=2)
+            plt.ylim(0, 0.35)
+            plt.figure(2*figure.number+1)
+            plt.semilogx(data_set.cycles, data_set.volumetric_strain, '-' + symbols[data_set.f], lw=2)
+            plt.ylim(-0.06, 0.24)
+    plt.show()
+
+
+if __name__ == '__main__':
+    main()
