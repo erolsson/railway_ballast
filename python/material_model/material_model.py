@@ -23,10 +23,10 @@ class MaterialModel:
 
         self.nf = abs(parameters[4])
         self.H1 = abs(parameters[5])
-        self.b1 = abs(parameters[9])
-        self.b2 = -abs(parameters[10])
-        self.b3 = -abs(parameters[11])
-        self.nb = -abs(parameters[12])
+        self.b1 = parameters[9]
+        self.b2 = parameters[10]
+        self.b3 = parameters[11]
+        self.nb = parameters[12]
 
         freq_idx = {10.: 6, 20.: 7, 40.: 8}
         if frequency == 5.:
@@ -56,7 +56,8 @@ class MaterialModel:
                 f = 0.
 
             ep_eff_dN = self.A*f**self.gf
-            e = ep_eff_dN*(nij + (self.b1*np.exp(-self.nf*ep) + self.b2*p + self.b3*p_cyclic + self.nb*p_cyclic**2)*np.array([1, 1, 1, 0, 0, 0]))
+            dilatation = self.b1*np.exp(-self.nf*von_Mises(ep)) + self.b2*p + self.b3*p_cyclic**self.nb
+            e = ep_eff_dN*(nij + dilatation*np.array([1, 1, 1, 0, 0, 0]))
             # e = ep_eff_dN*(nij + (self.b1 + self.b2*(p + self.fd*p_cyclic))*np.array([1., 1., 1., 0., 0., 0]))
 
             return e
@@ -73,8 +74,6 @@ class MaterialModel:
 
             for j in range(6):
                 e = solution.y[j][-1]
-                if abs(e) > 0.35:
-                    e = 1.*e/abs(e)
                 self.strain[i, j] = e
 
         return self.strain
@@ -87,14 +86,16 @@ class MaterialModel:
 
     def volumetric_strain(self):
         eij = self.permanent_strain_tensor()
-        return np.sum(eij[:, 0:3], axis=1)
+        ev = np.sum(eij[:, 0:3], axis=1)
+        # ev[np.abs(ev) > 0.25] = -1.
+        return ev
 
     def deviatoric_strain(self):
         eij = self.permanent_strain_tensor()
         e_vol = self.volumetric_strain()
         edev = eij - np.outer(e_vol/3, np.array([1, 1, 1, 0, 0, 0]))
-        edev[edev > 0.35] = 1.
-        edev[edev < -0.35] = -1.
+        # edev[edev > 0.35] = 1.
+        # edev[edev < -0.35] = -1.
         return edev
 
 
@@ -110,10 +111,9 @@ def main():
     plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                       'monospace': ['Computer Modern Typewriter']})
     # 5 Hz
-    par = np.array([1.31120880e+00, 8.38242260e-07, 5.20738832e-02, 1.02469624e-03,
-                    3.28582703e+00, 5.26457581e+02, 1.13335449e+00, 1.74209601e+00,
-                    2.37647298e+00, -4.75186794e-02, -3.02491126e-03,  1.77430478e-06,
-                    1.38965363e-06])
+    par = np.array([1.92596342e+00, 1.33771787e-07, 2.36556786e-02, 6.54713185e-04,
+                    1.59527656e+01, 2.03974910e+02, 1., 1.,
+                    1., 9.05538667e-02, -6.54359191e-03,  7.15099017e-07,  2.62519248e+00])
 
     cycles = np.exp(np.linspace(np.log(1), np.log(5e5), 100))
 
