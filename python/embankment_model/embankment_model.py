@@ -264,7 +264,7 @@ class RailwayEmbankment:
                                        resetDefaultValues=OFF)
         self.mdb.Gravity(name='gravity', createStepName='gravity', comp2=-9.82)
 
-    def run_job(self, cpus=8):
+    def run_job(self, cpus=12):
         job = mdb.Job(name='embankment', model=self.mdb, numCpus=cpus, numDomains=cpus)
         job.submit()
         job.waitForCompletion()
