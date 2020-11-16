@@ -387,9 +387,9 @@ class RailwayEmbankment:
         load_faces = self.rail_instance.faces.findAt(((self.track_gauge/2,
                                                        self.total_height + self.sleeper_height + self.rail_height,
                                                        1e-3),))
-        axes_load*1000*9.82/4
+        axes_force = axes_load*1000*9.82/4
         load_region = self.assembly.Surface(side1Faces=load_faces, name='load_face')
-        self.mdb.Pressure(name='train_wheel', createStepName='loading', region=load_region, magnitude=axes_load,
+        self.mdb.Pressure(name='train_wheel', createStepName='loading', region=load_region, magnitude=axes_force,
                           distributionType=TOTAL_FORCE)
 
     def run_job(self, cpus=12):
