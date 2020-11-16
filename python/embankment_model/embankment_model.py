@@ -255,7 +255,8 @@ class RailwayEmbankment:
         self.sleeper_part.SectionAssignment(region=(self.sleeper_part.elements,), sectionName='section_sleeper')
 
     def create_load_steps(self):
-        gravity_step = self.mdb.StaticStep(name='gravity', previous='Initial', nlgeom=ON, initialInc=1e-2)
+        gravity_step = self.mdb.StaticStep(name='gravity', previous='Initial', nlgeom=ON, initialInc=1e-2,
+                                           maxNumInc=10000000)
         gravity_step.control.setValues(allowPropagation=OFF,
                                        lineSearch=(5.0, 1.0, 0.0001, 0.25, 0.1),
                                        timeIncrementation=(15, 15, 9.0, 16.0, 10.0, 4.0, 12.0,
