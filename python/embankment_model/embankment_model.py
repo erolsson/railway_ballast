@@ -340,7 +340,7 @@ class RailwayEmbankment:
             if layer.name.startswith('ballast'):
                 mc = mat.MohrCoulombPlasticity(table=((45., 0.),), useTensionCutoff=ON)
                 mc.MohrCoulombHardening(table=((1e9, 0.),))
-                mc.TensionCutOff(table=((1e9, 0),))
+                mc.TensionCutOff(table=((1e9 , 0),))
 
             layer_elements = self.part.elements.getByBoundingBox(yMin=layer_start_height - 1e-3,
                                                                  yMax=layer_start_height + layer.height + 1e-3)
@@ -354,6 +354,9 @@ class RailwayEmbankment:
             mat.Elastic(table=((30e9, 0.2),))
             self.mdb.HomogeneousSolidSection(name='section_sleeper', material='concrete')
             self.sleeper_part.SectionAssignment(region=(self.sleeper_part.elements,), sectionName='section_sleeper')
+            if self.center_sleeper_part:
+                self.center_sleeper_part.SectionAssignment(region=(self.center_sleeper_part.elements,),
+                                                           sectionName='section_sleeper')
 
         if self.rail_instance:
             mat = self.mdb.Material('rail')
