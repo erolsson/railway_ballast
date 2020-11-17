@@ -340,7 +340,7 @@ class RailwayEmbankment:
             if layer.name.startswith('ballast'):
                 mc = mat.MohrCoulombPlasticity(table=((45., 0.),), useTensionCutoff=ON)
                 mc.MohrCoulombHardening(table=((1e9, 0.),))
-                mc.TensionCutOff(table=((1e4, 0),))
+                mc.TensionCutOff(table=((0, 0),))
 
             layer_elements = self.part.elements.getByBoundingBox(yMin=layer_start_height - 1e-3,
                                                                  yMax=layer_start_height + layer.height + 1e-3)
