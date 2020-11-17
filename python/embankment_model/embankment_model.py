@@ -300,6 +300,13 @@ class RailwayEmbankment:
         elem_type1 = mesh.ElemType(elemCode=C3D8, elemLibrary=STANDARD)
         self.part.setElementType(regions=(self.part.cells,), elemTypes=(elem_type1,))
 
+        ballast_elements = self.part.elements.getByBoundingBox(yMin=ballast_start_height - 1e-3,
+                                                               yMax=self.total_height + 1e-3)
+        self.part.Set(name='ballast_elements', elements=ballast_elements)
+
+        top_node = self.part.nodes.getByBoundingBox(xMax=1e-3, yMin=self.total_height - 1e-3, zMax=1e-3)
+        self.part.Set(name='top_node', nodes=top_node)
+
     def apply_boundary_conditions(self):
         # Setting displacement boundary conditions
         bottom_instance = self.assembly.instances['embankment_instance']
