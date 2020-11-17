@@ -401,11 +401,11 @@ class RailwayEmbankment:
 def main():
     embkankment_length = 5.5
     layers = [ElasticLayer(name='soil', bottom_width=20, top_width=20.,
-                           height=2., E=10e6, v=0.3, density=2000),
+                           height=2., E=50e6, v=0.2, density=2000),
               ElasticLayer(name='clay', bottom_width=20, top_width=20.,
-                           height=4., E=7.5e6, v=0.3, density=2000),
+                           height=4., E=50e6, v=0.2, density=2000),
               ElasticLayer(name='subgrade', bottom_width=20, top_width=20.,
-                           height=1., E=20e6, v=0.35, density=1900),
+                           height=1., E=50e6, v=0.2, density=2000),
               ElasticLayer(name='ballast_1', bottom_width=9.3, top_width=3.6,
                            height=3.8, E=200e6, v=0.35, density=1600),
               ElasticLayer(name='ballast_2', bottom_width=2.55, top_width=1.8,

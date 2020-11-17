@@ -138,6 +138,10 @@ def main():
         plt.xlim(1, 5e5)
         plt.figure(i+4)
         plt.xlim(1, 5e5)
+
+    plt.figure(100)
+    p = np.linspace(-100, 100, 100)
+    plt.plot(p, np.sqrt(1 + par[2]*p + par[3]*p**2))
     plt.show()
 
 
