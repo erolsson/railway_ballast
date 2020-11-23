@@ -1,5 +1,4 @@
 import numpy as np
-
 from scipy.integrate import solve_ivp
 
 from experimental_results.experimental_results import sun_et_al_16

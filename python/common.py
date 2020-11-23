@@ -14,6 +14,8 @@ except IOError:
     print("Run \"python find_modules.py\" from the terminal")
     sys.exit()
 
+sys.path.append()
 six = imp.load_module('six', open(modules['six'][0]), modules['six'][1], modules['six'][2])
 numpy = imp.load_module('numpy', modules['numpy'][0], modules['numpy'][1], modules['numpy'][2])
 scipy = imp.load_module('scipy', modules['scipy'][0], modules['scipy'][1], modules['scipy'][2])
+integrate = imp.load_module('scipy.integrate', modules['scipy'][0], modules['scipy'][1], modules['scipy'][2])

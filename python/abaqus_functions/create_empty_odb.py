@@ -3,6 +3,7 @@ from __future__ import print_function
 import odbAccess
 from abaqusConstants import DEFORMABLE_BODY, THREE_D
 import os
+import sys
 
 
 def _copy_node_and_elements(to_odb_base, from_odb_base):
@@ -82,6 +83,6 @@ def create_empty_odb(new_odb_file_name, old_odb_file_name):
 
 
 if __name__ == '__main__':
-    old_file = os.path.expanduser('~/railway_ballast/abaqus2014/embankment_EO.odb')
-    new_file = os.path.expanduser('~/railway_ballast/result.odb')
+    old_file = sys.argv[-1]
+    new_file = sys.argv[-2]
     create_empty_odb(new_file, old_file)
