@@ -3,7 +3,7 @@ import odbAccess
 import pickle
 import sys
 
-from abaqus_functions.odb_io_functions import read_field_from_odb
+from odb_io_functions import read_field_from_odb
 
 
 def write_stress_pickles(stress_odb_filename, static_pickle_filename, cyclic_pickle_filename):

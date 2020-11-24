@@ -3,7 +3,7 @@ import pickle
 
 import numpy as np
 
-from abaqus_functions.odb_io_functions import write_field_to_odb
+from odb_io_functions import write_field_to_odb
 
 
 def write_permanent_strains_to_odb(odb_file, array_file_name, pickle_file_name):
