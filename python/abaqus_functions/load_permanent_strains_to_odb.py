@@ -20,7 +20,7 @@ def write_permanent_strains_to_odb(odb_file, array_file_name, pickle_file_name):
         step_name = 'cycles=' + str(int(n))
         print(ep[i, :, :].shape)
         write_field_to_odb(ep[i, :, :], 'EP', odb_file, step_name=step_name, instance_name=instance_name,
-                           set_name=element_set_name, step_description='Results after ' + str(n) + ' cycles',
+                           set_name=element_set_name, # step_description='Results after ' + str(n) + ' cycles',
                            field_description='Permanent strain')
 
 
