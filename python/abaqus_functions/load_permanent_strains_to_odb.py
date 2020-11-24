@@ -7,6 +7,7 @@ from odb_io_functions import write_field_to_odb
 
 
 def write_permanent_strains_to_odb(odb_file, array_file_name, pickle_file_name):
+    print("Starting writing")
     ep = np.load(array_file_name)
     with open(pickle_file_name, 'rb') as pickle_file:
         data = pickle.load(pickle_file)
@@ -14,6 +15,7 @@ def write_permanent_strains_to_odb(odb_file, array_file_name, pickle_file_name):
 
     element_set_name = data['element_set']
     cycles = data['cycles']
+    print("Starting steps")
     for i, n in enumerate(cycles):
         step_name = 'cycles=' + str(int(n))
         print(ep[i, :, :].shape)
