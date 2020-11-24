@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import matplotlib.style
 
 from experimental_results.experimental_results import sun_et_al_16
-from material_model import MaterialModel
 
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)

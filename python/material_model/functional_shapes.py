@@ -1,11 +1,9 @@
 from __future__ import print_function, division
 
-import sys
 import warnings
 import find_modules  # noqa
 
 from common import numpy as np
-from common import scipy
 from multiprocesser.multiprocesser import multi_processer
 
 from scipy.integrate import solve_ivp
