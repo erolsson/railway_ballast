@@ -10,7 +10,7 @@ def write_permanent_strains_to_odb(odb_file, array_file_name, pickle_file_name):
     ep = np.load(array_file_name)
     with open(pickle_file_name, 'rb') as pickle_file:
         data = pickle.load(pickle_file)
-    instance_name = data['instance']
+    instance_name = str(data['instance'])
 
     element_set_name = data['element_set']
     cycles = data['cycles']
