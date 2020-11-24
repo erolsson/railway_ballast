@@ -1,6 +1,9 @@
 from __future__ import print_function, division
 
-import distro
+try:
+    import distro
+except ImportError:
+    import platform as distro
 import os
 import pickle
 import subprocess
