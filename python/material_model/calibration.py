@@ -5,7 +5,7 @@ import matplotlib.style
 
 from scipy.optimize import fmin
 
-from experimental_results.experimental_results import sun_et_al_16
+from experimental_results import sun_et_al_16
 from material_model import MaterialModel
 from multiprocesser.multiprocesser import multi_processer
 

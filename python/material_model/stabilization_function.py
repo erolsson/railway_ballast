@@ -6,7 +6,7 @@ from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
 import matplotlib.style
 
-from experimental_results.experimental_results import sun_et_al_16
+from experimental_results import sun_et_al_16
 from multiprocesser.multiprocesser import multi_processer
 
 matplotlib.style.use('classic')

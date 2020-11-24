@@ -77,7 +77,7 @@ class ExperimentalResults:
 
 
 sun_et_al_16 = ExperimentalResults()
-sun_et_al_16.read(os.path.expanduser('../experimental_results/sun_et_al_16'))
+sun_et_al_16.read(os.path.expanduser('~/railway_ballast/experimental_results/sun_et_al_16'))
 
 
 def main():

@@ -112,7 +112,7 @@ def main():
     plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
     plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                       'monospace': ['Computer Modern Typewriter']})
-    from experimental_results.experimental_results import sun_et_al_16
+    from experimental_results import sun_et_al_16
     fig = plt.figure(0)
     data = sun_et_al_16.get_data(f=[5., 10., 20])
     par = [1.68537609e+00,  1.56718859e-06,  3.52233209e+00,  3.89026887e-02,
