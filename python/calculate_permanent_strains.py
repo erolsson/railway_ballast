@@ -90,7 +90,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
         pickle.dump({'instance': instance_name, 'element_set': element_set_name,
                      'cycles': cycles.tolist()}, permanent_strain_pickle, protocol=2)
     os.chdir('abaqus_functions')
-    job = subprocess.Popen(abq + ' python load_permanent_strains_to_odb.py ' + strain_odb_file_name + ' '
+    job = subprocess.Popen(abq + ' viewer noGUI=load_permanent_strains_to_odb.py -- ' + strain_odb_file_name + ' '
                            + permanent_strain_array_file + ' ' + permanent_strain_pickle_file, shell=True)
     job.wait()
     os.chdir('..')
