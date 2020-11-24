@@ -162,10 +162,11 @@ def write_field_to_odb(field_data, field_id, odb_file_name, step_name, instance_
     odb = odbAccess.openOdb(odb_file_name, readOnly=False)
     print("Starting write field")
     if step_name not in odb.steps:
+        print("creating step", step_name, step_description)
         step = odb.Step(name=step_name, description=step_description, domain=TIME, timePeriod=1)
     else:
         step = odb.steps[step_name]
-
+    print("step created")
     if instance_name is None:
         instance = odb.rootAssembly.instances[odb.rootAssembly.instances.keys()[0]]
     else:
@@ -183,7 +184,7 @@ def write_field_to_odb(field_data, field_id, odb_file_name, step_name, instance_
             objects = instance.nodes
     else:
         raise TypeError("The specified position is not a valid output position for abaqus")
-
+    print("position found")
     object_numbers = []
     for obj in objects:
         object_numbers.append(obj.label)
@@ -213,6 +214,7 @@ def write_field_to_odb(field_data, field_id, odb_file_name, step_name, instance_
     else:
         field = frame.FieldOutput(name=field_id, description=field_description, type=field_type,
                                   validInvariants=invariants)
+    print("Adding data")
     field.addData(position=position, instance=instance, labels=object_numbers, data=field_data_to_frame)
     odb.update()
     odb.save()

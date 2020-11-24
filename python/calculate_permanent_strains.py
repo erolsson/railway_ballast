@@ -47,11 +47,13 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
                            + static_pickle_file + ' ' + cyclic_pickle_file,
                            shell=True)
     job.wait()
+    os.chdir('..')
+
     with open(static_pickle_file, 'rb') as static_pickle:
         static_data = pickle.load(static_pickle, encoding='latin1')
         static_stresses = static_data['data']
         instance_name = static_data['instance']
-        element_set_name = static_data['element_set_name']
+        element_set_name = static_data['element_set']
     os.remove(static_pickle_file)
 
     with open(cyclic_pickle_file, 'rb') as cyclic_pickle:
@@ -59,8 +61,9 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
     os.remove(cyclic_pickle_file)
 
     n = static_stresses.shape[0]
-    n = 1000
     permanent_strains = np.zeros((len(cycles), n, static_stresses.shape[1]))
+    n = 1000
+
     num_cpus = 12
     chunksize = n//num_cpus
     indices = [i*chunksize for i in range(num_cpus)]
@@ -73,12 +76,21 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
     result = multi_processer(job_list, timeout=7200, cpus=num_cpus)
     for i in range(num_cpus):
         permanent_strains[:, indices[i]:indices[i+1], :] = result[i]
+
     permanent_strain_pickle_file = os.path.expanduser('~/railway_ballast/python/embankment_model/'
                                                       'permanent_strains.pkl')
+    permanent_strain_array_file = os.path.expanduser('~/railway_ballast/python/embankment_model/'
+                                                     'permanent_strains.npy')
+    np.save(permanent_strain_array_file, permanent_strains)
+
     with open(permanent_strain_pickle_file, 'wb') as permanent_strain_pickle:
-        pickle.dump({'data': permanent_strains, 'instance': instance_name, 'element_set': element_set_name,
-                     'cycles': cycles},
-                    permanent_strain_pickle, protocol=2)
+        pickle.dump({'instance': instance_name, 'element_set': element_set_name,
+                     'cycles': cycles.tolist()}, permanent_strain_pickle, protocol=2)
+    os.chdir('abaqus_functions')
+    job = subprocess.Popen(abq + ' python load_permanent_strains_to_odb.py ' + strain_odb_file_name + ' '
+                           + permanent_strain_array_file + ' ' + permanent_strain_pickle_file, shell=True)
+    job.wait()
+    os.chdir('..')
 
 
 def main():
