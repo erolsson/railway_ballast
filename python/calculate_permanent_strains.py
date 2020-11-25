@@ -54,9 +54,9 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
     with open(static_pickle_file, 'rb') as static_pickle:
         static_data = pickle.load(static_pickle, encoding='latin1')
-        static_stresses = static_data['data']
-        instance_name = static_data['instance']
-        element_set_name = static_data['element_set']
+        static_stresses = static_data['data']/1e3
+        instance_name = str(static_data['instance'])
+        element_set_name = str(static_data['element_set'])
     os.remove(static_pickle_file)
 
     with open(cyclic_pickle_file, 'rb') as cyclic_pickle:
@@ -65,7 +65,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
     n = static_stresses.shape[0]
     permanent_strains = np.zeros((len(cycles), n, static_stresses.shape[1]))
-    n = 1000
+    # n = 1000
 
     num_cpus = 12
     chunksize = n//num_cpus
@@ -90,7 +90,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
         pickle.dump({'instance': instance_name, 'element_set': element_set_name,
                      'cycles': cycles.tolist()}, permanent_strain_pickle, protocol=2)
     os.chdir('abaqus_functions')
-    job = subprocess.Popen(abq + ' viewer noGUI=load_permanent_strains_to_odb.py -- ' + strain_odb_file_name + ' '
+    job = subprocess.Popen(abq + ' python load_permanent_strains_to_odb.py ' + strain_odb_file_name + ' '
                            + permanent_strain_array_file + ' ' + permanent_strain_pickle_file, shell=True)
     job.wait()
     os.chdir('..')

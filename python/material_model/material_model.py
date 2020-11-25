@@ -38,6 +38,8 @@ class MaterialModel:
     def update(self, cycles, cyclic_stress, static_stress):
         self.strain = np.zeros((cycles.shape[0], 6))
         p = -invariant_1(static_stress)/3
+        if p < 0:
+            p = 0
         q = von_Mises(cyclic_stress)
         p_cyclic = -invariant_1(cyclic_stress)/3*self.fd
         p_tot = p + p_cyclic
