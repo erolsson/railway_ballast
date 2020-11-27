@@ -68,7 +68,7 @@ def read_field_from_odb(field_id, odb_file_name, step_name=None, frame_number=-1
         all_name = 'ALL_NODES'
         object_list = base.nodes
 
-    if set_name is None:
+    if set_name == '':
         if all_name not in set_dict:
             objects = object_list
             set_func(name=all_name, elements=objects)

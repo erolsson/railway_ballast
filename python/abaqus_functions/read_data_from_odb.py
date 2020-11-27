@@ -2,7 +2,7 @@ import pickle
 import sys
 
 from odb_io_functions import read_field_from_odb
-
+from abaqusConstants import NODAL, ELEMENT_NODAL, INTEGRATION_POINT
 
 parameter_pickle_name = sys.argv[-2]
 results_pickle_name = sys.argv[-1]
@@ -18,9 +18,12 @@ set_name = str(data['set_name'])
 instance_name = str(data['instance_name'])
 get_position_numbers = data['get_position_numbers']
 get_frame_value = data['get_frame_value']
+position = INTEGRATION_POINT
+if str(data['position']) == 'NODAL':
+    position = NODAL
 
 field_data = read_field_from_odb(field_id, odb_file_name, step_name, frame_number, set_name, instance_name=instance_name,
-                                 get_position_numbers=False, get_frame_value=False)
+                                 get_position_numbers=False, get_frame_value=False, position=position)
 
 data_dict = {}
 if not get_position_numbers and not get_frame_value:
@@ -36,4 +39,4 @@ else:
     data_dict['element_labels'] = field_data[pos_idx + 1]
 
 with open(results_pickle_name, 'wb') as results_pickle:
-    pickle.dump(data_dict)
+    pickle.dump(data_dict, results_pickle)

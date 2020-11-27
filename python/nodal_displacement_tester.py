@@ -2,8 +2,9 @@ from __future__ import division, print_function
 import os
 
 from calculate_permanent_deformations import calculate_nodal_displacements_from_strains
-from calculate_permanent_deformations import BoundaryCondition
+from abaqus_functions.utilities import BoundaryCondition
 from write_data_to_odb import write_data_to_odb
+from read_data_from_odb import read_data_from_odb
 
 
 def main():
@@ -14,8 +15,11 @@ def main():
                            BoundaryCondition('DISP_NODES', 'node_set', 1, values={6: 0.01})]
 
     u, error = calculate_nodal_displacements_from_strains(odb_file_name, boundary_conditions, step_name='loading')
-    print(u.shape)
-    print(error.shape)
+    print(u)
+    u_true = read_data_from_odb('U', odb_file_name, step_name='loading', position='NODAL')
+    print(u_true)
+    print(error)
+    sddsddssddsdsds
     write_data_to_odb(u, 'UP', odb_file_name, step_name='loading', position='NODAL', frame_number=1)
     write_data_to_odb(error, 'ERR', odb_file_name, step_name='loading', frame_number=1)
 
