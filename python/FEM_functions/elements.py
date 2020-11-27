@@ -55,7 +55,6 @@ class C3D8:
         B = np.zeros((6, 24))
         jacobian = self.J(xi, eta, zeta)
         d = self.d(xi, eta, zeta)
-        print(self.volume())
         for i in range(8):
             dx_avg = [np.linalg.solve(self.J(*gp), self.d(*gp)[:, i])*np.linalg.det(self.J(*gp))
                       for gp in self.gauss_points]

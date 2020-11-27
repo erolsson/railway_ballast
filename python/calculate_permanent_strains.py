@@ -1,9 +1,5 @@
 from __future__ import print_function, division
 
-try:
-    import distro
-except ImportError:
-    import platform as distro
 import os
 import pickle
 import subprocess
@@ -12,6 +8,10 @@ import numpy as np
 
 from material_model.material_model import MaterialModel
 from multiprocesser.multiprocesser import multi_processer
+from common import abq
+from write_data_to_odb import write_data_to_odb
+from calculate_permanent_deformations import calculate_nodal_displacements_from_strains
+from abaqus_functions.utilities import BoundaryCondition
 
 
 def evaluate_permanent_strain_for_gp(material_parameters, cycles, static_stress_state, cyclic_stress_state):
@@ -24,17 +24,14 @@ def evaluate_permanent_strain_for_gp(material_parameters, cycles, static_stress_
 
 
 def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycles, material_parameters):
-    if distro.linux_distribution()[0] == 'Ubuntu':
-        abq = 'singularity exec --nv ' + os.path.expanduser('~/imgs/sing/abaqus-2018-centos-7.img') + \
-                   ' vglrun /opt/abaqus/2018/Commands/abq2018'
-    else:
-        abq = '/scratch/users/erik/SIMULIA/CAE/2018/linux_a64/code/bin/ABQLauncher'
-
     try:
         len(cycles)
     except TypeError:
         cycles = np.array(cycles)
     cycles = np.array(cycles)
+
+    work_directory = os.path.abspath(strain_odb_file_name)
+    work_directory = os.path.dirname(work_directory)
 
     if not os.path.isfile(strain_odb_file_name):
         os.chdir('abaqus_functions')
@@ -44,8 +41,8 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
         os.chdir('..')
 
     os.chdir('abaqus_functions')
-    static_pickle_file = os.path.expanduser('~/railway_ballast/python/embankment_model/static_stresses.pkl')
-    cyclic_pickle_file = os.path.expanduser('~/railway_ballast/python/embankment_model/cyclic_stresses.pkl')
+    static_pickle_file = work_directory + '/static_stresses.pkl'
+    cyclic_pickle_file = work_directory + '/cyclic_stresses.pkl'
     job = subprocess.Popen(abq + ' python write_stress_state_pickles.py ' + stress_odb_file_name + ' '
                            + static_pickle_file + ' ' + cyclic_pickle_file,
                            shell=True)
@@ -65,8 +62,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
     n = static_stresses.shape[0]
     permanent_strains = np.zeros((len(cycles), n, static_stresses.shape[1]))
-    # n = 1000
-
+    n = 1000
     num_cpus = 12
     chunksize = n//num_cpus
     indices = [i*chunksize for i in range(num_cpus)]
@@ -80,20 +76,23 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
     for i in range(num_cpus):
         permanent_strains[:, indices[i]:indices[i+1], :] = result[i]
 
-    permanent_strain_pickle_file = os.path.expanduser('~/railway_ballast/python/embankment_model/'
-                                                      'permanent_strains.pkl')
-    permanent_strain_array_file = os.path.expanduser('~/railway_ballast/python/embankment_model/'
-                                                     'permanent_strains.npy')
-    np.save(permanent_strain_array_file, permanent_strains)
+    boundary_conditions = [BoundaryCondition('X1_NODES', 'node_set', 1),
+                           BoundaryCondition('BOTTOM_NODES', 'node_set', 2),
+                           BoundaryCondition('X_SYM_NODES', 'node_set', 1),
+                           BoundaryCondition('Z_SYM_NODES', 'node_set', 3),
+                           BoundaryCondition('Z1_NODES', 'node_set', 3)]
+    for i, n in enumerate(cycles):
+        write_data_to_odb(field_data=permanent_strains[i, :, :], field_id='EP', odb_file_name=strain_odb_file_name,
+                          step_name='cycles_' + str(n), instance_name=instance_name, set_name=element_set_name)
 
-    with open(permanent_strain_pickle_file, 'wb') as permanent_strain_pickle:
-        pickle.dump({'instance': instance_name, 'element_set': element_set_name,
-                     'cycles': cycles.tolist()}, permanent_strain_pickle, protocol=2)
-    os.chdir('abaqus_functions')
-    job = subprocess.Popen(abq + ' python load_permanent_strains_to_odb.py ' + strain_odb_file_name + ' '
-                           + permanent_strain_array_file + ' ' + permanent_strain_pickle_file, shell=True)
-    job.wait()
-    os.chdir('..')
+        up, err = calculate_nodal_displacements_from_strains(strain_odb_file_name, boundary_conditions,
+                                                             step_name='cycles_' + str(n),
+                                                             instance_name=instance_name, strain_field_var='EP',
+                                                             set_name=element_set_name)
+        write_data_to_odb(up, 'UP', strain_odb_file_name, step_name='cycles_' + str(n), position='NODAL',
+                          frame_number=1, set_name=element_set_name)
+        write_data_to_odb(err, 'ERR', strain_odb_file_name, step_name='cycles_' + str(n), frame_number=1,
+                          set_name=element_set_name)
 
 
 def main():
@@ -102,7 +101,8 @@ def main():
                     1., 9.05538667e-02, -6.54359191e-03, 7.15099017e-07, 2.62519248e+00])
     stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/embankment.odb')
     strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results.odb')
-    calculate_permanent_strains(stress_odb_filename, strain_odb_filename, [100, 1000, 10000, 100000, 1000000], par)
+    cycles = [100, 1000, 10000, 100000, 1000000]
+    calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
 
 
 if __name__ == '__main__':

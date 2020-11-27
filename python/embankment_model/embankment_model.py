@@ -303,6 +303,9 @@ class RailwayEmbankment:
         ballast_elements = self.part.elements.getByBoundingBox(yMin=ballast_start_height - 1e-3,
                                                                yMax=self.total_height + 1e-3)
         self.part.Set(name='ballast_elements', elements=ballast_elements)
+        ballast_nodes = self.part.nodes.getByBoundingBox(yMin=ballast_start_height - 1e-3,
+                                                         yMax=self.total_height + 1e-3)
+        self.part.Set(name='ballast_nodes', elements=ballast_nodes)
 
         top_node = self.part.nodes.getByBoundingBox(xMax=1e-3, yMin=self.total_height - 1e-3, zMax=1e-3)
         self.part.Set(name='top_node', nodes=top_node)

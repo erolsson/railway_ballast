@@ -50,7 +50,7 @@ def read_field_from_odb(field_id, odb_file_name, step_name=None, frame_number=-1
     """
     odb = odbAccess.openOdb(odb_file_name, readOnly=False)
 
-    if instance_name is None:
+    if not instance_name:
         if len(odb.rootAssembly.instances) == 1:
             base = odb.rootAssembly.instances[odb.rootAssembly.instances.keys()[0]]
         else:
@@ -76,7 +76,7 @@ def read_field_from_odb(field_id, odb_file_name, step_name=None, frame_number=-1
     else:
         element_set = set_dict[set_name]
 
-    if step_name is None:
+    if not step_name:
         step_name = odb.steps.keys()[-1]
 
     if frame_number == -1:
@@ -164,7 +164,7 @@ def write_field_to_odb(field_data, field_id, odb_file_name, step_name, instance_
         step = odb.Step(name=step_name, description=step_description, domain=TIME, timePeriod=1.)
     else:
         step = odb.steps[step_name]
-    if instance_name is None:
+    if instance_name is '':
         instance = odb.rootAssembly.instances[odb.rootAssembly.instances.keys()[0]]
     else:
         instance = odb.rootAssembly.instances[instance_name]
