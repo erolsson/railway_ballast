@@ -9,7 +9,7 @@ import sys
 
 import numpy as np
 
-from abaqus_functions.odb_io_functions import read_field_from_odb
+from odb_io_functions import read_field_from_odb
 from utilities import BoundaryCondition
 sys.path.append('..')
 from FEM_functions.elements import C3D8
