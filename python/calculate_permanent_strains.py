@@ -10,7 +10,7 @@ from material_model.material_model import MaterialModel
 from multiprocesser.multiprocesser import multi_processer
 from common import abq
 from write_data_to_odb import write_data_to_odb
-from calculate_permanent_deformations import calculate_nodal_displacements_from_strains
+from calculate_permanent_deformations import DeformationCalculator
 from abaqus_functions.utilities import BoundaryCondition
 
 
@@ -55,7 +55,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
         instance_name = str(static_data['instance'])
         element_set_name = str(static_data['element_set'])
     os.remove(static_pickle_file)
-
+    """
     with open(cyclic_pickle_file, 'rb') as cyclic_pickle:
         cyclic_stresses = pickle.load(cyclic_pickle, encoding='latin1')['data']/1e3
     os.remove(cyclic_pickle_file)
@@ -75,20 +75,22 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
     result = multi_processer(job_list, timeout=7200, cpus=num_cpus)
     for i in range(num_cpus):
         permanent_strains[:, indices[i]:indices[i+1], :] = result[i]
-
+    
+    for i, n in enumerate(cycles):
+        write_data_to_odb(field_data=permanent_strains[i, :, :], field_id='EP', odb_file_name=strain_odb_file_name,
+                          step_name='cycles_' + str(n), instance_name=instance_name, set_name=element_set_name)
+    """
     boundary_conditions = [BoundaryCondition('X1_NODES', 'node_set', 1),
                            BoundaryCondition('BOTTOM_NODES', 'node_set', 2),
                            BoundaryCondition('X_SYM_NODES', 'node_set', 1),
                            BoundaryCondition('Z_SYM_NODES', 'node_set', 3),
                            BoundaryCondition('Z1_NODES', 'node_set', 3)]
-    for i, n in enumerate(cycles):
-        write_data_to_odb(field_data=permanent_strains[i, :, :], field_id='EP', odb_file_name=strain_odb_file_name,
-                          step_name='cycles_' + str(n), instance_name=instance_name, set_name=element_set_name)
 
-        up, err = calculate_nodal_displacements_from_strains(strain_odb_file_name, boundary_conditions,
-                                                             step_name='cycles_' + str(n),
-                                                             instance_name=instance_name, strain_field_var='EP',
-                                                             set_name=element_set_name)
+    calculator = DeformationCalculator(strain_odb_file_name, boundary_conditions, step_name='cycles_' + str(cycles[0]),
+                                       instance_name=instance_name, set_name=element_set_name, strain_field_id='EP')
+    for i, n in enumerate(cycles):
+        up, err = calculator.calculate_deformations(step_name='cycles_' + str(n))
+
         write_data_to_odb(up, 'UP', strain_odb_file_name, step_name='cycles_' + str(n), position='NODAL',
                           frame_number=1, set_name=element_set_name)
         write_data_to_odb(err, 'ERR', strain_odb_file_name, step_name='cycles_' + str(n), frame_number=1,

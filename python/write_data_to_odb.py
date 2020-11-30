@@ -11,8 +11,8 @@ def write_data_to_odb(field_data, field_id, odb_file_name, step_name, instance_n
                       step_description='', frame_number=None, frame_value=None, field_description='',
                       position='INTEGRATION_POINT'):
     work_directory = os.path.dirname(os.path.abspath(odb_file_name))
-    pickle_filename = work_directory + '/load_field_to_odb_pickle.pkl'
-    data_filename = work_directory + '/field_data.npy'
+    pickle_filename = work_directory + r'/load_field_to_odb_pickle.pkl'
+    data_filename = work_directory + r'/field_data.npy'
     np.save(data_filename, field_data)
 
     with open(pickle_filename, 'wb') as pickle_file:
