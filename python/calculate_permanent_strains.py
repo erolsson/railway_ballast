@@ -55,7 +55,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
         instance_name = str(static_data['instance'])
         element_set_name = str(static_data['element_set'])
     os.remove(static_pickle_file)
-    """
+
     with open(cyclic_pickle_file, 'rb') as cyclic_pickle:
         cyclic_stresses = pickle.load(cyclic_pickle, encoding='latin1')['data']/1e3
     os.remove(cyclic_pickle_file)
@@ -79,7 +79,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
     for i, n in enumerate(cycles):
         write_data_to_odb(field_data=permanent_strains[i, :, :], field_id='EP', odb_file_name=strain_odb_file_name,
                           step_name='cycles_' + str(n), instance_name=instance_name, set_name=element_set_name)
-    """
+
     boundary_conditions = [BoundaryCondition('X1_NODES', 'node_set', 1),
                            BoundaryCondition('BOTTOM_NODES', 'node_set', 2),
                            BoundaryCondition('X_SYM_NODES', 'node_set', 1),
@@ -92,8 +92,8 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
         up, err = calculator.calculate_deformations(step_name='cycles_' + str(n))
 
         write_data_to_odb(up, 'UP', strain_odb_file_name, step_name='cycles_' + str(n), position='NODAL',
-                          frame_number=1, set_name=element_set_name)
-        write_data_to_odb(err, 'ERR', strain_odb_file_name, step_name='cycles_' + str(n), frame_number=1,
+                          frame_number=0, set_name='EMBANKMENT_INSTANCE_BALLAST_NODES')
+        write_data_to_odb(err, 'ERR', strain_odb_file_name, step_name='cycles_' + str(n), frame_number=0,
                           set_name=element_set_name)
 
 
