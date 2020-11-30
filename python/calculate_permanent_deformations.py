@@ -72,7 +72,7 @@ class DeformationCalculator:
         all_cols = np.arange(self.nodal_displacements.shape[0])
         self.bc_cols = np.where(np.in1d(all_cols, bc_dofs))[0]
         self.cols_to_keep = np.where(np.logical_not(np.in1d(all_cols, bc_dofs)))[0]
-
+        print("Computing scale factors")
         job_list = []
         self.B_red = self.B_matrix[:, self.cols_to_keep]
         num_cols = self.B_red.shape[1]
@@ -80,8 +80,10 @@ class DeformationCalculator:
             job_list.append((calculate_scale_factor, [self.B_red[:, col]], {}))
         self.scale_factors = np.array(multi_processer(job_list, cpus=12, delay=0))
 
+        print("Scaling B-matrix")
         for col in range(num_cols):
             self.B_red[:, col] /= self.scale_factors[col]
+        print("Init done")
 
     def calculate_deformations(self, step_name, frame_number=-1):
         strain = read_data_from_odb(self.stain_field_id, self.odb_file_name, step_name=step_name,
