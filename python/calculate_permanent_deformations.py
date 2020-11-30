@@ -5,6 +5,7 @@ import subprocess
 
 import numpy as np
 from scipy.sparse import coo_matrix
+import scipy.sparse as sp
 from scipy.sparse.linalg import lsqr, norm
 
 from common import abq
@@ -78,11 +79,11 @@ class DeformationCalculator:
         num_cols = self.B_red.shape[1]
         for col in range(num_cols):
             job_list.append((calculate_scale_factor, [self.B_red[:, col]], {}))
-        self.scale_factors = np.array(multi_processer(job_list, cpus=12, delay=0))
 
         print("Scaling B-matrix")
-        for col in range(num_cols):
-            self.B_red[:, col] /= self.scale_factors[col]
+        self.scale_factors = norm(self.B_red, axis=0)
+        scale_array = sp.diags([1./self.scale_factors], offsets=[0])
+        self.B_red *= scale_array
         print("Init done")
 
     def calculate_deformations(self, step_name, frame_number=-1):
