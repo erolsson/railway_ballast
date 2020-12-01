@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.style
 
-from experimental_results import sun_et_al_16
+from experimental_data import sun_et_al_16
 from functional_shapes import permanent_strain
 
 matplotlib.style.use('classic')

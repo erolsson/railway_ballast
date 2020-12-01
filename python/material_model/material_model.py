@@ -65,7 +65,7 @@ class MaterialModel:
 
         for i in range(cycles.shape[0]):
             if i == 0:
-                n0 = 1
+                n0 = 0
                 e1 = np.zeros(6)
             else:
                 e1 = self.strain[i - 1, :]
@@ -75,6 +75,10 @@ class MaterialModel:
 
             for j in range(6):
                 e = solution.y[j][-1]
+                if e > 1.:
+                    e = 1
+                if e < -1:
+                    e = -1
                 self.strain[i, j] = e
 
         return self.strain

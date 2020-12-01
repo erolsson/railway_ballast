@@ -3,7 +3,7 @@ from __future__ import print_function, division
 import numpy as np
 from scipy.optimize import fmin
 
-from experimental_results import sun_et_al_16
+from experimental_data import sun_et_al_16
 
 import matplotlib.pyplot as plt
 import matplotlib.style
