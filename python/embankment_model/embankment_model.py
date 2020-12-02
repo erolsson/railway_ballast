@@ -297,7 +297,7 @@ class RailwayEmbankment:
             elem_type1 = mesh.ElemType(elemCode=C3D20, elemLibrary=STANDARD)
             self.rail_part.setElementType(regions=(self.rail_part.cells,), elemTypes=(elem_type1,))
             self.rail_part.generateMesh()
-        elem_type1 = mesh.ElemType(elemCode=C3D8, elemLibrary=STANDARD)
+        elem_type1 = mesh.ElemType(elemCode=C3D20, elemLibrary=STANDARD)
         self.part.setElementType(regions=(self.part.cells,), elemTypes=(elem_type1,))
 
         ballast_elements = self.part.elements.getByBoundingBox(yMin=ballast_start_height - 1e-3,
@@ -404,7 +404,7 @@ class RailwayEmbankment:
                           distributionType=TOTAL_FORCE)
 
     def run_job(self, cpus=12):
-        job = mdb.Job(name='embankment', model=self.mdb, numCpus=cpus, numDomains=cpus)
+        job = mdb.Job(name='embankment_second_order', model=self.mdb, numCpus=cpus, numDomains=cpus)
         job.submit()
         job.waitForCompletion()
 
