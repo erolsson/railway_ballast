@@ -261,7 +261,8 @@ class RailwayEmbankment:
             n = get_edge_direction(ballast_edge)
             if n[0] == 0 and n[1] == 0:
                 length_ballast_edges.append(ballast_edge)
-            if n[1] == 0 and n[2] == 0 and ballast_edge.pointOn[0][0] < self.sleeper_length:
+            if n[1] == 0 and n[2] == 0 and (ballast_edge.pointOn[0][0] < self.sleeper_length or
+                                            ballast_edge.pointOn[0][1] == ballast_start_height):
                 width_ballast_edges.append(ballast_edge)
             if n[0] == 0 and n[2] == 0 and ballast_edge.pointOn[0][0] < self.sleeper_length:
                 height_ballast_edges.append(ballast_edge)
