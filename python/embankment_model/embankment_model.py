@@ -116,7 +116,7 @@ class RailwayEmbankment:
             part.PartitionCellByDatumPlane(datumPlane=part.datum[datum_plane_vertical.id], cells=part.cells)
 
             # meshing the sleeper
-            part.seedPart(size=0.1)
+            part.seedPart(size=0.025)
             elem_type1 = mesh.ElemType(elemCode=C3D20, elemLibrary=STANDARD)
             part.setElementType(regions=(part.cells,), elemTypes=(elem_type1,))
             part.generateMesh()
@@ -188,7 +188,7 @@ class RailwayEmbankment:
             sleeper_face = instance.faces.findAt((1e-3, self.total_height, start_point + 1e-3)).getFacesByFaceAngle(0.)
             sleeper_surface = self.assembly.Surface(side1Faces=sleeper_face,
                                                     name='sleeper_surface_' + str(sleeper_idx))
-            self.mdb.Tie(name='tie_sleeper_' + str(sleeper_idx), slave=sleeper_surface, master=ballast_surface)
+            self.mdb.Tie(name='tie_sleeper_' + str(sleeper_idx), slave=ballast_surface, master=sleeper_surface)
 
             rail_face = self.rail_instance.faces.findAt(((self.track_gauge/2,
                                                          self.total_height + self.sleeper_height,
