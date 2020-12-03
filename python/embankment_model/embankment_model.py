@@ -446,8 +446,8 @@ class RailwayEmbankment:
 
     def run_job(self, cpus=12):
         job = mdb.Job(name='embankment_second_order', model=self.mdb, numCpus=cpus, numDomains=cpus)
-        # job.submit()
-        # job.waitForCompletion()
+        job.submit()
+        job.waitForCompletion()
 
 
 def main():
