@@ -10,7 +10,7 @@ try:
     import interaction
     from abaqusConstants import COORDINATE, STANDALONE, ON, DEFORMABLE_BODY, AXISYM, OFF, THREE_D, DELETE, GEOMETRY
     from abaqusConstants import SINGLE, FIXED, SWEEP, MEDIAL_AXIS, DC3D8, DC3D6, C3D8, C3D6, C3D20, STANDARD, ANALYSIS
-    from abaqusConstants import PERCENTAGE, DOMAIN, DEFAULT, INDEX, YZPLANE, XYPLANE, HEX, TOTAL_FORCE
+    from abaqusConstants import PERCENTAGE, DOMAIN, DEFAULT, INDEX, YZPLANE, XYPLANE, HEX, TOTAL_FORCE, NUMBER
     from abaqus import backwardCompatibility
     backwardCompatibility.setValues(reportDeprecated=False)
 except ImportError:
@@ -238,6 +238,7 @@ class RailwayEmbankment:
         element_size_ballast_width = 0.1
         element_size_ballast_length = 0.1
         element_size_subgrade_height = 0.5
+        element_size_subgrade_width = 0.5
         ballast_start_height = 0
         first_ballast_layer = None
         for layer in self.layers:
@@ -255,23 +256,62 @@ class RailwayEmbankment:
                                                          zMin=-1e-3,
                                                          zMax=self.length + 1e-3)
         length_ballast_edges = []
-        width_ballast_edges = []
+        width_ballast_edges_size_seeds = []
         height_ballast_edges = []
+        seed_layer_y = self.total_height - self.layers[-1].height
         for ballast_edge in ballast_edges:
             n = get_edge_direction(ballast_edge)
             if n[0] == 0 and n[1] == 0:
                 length_ballast_edges.append(ballast_edge)
-            if n[1] == 0 and n[2] == 0 and (ballast_edge.pointOn[0][0] < self.sleeper_length or
-                                            ballast_edge.pointOn[0][1] == ballast_start_height):
-                width_ballast_edges.append(ballast_edge)
+
+            if n[1] == 0 and n[2] == 0 and ballast_edge.pointOn[0][1] == seed_layer_y:
+                width_ballast_edges_size_seeds.append(ballast_edge)
             if n[0] == 0 and n[2] == 0 and ballast_edge.pointOn[0][0] < self.sleeper_length:
                 height_ballast_edges.append(ballast_edge)
 
         self.part.seedEdgeBySize(edges=height_ballast_edges, size=element_size_ballast_height, constraint=FIXED)
         self.part.seedEdgeBySize(edges=length_ballast_edges, size=element_size_ballast_length, constraint=FIXED)
-        self.part.seedEdgeBySize(edges=width_ballast_edges, size=element_size_ballast_width, constraint=FIXED)
-        subgrade_edges = self.part.edges.getByBoundingBox(xMin=-1e-3,
-                                                          xMax=self.layers[0].bottom_width + 1e-3,
+        self.part.seedEdgeBySize(edges=width_ballast_edges_size_seeds, size=element_size_ballast_width,
+                                 constraint=FIXED)
+
+        vertical_edges = {}
+        y0 = self.total_height
+        for layer in self.layers[::-1]:
+            y0 -= layer.height
+            y_point = (y0 + y0 + layer.height)/2
+            vertical_edges[y_point] = self.part.edges.findAt((0., y_point, 0))
+
+        width_edges = {}
+        width_edges_list = self.part.edges.getByBoundingBox(yMin=seed_layer_y - 1e-3, yMax=seed_layer_y + 1e-3,
+                                                            zMin=-1e-3, zMax=1e-3)
+        for width_edge in width_edges_list:
+            vertex_idx = width_edge.getVertices()
+            p1 = self.part.vertices[vertex_idx[0]].pointOn[0]
+            p2 = self.part.vertices[vertex_idx[1]].pointOn[0]
+            x0 = min(p1[0], p2[0])
+            width_edges[x0] = width_edge
+
+        for ballast_edge in ballast_edges:
+            n = get_edge_direction(ballast_edge)
+            if n[1] != 0:
+                vertex_idx = ballast_edge.getVertices()
+                p1 = self.part.vertices[vertex_idx[0]].pointOn[0]
+                p2 = self.part.vertices[vertex_idx[1]].pointOn[0]
+                y = (p1[1] + p2[1])/2
+                n_seeds = self.part.getEdgeSeeds(edge=vertical_edges[y], attribute=NUMBER)
+                self.part.seedEdgeByNumber(edges=[ballast_edge], number=n_seeds)
+
+        for edge in self.part.edges.getByBoundingBox(xMax=first_ballast_layer.bottom_width + 1e-3):
+            n = get_edge_direction(edge)
+            if n[1] == 0 and n[2] == 0:
+                vertex_idx = edge.getVertices()
+                p1 = self.part.vertices[vertex_idx[0]].pointOn[0]
+                p2 = self.part.vertices[vertex_idx[1]].pointOn[0]
+                x0 = min(p1[0], p2[0])
+                n_seeds = self.part.getEdgeSeeds(edge=width_edges[x0], attribute=NUMBER)
+                self.part.seedEdgeByNumber(edges=[edge], number=n_seeds)
+
+        subgrade_edges = self.part.edges.getByBoundingBox(xMin=-self.layers[0].bottom_width + 1e-3,
                                                           yMin=-1e-3, yMax=ballast_start_height + 1e-3,
                                                           zMin=-1e-3, zMax=self.length + 1e-3)
         subgrade_width_edges = []
@@ -284,7 +324,7 @@ class RailwayEmbankment:
                 subgrade_height_edges.append(subgrade_edge)
 
         self.part.seedEdgeBySize(edges=subgrade_height_edges, size=element_size_subgrade_height, constraint=FIXED)
-        self.part.seedEdgeBySize(edges=subgrade_width_edges, size=element_size_subgrade_height, constraint=FIXED)
+        self.part.seedEdgeBySize(edges=subgrade_width_edges, size=element_size_subgrade_width, constraint=FIXED)
 
         # Meshing the ballast first
         ballast_cells = self.part.cells.getByBoundingBox(xMax=first_ballast_layer.bottom_width + 1e-3,
@@ -406,8 +446,8 @@ class RailwayEmbankment:
 
     def run_job(self, cpus=12):
         job = mdb.Job(name='embankment_second_order', model=self.mdb, numCpus=cpus, numDomains=cpus)
-        job.submit()
-        job.waitForCompletion()
+        # job.submit()
+        # job.waitForCompletion()
 
 
 def main():
