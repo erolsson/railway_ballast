@@ -47,7 +47,7 @@ class RailwayEmbankment:
         self.rail_part = None
         self.rail_instance = None
         self.track_gauge = 1.435
-        self.sleeper_height = 0.05
+        self.sleeper_height = 0.175
 
         self.rail_area_inertia = 32520000/1e12
         self.rail_height = 0.172
@@ -445,7 +445,7 @@ class RailwayEmbankment:
                           distributionType=TOTAL_FORCE)
 
     def run_job(self, cpus=12):
-        job = mdb.Job(name='embankment_second_order', model=self.mdb, numCpus=cpus, numDomains=cpus)
+        job = mdb.Job(name='embankment_second_order_2', model=self.mdb, numCpus=cpus, numDomains=cpus)
         job.submit()
         job.waitForCompletion()
 
