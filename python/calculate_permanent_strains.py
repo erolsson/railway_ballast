@@ -101,8 +101,8 @@ def main():
     par = np.array([1.92596342e+00, 1.33771787e-07, 2.36556786e-02, 6.54713185e-04,
                     1.59527656e+01, 2.03974910e+02, 1., 1.,
                     1., 9.05538667e-02, -6.54359191e-03, 7.15099017e-07, 2.62519248e+00])
-    stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/embankment.odb')
-    strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results.odb')
+    stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/embankment_second_order_2.odb')
+    strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_2.odb')
     cycles = [100, 1000, 10000, 100000, 1000000]
     calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
 

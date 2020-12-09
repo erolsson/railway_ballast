@@ -47,14 +47,17 @@ class DeformationCalculator:
         bc_vals_dict = data['bc_vals_dict']
         self.nodal_displacements = data['nodal_displacements']
         elements = data['elements']
+        b_components = data['b_components']
+        strain_components = data['strain_components']
+        displacement_components = data['displacement_components']
         self.bc_vals = 0.*bc_dofs
         for i, dof in enumerate(bc_dofs):
             self.bc_vals[i] = bc_vals_dict.get(dof, 0.)
 
         self.nodal_displacements[bc_dofs] = self.bc_vals
-        row = np.zeros(len(elements)*6*24*8)
-        col = np.zeros(len(elements)*6*24*8)
-        values = np.zeros(len(elements)*6*24*8)
+        row = np.zeros(b_components)
+        col = np.zeros(b_components)
+        values = np.zeros(b_components)
         print("Assembling B-matrix")
         job_list = []
         for i, element in enumerate(elements):
@@ -63,13 +66,14 @@ class DeformationCalculator:
         b_data = multi_processer(job_list, cpus=12, delay=0., timeout=1e5)
         print("Assembling results")
         for i, data in enumerate(b_data):
-            col[i*6*24*8:(i + 1)*6*24*8] = data[0]
-            row[i*6*24*8:(i + 1)*6*24*8] = data[1]
-            values[i*6*24*8:(i + 1)*6*24*8] = data[2]
+            n = data[0].shape[0]
+            col[i*n:(i + 1)*n] = data[0]
+            row[i*n:(i + 1)*n] = data[1]
+            values[i*n:(i + 1)*n] = data[2]
 
         self.B_matrix = coo_matrix((values, (row, col)),
-                                   shape=(len(elements)*6*8, self.nodal_displacements.shape[0])).tocsc()
-
+                                   shape=(strain_components, displacement_components)).tocsc()
+        print("Shape of B-matrix:", self.B_matrix.shape)
         all_cols = np.arange(self.nodal_displacements.shape[0])
         self.bc_cols = np.where(np.in1d(all_cols, bc_dofs))[0]
         self.cols_to_keep = np.where(np.logical_not(np.in1d(all_cols, bc_dofs)))[0]
@@ -102,21 +106,23 @@ class DeformationCalculator:
 
 
 def calculate_element_data(element, idx):
-    displacement_comp = np.zeros(24)
-    col = np.zeros(6*24*8)
-    row = np.zeros(6*24*8)
-    values = np.zeros(6*24*8)
+    displacement_comp = np.zeros(element.dofs)
+    n = element.dofs*element.strains_components
+    dofs = element.dofs
+    col = np.zeros(n)
+    row = np.zeros(n)
+    values = np.zeros(n)
     strain_line = 0
     for k, n in enumerate(element.node_labels):
         displacement_comp[3*k] = 3*n
         displacement_comp[3*k + 1] = 3*n + 1
         displacement_comp[3*k + 2] = 3*n + 2
-    for j, gp in enumerate(C3D8.gauss_points):
+    for j, gp in enumerate(element.gauss_points):
         B = element.B(*gp)
         for comp in range(6):
-            col[strain_line*24:strain_line*24 + 24] = displacement_comp
-            row[strain_line*24:strain_line*24 + 24] = strain_line + idx*6*8
-            values[strain_line*24:strain_line*24 + 24] = B[comp, :]
+            col[strain_line*dofs:strain_line*dofs + dofs] = displacement_comp
+            row[strain_line*dofs:strain_line*dofs + element.dofs] = strain_line + idx*element.strains_components
+            values[strain_line*dofs:strain_line*dofs + dofs] = B[comp, :]
             strain_line += 1
     return col, row, values
 

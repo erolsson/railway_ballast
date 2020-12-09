@@ -12,7 +12,7 @@ import numpy as np
 from odb_io_functions import read_field_from_odb
 from utilities import BoundaryCondition
 sys.path.append('..')
-from FEM_functions.elements import C3D8
+from FEM_functions.elements import C3D8, C3D20
 
 
 if __name__ == '__main__':
@@ -79,6 +79,9 @@ if __name__ == '__main__':
         instance_nodes[n.label] = n
 
     Node = namedtuple('Node', ['label', 'coordinates'])
+    strain_components = 0
+    displacement_components = nodal_displacements.shape[0]
+    b_components = 0
     for e_label in np.unique(element_labels):
         element = instance_elements[e_label]
 
@@ -87,9 +90,20 @@ if __name__ == '__main__':
         for abaqus_node in abaqus_element_nodes:
             idx = np.where(node_labels == abaqus_node.label)[0][0]
             element_nodes.append(Node(label=idx, coordinates=abaqus_node.coordinates))
-        elements.append(C3D8(element_nodes))
+        element_class = None
+        if len(element_nodes) == 8:
+            element_class = C3D8
+            b_components += 8*6*24
+            strain_components += 8*6
+        elif len(element_nodes) == 20:
+            element_class = C3D20
+            b_components += 27*6*60
+            strain_components += 27*6
+        elements.append(element_class(element_nodes))
 
     with open(results_pickle_file, 'wb') as results_pickle:
         pickle.dump({'elements': elements, 'bc_dofs': bc_dofs, 'bc_vals_dict': bc_vals_dict,
-                     'nodal_displacements': nodal_displacements, 'node_labels': node_labels},
+                     'nodal_displacements': nodal_displacements, 'node_labels': node_labels,
+                     'strain_components': strain_components, 'displacement_components': displacement_components,
+                     'b_components': b_components},
                     results_pickle)
