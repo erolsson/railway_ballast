@@ -17,7 +17,7 @@ except ImportError:
     print(" ERROR: This script require Abaqus CAE to run")
     raise
 
-from simulation import simulation2 as simulation
+from simulation import simulation2 as simulation_to_run
 
 
 class RailwayEmbankment:
@@ -442,13 +442,13 @@ class RailwayEmbankment:
 
 
 def main():
-    embankment = RailwayEmbankment(simulation)
+    embankment = RailwayEmbankment(simulation_to_run)
     embankment.create_rail()
     embankment.create_sleepers(sleeper_cc_distance=0.65, sleeper_width=0.265, sleeper_length=1.)
     embankment.mesh()
     embankment.apply_boundary_conditions()
     embankment.create_materials()
-    embankment.create_load_steps(axes_load=simulation.axes_load)
+    embankment.create_load_steps(axes_load=simulation_to_run.axes_load)
     embankment.assembly.regenerate()
     embankment.run_job()
 
