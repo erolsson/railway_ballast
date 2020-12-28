@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.style
 
-from embankment_model.simulation import simulation1
+from embankment_model.simulations import simulation1
 from get_data_from_path import get_data_from_path
 
 matplotlib.style.use('classic')
