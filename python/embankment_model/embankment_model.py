@@ -17,27 +17,18 @@ except ImportError:
     print(" ERROR: This script require Abaqus CAE to run")
     raise
 
-
-class ElasticLayer:
-    def __init__(self, name, bottom_width, top_width, height, E, v, density):
-        self.name = name
-        self.bottom_width = bottom_width
-        self.top_width = top_width
-        self.height = height
-        self.E = E
-        self.v = v
-        self.density = density
+from simulation import simulation2 as simulation
 
 
 class RailwayEmbankment:
-    def __init__(self, layers, length):
+    def __init__(self, simulation):
         Mdb()
         self.mdb = mdb.models['Model-1']
         self.mdb.setValues(noPartsInputFile=ON)
         self.assembly = self.mdb.rootAssembly
-        self.length = length
+        self.length = simulation.embankment_length
         self.total_height = 0
-        self.layers = layers
+        self.layers = simulation.layers
         instances = []
         parts = []
         self.sleeper_length = None
@@ -46,16 +37,16 @@ class RailwayEmbankment:
         self.sleeper_instances = []
         self.rail_part = None
         self.rail_instance = None
-        self.track_gauge = 1.435
+        self.track_gauge = simulation.track_gauge
         self.sleeper_height = 0.175
 
         self.rail_area_inertia = 32520000/1e12
         self.rail_height = 0.172
         self.rail_width = 12*self.rail_area_inertia/self.rail_height**3
         self.rail_density = 60.4/self.rail_width/self.rail_height
-        print(self.rail_density, self.rail_width)
+        self.job_name = simulation.job_name
 
-        for layer in layers:
+        for layer in self.layers:
             sketch = self.mdb.ConstrainedSketch(name='sketch_' + layer.name, sheetSize=800.0)
             p1 = (0, self.total_height)
             p2 = (layer.bottom_width, self.total_height)
@@ -67,7 +58,7 @@ class RailwayEmbankment:
             sketch.Line(point1=p3, point2=p4)
             sketch.Line(point1=p4, point2=p1)
             part = self.mdb.Part(name='part_' + layer.name, dimensionality=THREE_D, type=DEFORMABLE_BODY)
-            part.BaseSolidExtrude(sketch=sketch, depth=length)
+            part.BaseSolidExtrude(sketch=sketch, depth=self.length)
             parts.append(part)
             instances.append(self.assembly.Instance(name='instance_' + layer.name, part=part, dependent=ON))
         self.part = self.assembly.PartFromBooleanMerge(name='embankment_part',
@@ -79,10 +70,10 @@ class RailwayEmbankment:
         for part in parts:
             del self.mdb.parts[part.name]
 
-        for i in range(len(layers) - 1):
-            if layers[i].top_width != layers[i+1].bottom_width:
+        for i in range(len(self.layers) - 1):
+            if self.layers[i].top_width != self.layers[i+1].bottom_width:
                 datum_plane_vertical = self.part.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE,
-                                                                            offset=layers[i+1].bottom_width)
+                                                                            offset=self.layers[i+1].bottom_width)
                 self.part.PartitionCellByDatumPlane(datumPlane=self.part.datum[datum_plane_vertical.id],
                                                     cells=self.part.cells)
 
@@ -445,30 +436,19 @@ class RailwayEmbankment:
                           distributionType=TOTAL_FORCE)
 
     def run_job(self, cpus=12):
-        job = mdb.Job(name='embankment_second_order_2', model=self.mdb, numCpus=cpus, numDomains=cpus)
+        job = mdb.Job(name=self.job_name, model=self.mdb, numCpus=cpus, numDomains=cpus)
         job.submit()
         job.waitForCompletion()
 
 
 def main():
-    embkankment_length = 5.5
-    layers = [ElasticLayer(name='soil', bottom_width=20, top_width=20.,
-                           height=2., E=50e6, v=0.2, density=2000),
-              ElasticLayer(name='clay', bottom_width=20, top_width=20.,
-                           height=4., E=50e6, v=0.2, density=2000),
-              ElasticLayer(name='subgrade', bottom_width=20, top_width=20.,
-                           height=1., E=50e6, v=0.2, density=2000),
-              ElasticLayer(name='ballast_1', bottom_width=9.3, top_width=3.6,
-                           height=3.8, E=200e6, v=0.35, density=1600),
-              ElasticLayer(name='ballast_2', bottom_width=2.55, top_width=1.8,
-                           height=0.5, E=200e6, v=0.35, density=1600)]
-    embankment = RailwayEmbankment(layers, embkankment_length)
+    embankment = RailwayEmbankment(simulation)
     embankment.create_rail()
     embankment.create_sleepers(sleeper_cc_distance=0.65, sleeper_width=0.265, sleeper_length=1.)
     embankment.mesh()
     embankment.apply_boundary_conditions()
     embankment.create_materials()
-    embankment.create_load_steps(axes_load=22.5)
+    embankment.create_load_steps(axes_load=simulation.axes_load)
     embankment.assembly.regenerate()
     embankment.run_job()
 
