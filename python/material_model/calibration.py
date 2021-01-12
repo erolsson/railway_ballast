@@ -5,7 +5,7 @@ import matplotlib.style
 
 from scipy.optimize import fmin
 
-from experimental_data import sun_et_al_16
+from experimental_results import sun_et_al_16
 from material_model import MaterialModel
 from multiprocesser.multiprocesser import multi_processer
 
@@ -19,7 +19,7 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
 
-def deviatoric_residual(fitting_parameters, parameters, parameters_to_fit, experiments, residual_func):
+def residual(fitting_parameters, parameters, parameters_to_fit, experiments, residual_func):
     parameters[parameters_to_fit] = fitting_parameters
     job_list = [(residual_func, [parameters, experiment], {})
                 for experiment in experiments]
@@ -43,7 +43,7 @@ def calc_deviatoric_residual_for_data_experiment(parameters, experiment):
     model = MaterialModel(parameters=parameters, frequency=experiment.f)
     model.update(experiment.cycles, cyclic_stress, static_stress)
     model_e = -model.deviatoric_strain()[:, 0]
-    r = np.sum((1 - model_e[e_exp != 0]/e_exp[e_exp != 0])**2*np.log(experiment.cycles[e_exp != 0]))
+    r = np.sum((e_exp - model_e)**2)
     return r, round(model_e[-1] + e0, 4), round(e_exp[-1] + e0, 4), experiment.p, experiment.q, experiment.f
 
 
@@ -55,24 +55,24 @@ def calc_volumetric_residual_for_data_experiment(parameters, experiment):
     model = MaterialModel(parameters=parameters, frequency=experiment.f)
     model.update(experiment.cycles, cyclic_stress, static_stress)
     model_e = -model.volumetric_strain()
-    idx = np.logical_and(e_exp < 0.5, e_exp != 0)
+    idx = np.logical_and(e_exp < 0.3, e_exp != 0)
     r = np.sum((model_e[idx] - e_exp[idx])**2*np.log(experiment.cycles[idx]))
 
     return r, round(model_e[-1] + e0, 4), round(e_exp[-1] + e0, 4), experiment.p, experiment.q, experiment.f
 
 
 def main():
-    frequencies = [10.]
-    parameters_to_fit = range(9, 13)
-    parameters = np.array([1.92595851e+00, 1.33773133e-07, 2.36533127e-02, 6.54720828e-04,
-                           1.59528891e+01, 2.03976492e+02, 1., 1.,
-                           1., 2.21751785e-01, -4.55843109e-03, 1, 1])
+    frequencies = [5]
+    parameters_to_fit = list(range(2)) + list(range(4, 6))
+    parameters = np.array([9.39141439e-01,  1.90573525e-04, 5.43522967e+00,  4.54045581e-02,
+                           1.09092425e+01,  8.01956620e+00, 1., 1.,
+                           1., 0, 0, 0, 0])
 
     fitting_dataset = sun_et_al_16.get_data(f=frequencies)
-    for i in range(10):
-        parameters[parameters_to_fit] = fmin(deviatoric_residual, [parameters[parameters_to_fit]],
+    for i in range(6):
+        parameters[parameters_to_fit] = fmin(residual, [parameters[parameters_to_fit]],
                                              args=(parameters, parameters_to_fit, fitting_dataset,
-                                                   calc_volumetric_residual_for_data_experiment), maxfun=1e6,
+                                                   calc_deviatoric_residual_for_data_experiment), maxfun=1e6,
                                              maxiter=1e6)
         print(parameters[parameters_to_fit])
 

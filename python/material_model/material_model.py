@@ -8,7 +8,7 @@ def invariant_1(tensor):
     return tensor[0] + tensor[1] + tensor[2]
 
 
-def von_Mises(tensor):
+def von_mises(tensor):
     return np.sqrt(np.sum(tensor[0:3]**2) + 3*np.sum(tensor[3:6]**2) - tensor[0]*tensor[1]
                    - tensor[0]*tensor[2] - tensor[1]*tensor[2])
 
@@ -32,6 +32,8 @@ class MaterialModel:
             self.fd = 1.
         else:
             self.fd = parameters[freq_idx[frequency]]
+            if self.fd < 1.:
+                self.fd = 1
         self.strain = None
         self.parameters = parameters
 
@@ -40,14 +42,14 @@ class MaterialModel:
         p = -invariant_1(static_stress)/3
         if p < 0:
             p = 0
-        q = von_Mises(cyclic_stress)
-        p_cyclic = -invariant_1(cyclic_stress)/3*self.fd
-        p_tot = p + p_cyclic
+        q = von_mises(cyclic_stress)
+        p_cyclic = -invariant_1(cyclic_stress)/3
+        p_eff = p + p_cyclic
         nij = 1.5*(cyclic_stress - invariant_1(cyclic_stress)/3*np.array([1, 1, 1, 0, 0, 0]))/q
 
-        def dedn(n, ep):
-            arg = 1. + self.A1*p + self.A2*p**2
-            hf = self._hf(von_Mises(ep))
+        def dedn(_, ep):
+            arg = 1. + self.A1*p_eff + self.A2*p_eff**2
+            hf = self._hf(von_mises(ep))
 
             if arg < 1e-6:
                 arg = 1e-6
@@ -56,12 +58,12 @@ class MaterialModel:
             if f < 0.:
                 f = 0.
 
-            ep_eff_dN = self.A*f**self.gf
-            dilatation = self.b1*np.exp(-self.nf*von_Mises(ep)) + self.b2*p + self.b3*p_cyclic**self.nb
-            e = ep_eff_dN*(nij + dilatation*np.array([1, 1, 1, 0, 0, 0]))
+            ep_eff_dn = self.A*f**self.gf
+            dilatation = self.b1*np.exp(-self.nf*von_mises(ep)) + self.b2*p + self.b3*p_cyclic**self.nb
+            deij_dn = ep_eff_dn*(nij + dilatation*np.array([1, 1, 1, 0, 0, 0]))
             # e = ep_eff_dN*(nij + (self.b1 + self.b2*(p + self.fd*p_cyclic))*np.array([1., 1., 1., 0., 0., 0]))
 
-            return e
+            return deij_dn
 
         for i in range(cycles.shape[0]):
             if i == 0:
@@ -80,7 +82,6 @@ class MaterialModel:
                 if e < -1:
                     e = -1
                 self.strain[i, j] = e
-
         return self.strain
 
     def _hf(self, ep):

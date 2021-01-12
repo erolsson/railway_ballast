@@ -28,18 +28,16 @@ class Experiment:
         volumetric_strain = data[:, 1]
 
         self.cycles = np.linspace(np.max([axial_cycles[0], volumetric_cycles[0]]),
-                                  np.log(4e5), num_points)
-        idx = self.cycles < min(axial_cycles[-1], volumetric_cycles[-1])
+                                  np.min([axial_cycles[-1], volumetric_cycles[-1]]), num_points)
 
         self.axial_strain = 0*self.cycles + 1 + axial_strain[0]
         self.volumetric_strain = 0*self.cycles + 1. + volumetric_strain[0]
-        self.axial_strain[idx] = np.interp(self.cycles[idx], axial_cycles, axial_strain)
-        self.volumetric_strain[idx] = np.interp(self.cycles[idx], volumetric_cycles, volumetric_strain)
+        self.axial_strain = np.interp(self.cycles, axial_cycles, axial_strain)
+        self.volumetric_strain = np.interp(self.cycles, volumetric_cycles, volumetric_strain)
         self.cycles = np.exp(self.cycles)
 
     def deviatoric_axial_strain(self):
         edev = self.axial_strain - self.volumetric_strain/3
-        edev[edev > 0.3] = 1. + edev[0]
         return edev
 
 
