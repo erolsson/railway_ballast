@@ -15,30 +15,41 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
 
 parameters = OrderedDict()
 
-parameters[5] = [1.18705105e+00,  3.75814744e-04, 5.43522967e+00,  4.54045581e-02,
-                 2.94230799e+01,  8.08711944e+00]
 
-parameters[10] = [6.84064006e-01,  2.87438142e-04, 5.43522967e+00,  4.54045581e-02,
-                  2.49613427e+01,  8.07865840e+00]
+parameters[5] = [2.78174304e+00, 5.67424219e-09, 4.79444140e-02, 1.21521435e-03,
+                 1.25454110e+01, 1.94706613e+02, 0.00189335, -0.00511544,  0.0013497,   0.00132903 ]
 
-parameters[20] = [9.39141439e-01,  1.90573525e-04, 4.91382134e+00,  6.19133427e-02,
-                  1.09092425e+01,  8.01956620e+00]
+parameters[10] = [1.81696447e+00, 3.67922225e-07, 5.25068390e-02, 7.49368438e-04,
+                  1.39169448e+01, 1.86223864e+02]
 
-parameters[40] = [1.06807362e+00, 2.03734495e-04, 5.43068531e+00, 4.08554859e-02,
-                  6.96762283e+00, 8.93961830e+00]
+parameters[20] = [1.41053055e+00, 3.32379026e-06, 8.67794008e-01, 4.52482073e-04,
+                  2.00671901e+00, 1.65727190e+02]
 
-pressure = np.linspace(0, 100, 1000)
-ep = np.linspace(0, 0.3, 1000)
-for f, par in parameters.items():
-    plt.figure(0)
-    plt.plot(pressure, (np.sqrt(1 + par[2]*pressure + par[3]*pressure**2)))
+parameters[40] = [1.40956811e+00, 1.10662626e-06, 7.38373606e-02, 4.52749231e-04,
+                  1.25748667e+00, 4.76597957e+02]
 
-    plt.figure(1)
-    plt.plot(ep,  par[5]*(1 - np.exp(-par[4]*ep)))
+parameters_common = [1.69673393e+00, 2.74160533e-07, 3.77582169e-04, 8.94507739e-04,
+                     1.35766134e+01, 2.42346547e+02, 8.88304920e-01, 5.69321089e-01,
+                     3.82273550e-01]
+
+
+def main():
+    pressure = np.linspace(0, 100, 1000)
+    ep = np.linspace(0, 0.3, 1000)
+    for f, par in parameters.items():
+        plt.figure(0)
+        plt.plot(pressure, (np.sqrt(1 + par[2]*pressure + par[3]*pressure**2)))
+
+        plt.figure(1)
+        plt.plot(ep,  par[5]*(1 - np.exp(-par[4]*ep)))
+        plt.figure(2)
+        plt.plot(pressure, par[1]*(230/np.sqrt(1 + par[2]*pressure + par[3]*pressure**2))**par[0])
+
     plt.figure(2)
-    plt.plot(pressure, par[1]*(230/np.sqrt(1 + par[2]*pressure + par[3]*pressure**2))**par[0])
+    plt.xlim(20, 70)
+    plt.ylim(0, 0.02)
+    plt.show()
 
-plt.figure(2)
-plt.xlim(20, 70)
-plt.ylim(0, 0.02)
-plt.show()
+
+if __name__ == '__main__':
+    main()

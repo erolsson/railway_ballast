@@ -7,6 +7,7 @@ from scipy.optimize import fmin
 
 from experimental_results import sun_et_al_16
 from material_model import MaterialModel
+from model_parameters import parameters
 from multiprocesser.multiprocesser import multi_processer
 
 
@@ -19,9 +20,9 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
 
-def residual(fitting_parameters, parameters, parameters_to_fit, experiments, residual_func):
-    parameters[parameters_to_fit] = fitting_parameters
-    job_list = [(residual_func, [parameters, experiment], {})
+def residual(fitting_parameters, par, parameters_to_fit, experiments, residual_func):
+    par[parameters_to_fit] = fitting_parameters
+    job_list = [(residual_func, [par, experiment], {})
                 for experiment in experiments]
     simulations = multi_processer(job_list, delay=0.)
     residual = 0
@@ -35,46 +36,47 @@ def residual(fitting_parameters, parameters, parameters_to_fit, experiments, res
     return residual
 
 
-def calc_deviatoric_residual_for_data_experiment(parameters, experiment):
+def calc_deviatoric_residual_for_data_experiment(par, experiment):
     e0 = experiment.deviatoric_axial_strain()[0]
     e_exp = experiment.deviatoric_axial_strain() - e0
     static_stress = -experiment.p*np.array([1, 1, 1, 0, 0, 0])
     cyclic_stress = -experiment.q*np.array([1, 0, 0, 0, 0, 0])
-    model = MaterialModel(parameters=parameters, frequency=experiment.f)
+    model = MaterialModel(material_parameters=par, frequency=experiment.f)
     model.update(experiment.cycles, cyclic_stress, static_stress)
     model_e = -model.deviatoric_strain()[:, 0]
-    r = np.sum((e_exp - model_e)**2)
+    idx = np.logical_and(e_exp < 0.3, e_exp != 0)
+    r = np.sqrt(np.sum((model_e[idx] - e_exp[idx])**2)/e_exp.shape[0])*100
     return r, round(model_e[-1] + e0, 4), round(e_exp[-1] + e0, 4), experiment.p, experiment.q, experiment.f
 
 
-def calc_volumetric_residual_for_data_experiment(parameters, experiment):
+def calc_volumetric_residual_for_data_experiment(par, experiment):
     e0 = experiment.volumetric_strain[0]
     e_exp = experiment.volumetric_strain - e0
     static_stress = -experiment.p*np.array([1, 1, 1, 0, 0, 0])
     cyclic_stress = -experiment.q*np.array([1, 0, 0, 0, 0, 0])
-    model = MaterialModel(parameters=parameters, frequency=experiment.f)
+    model = MaterialModel(material_parameters=par, frequency=experiment.f)
     model.update(experiment.cycles, cyclic_stress, static_stress)
     model_e = -model.volumetric_strain()
     idx = np.logical_and(e_exp < 0.3, e_exp != 0)
-    r = np.sum((model_e[idx] - e_exp[idx])**2*np.log(experiment.cycles[idx]))
+    r = np.sqrt(np.sum((model_e[idx] - e_exp[idx])**2)/e_exp.shape[0])*100
 
     return r, round(model_e[-1] + e0, 4), round(e_exp[-1] + e0, 4), experiment.p, experiment.q, experiment.f
 
 
 def main():
-    frequencies = [5]
-    parameters_to_fit = list(range(2)) + list(range(4, 6))
-    parameters = np.array([9.39141439e-01,  1.90573525e-04, 5.43522967e+00,  4.54045581e-02,
-                           1.09092425e+01,  8.01956620e+00, 1., 1.,
-                           1., 0, 0, 0, 0])
-
+    frequencies = [5, 10, 20, 40]
+    # parameters_to_fit = list(range(4, 6))
+    # parameters_to_fit = list(range(9, 13))
+    parameters_to_fit = range(9)
+    par = np.array([1.81696447e+00, 3.67922225e-07, 5.25068390e-02, 7.49368438e-04,
+                  1.39169448e+01, 1.86223864e+02, 1, 1, 1, 0.00189335, -0.00511544,  0.0013497,   0.00132903] )
     fitting_dataset = sun_et_al_16.get_data(f=frequencies)
     for i in range(6):
-        parameters[parameters_to_fit] = fmin(residual, [parameters[parameters_to_fit]],
-                                             args=(parameters, parameters_to_fit, fitting_dataset,
-                                                   calc_deviatoric_residual_for_data_experiment), maxfun=1e6,
-                                             maxiter=1e6)
-        print(parameters[parameters_to_fit])
+        par[parameters_to_fit] = fmin(residual, [par[parameters_to_fit]],
+                                      args=(par, parameters_to_fit, fitting_dataset,
+                                            calc_deviatoric_residual_for_data_experiment), maxfun=1e6,
+                                      maxiter=1e6)
+        print(par[parameters_to_fit])
 
 
 if __name__ == '__main__':
