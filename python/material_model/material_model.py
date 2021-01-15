@@ -23,10 +23,11 @@ class MaterialModel:
 
         self.nf = abs(material_parameters[4])
         self.H1 = abs(material_parameters[5])
-        self.b1 = material_parameters[9]
-        self.b2 = material_parameters[10]
-        self.b3 = material_parameters[11]
-        self.nb = material_parameters[12]
+        self.b1 = abs(material_parameters[9])
+        self.b2 = abs(material_parameters[10])
+        self.b3 = abs(material_parameters[11])
+        self.nb = abs(material_parameters[12])
+        self.b4 = abs(material_parameters[13])
 
         freq_idx = {10.: 6, 20.: 7, 40.: 8}
         if frequency == 5.:
@@ -35,20 +36,22 @@ class MaterialModel:
             self.fd = material_parameters[freq_idx[frequency]]
             if self.fd > 1.:
                 self.fd = 1
-        self.strain = None
+        self.frictional_strain = None
+        self.compaction_strain = None
         self.parameters = material_parameters
 
     def update(self, cycles, cyclic_stress, static_stress):
-        self.strain = np.zeros((cycles.shape[0], 6))
-        p = -invariant_1(static_stress)/3
-        if p < 0:
-            p = 0
+        self.frictional_strain = np.zeros((cycles.shape[0], 6))
+        self.compaction_strain = np.zeros((cycles.shape[0], 6))
+        p0 = -invariant_1(static_stress)/3
+        pc = -invariant_1(cyclic_stress)/3
+        if p0 < 0:
+            p0 = 0
         q = von_mises(cyclic_stress)
-        p_cyclic = -invariant_1(cyclic_stress)/3
         nij = 1.5*(cyclic_stress - invariant_1(cyclic_stress)/3*np.array([1, 1, 1, 0, 0, 0]))/q
 
-        def dedn(_, ep):
-            arg = 1. + self.A1*p + self.A2*p**2
+        def dkd_dn(_, ep):
+            arg = 1. + self.A1*p0 + self.A2*p0**2
             hf = self._hf(von_mises(ep))
 
             if arg < 1e-6:
@@ -59,46 +62,47 @@ class MaterialModel:
                 f = 0.
 
             ep_eff_dn = self.A*f**self.gf
-            dilatation = self.b1*np.exp(-self.nb*von_mises(ep)) + self.b3*p_cyclic + self.b2*p
+            dilatation = self.b1
             deij_dn = ep_eff_dn*(nij + dilatation*np.array([1, 1, 1, 0, 0, 0]))
-            # e = ep_eff_dN*(nij + (self.b1 + self.b2*(p + self.fd*p_cyclic))*np.array([1., 1., 1., 0., 0., 0]))
-
             return deij_dn
 
+        def dkv_dn(_, ev):
+            f = p0 + self.b4*pc - self.b3*ev
+            if f < 0:
+                f = 0
+            return self.b2*f**self.nb
+
         for i in range(1, cycles.shape[0]):
-            e1 = self.strain[i - 1, :]
+            e_fric = self.frictional_strain[i - 1, :]
+            e_comp = self.compaction_strain[i - 1, :]
             n0 = cycles[i - 1]
+            solution_fric = solve_ivp(dkd_dn, [n0, cycles[i]], e_fric)
+            solution_comp = solve_ivp(dkv_dn, [n0, cycles[i]], [e_comp[0] + e_comp[1] + e_comp[2]])
 
-            solution = solve_ivp(dedn, [n0, cycles[i]], e1)
+            e_f = solution_fric.y[:, -1]
+            e_c = solution_comp.y[:, -1]
 
-            for j in range(6):
-                e = solution.y[j][-1]
-                if e > 1.:
-                    e = 1
-                if e < -1:
-                    e = -1
-                self.strain[i, j] = e
-        return self.strain
+            self.frictional_strain[i, :] = e_f
+            for j in range(3):
+                self.compaction_strain[i, j] = e_c/3
+        return self.frictional_strain - self.compaction_strain
 
     def _hf(self, ep):
         return self.H1*(1 - np.exp(-self.nf*self.fd*ep))
 
-    def permanent_strain_tensor(self):
-        return self.strain
+    def strain(self):
+        return self.frictional_strain - self.compaction_strain
 
     def volumetric_strain(self):
-        eij = self.permanent_strain_tensor()
-        ev = np.sum(eij[:, 0:3], axis=1)
-        # ev[np.abs(ev) > 0.25] = -1.
-        return ev
+        e = self.strain()
+        return e[:, 0] + e[:, 1] + e[:, 2]
 
     def deviatoric_strain(self):
-        eij = self.permanent_strain_tensor()
+        e_dev = np.array(self.strain())
         e_vol = self.volumetric_strain()
-        edev = eij - np.outer(e_vol/3, np.array([1, 1, 1, 0, 0, 0]))
-        # edev[edev > 0.35] = 1.
-        # edev[edev < -0.35] = -1.
-        return edev
+        for i in range(3):
+            e_dev[:, i] -= e_vol/3
+        return e_dev
 
 
 def main():
@@ -113,31 +117,48 @@ def main():
     plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                       'monospace': ['Computer Modern Typewriter']})
     # 5 Hz
-    par = np.array([1.69973217e+00,  1.31799074e-04,  1.80611419e+02, -3.43052634e-01,
-                    4.37232129e+00,  1.13225231e+01,  8.65944683e-01,  5.11461948e-01,
-                    3.46847004e-01, 0, 0,  0,  0])
-    par[:9] = parameters_common
+    base_parameters = np.zeros(14)
+    base_parameters[6:9] = 1.
+    # base_parameters[:9] = parameters_common
     cycles = np.exp(np.linspace(np.log(1), np.log(5e5), 100))
 
-    for i, f in enumerate([5., 10., 20, 40]):
+    colors = {(10, 230): 'b', (30, 230): 'r', (60, 230): 'g', (60, 370): 'k', (30, 276): 'm', (60, 460): 'y'}
+    for i, f in enumerate([5., 10.]):
         # par[0:6] = parameters[f]
-        model = MaterialModel(material_parameters=par, frequency=f)
+
         experimental_data = sun_et_al_16.get_data(f=f)
         for experiment in experimental_data:
+            p = experiment.p
+            q = experiment.q
             plt.figure(i)
             edev = experiment.deviatoric_axial_strain()
-
-            plt.semilogx(experiment.cycles[edev < 0.9], edev[edev < 0.9])
-            static_stress = -experiment.p*np.array([1, 1, 1, 0, 0, 0])
-            cyclic_stress = -experiment.q*np.array([1, 0, 0, 0, 0, 0])
+            plt.semilogx(experiment.cycles[edev < 0.9], edev[edev < 0.9], colors[(p, q)], lw=2)
+            par1 = np.array(base_parameters)
+            par1[0:6] = parameters[f][0:6]
+            par1[9:] = parameters[f][6:]
+            model = MaterialModel(material_parameters=par1, frequency=f)
+            static_stress = -p*np.array([1, 1, 1, 0, 0, 0])
+            cyclic_stress = -q*np.array([1, 0, 0, 0, 0, 0])
             model.update(cycles, cyclic_stress, static_stress)
             edev = -model.deviatoric_strain()[:, 0]
-            print(edev)
-            plt.semilogx(cycles[edev < 0.9], edev[edev < 0.9] + experiment.deviatoric_axial_strain()[0], '--')
+            plt.semilogx(cycles[edev < 0.9], edev[edev < 0.9] + experiment.deviatoric_axial_strain()[0],
+                         '--' + colors[(p, q)], lw=2)
 
-            # plt.figure(i+4)
-            # plt.semilogx(experiment.cycles, experiment.volumetric_strain)
-            # plt.semilogx(cycles, -model.volumetric_strain() + experiment.volumetric_strain[0], '--')
+            plt.figure(i + 4)
+            plt.semilogx(experiment.cycles, experiment.volumetric_strain, colors[(p, q)], lw=2)
+            plt.semilogx(cycles, -model.volumetric_strain() + experiment.volumetric_strain[0],
+                         '--' + colors[(p, q)], lw=2)
+
+            plt.figure(i)
+            par2 = np.array(base_parameters)
+            par2[0:9] = parameters_common
+            model = MaterialModel(material_parameters=par2, frequency=f)
+            model.update(cycles, cyclic_stress, static_stress)
+            edev = -model.deviatoric_strain()[:, 0]
+            plt.semilogx(cycles[edev < 0.9], edev[edev < 0.9] + experiment.deviatoric_axial_strain()[0],
+                         ':' + colors[(p, q)], lw=2)
+
+
 
         plt.figure(i)
         plt.xlim(1, 5e5)

@@ -24,7 +24,7 @@ def main():
         for experiment in experimental_data:
             edev = (experiment.deviatoric_axial_strain() - experiment.deviatoric_axial_strain()[0])
             ea = experiment.axial_strain - experiment.axial_strain[0]
-            ev = experiment.volumetric_strain - experiment.volumetric_strain[0]
+            ev = experiment.compaction_strain - experiment.compaction_strain[0]
             dea = np.diff(ea)/np.diff(experiment.cycles)
             dev = np.diff(ev)/np.diff(experiment.cycles)
             dedev = np.diff(edev)/np.diff(experiment.cycles)

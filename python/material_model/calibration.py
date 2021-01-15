@@ -64,17 +64,22 @@ def calc_volumetric_residual_for_data_experiment(par, experiment):
 
 
 def main():
-    frequencies = [5, 10, 20, 40]
+    frequencies = [20]
     # parameters_to_fit = list(range(4, 6))
-    # parameters_to_fit = list(range(9, 13))
-    parameters_to_fit = range(9)
+    parameters_to_fit = list(range(9, 14))
+    # parameters_to_fit = range(6)
     par = np.array([1.81696447e+00, 3.67922225e-07, 5.25068390e-02, 7.49368438e-04,
-                  1.39169448e+01, 1.86223864e+02, 1, 1, 1, 0.00189335, -0.00511544,  0.0013497,   0.00132903] )
+                    1.39169448e+01, 1.86223864e+02, 1, 1,
+                    1, 0, 1e-5, 0,
+                    1., 1.])
     fitting_dataset = sun_et_al_16.get_data(f=frequencies)
+    par[0:6] = parameters[10][0:6]
+    par[9:] = parameters[10][6:]
     for i in range(6):
+
         par[parameters_to_fit] = fmin(residual, [par[parameters_to_fit]],
                                       args=(par, parameters_to_fit, fitting_dataset,
-                                            calc_deviatoric_residual_for_data_experiment), maxfun=1e6,
+                                            calc_volumetric_residual_for_data_experiment), maxfun=1e6,
                                       maxiter=1e6)
         print(par[parameters_to_fit])
 

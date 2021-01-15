@@ -76,13 +76,13 @@ def permanent_strain(cycles, p, q, freq, parameters, e0=0):
 
 def calc_residual_for_dataset(data, par):
     e_exp = data.axial_strain
-    ev_exp = data.volumetric_strain
+    ev_exp = data.compaction_strain
     static_stress = -data.p*np.array([1, 1, 1, 0, 0, 0])
     cyclic_stress = -data.q*np.array([1, 0, 0, 0, 0, 0])
     model = MaterialModel(parameters=par, frequency=data.f)
     model.update(data.cycles, cyclic_stress, static_stress)
-    model_e = -model.strain[:, 0]
-    model_ev = -model.volumetric_strain()
+    model_e = -model.frictional_strain[:, 0]
+    model_ev = -model.compaction_strain()
     e_exp = e_exp - e_exp[0]
     ev_exp -= ev_exp[0]
     return (np.sum((model_e - e_exp)**2*np.log(data.cycles)) +
@@ -143,11 +143,11 @@ def main():
         print(experiment.p, experiment.q)
         model_strain = permanent_strain(experiment.cycles, experiment.p, experiment.q, par)
         if c == 'k':
-            plt.semilogx(experiment.cycles, experiment.strain, '-' + c, lw=2, label='Experiment (Sun et. al 2016)')
-            plt.semilogx(experiment.cycles, model_strain + experiment.strain[0], '--' + c, lw=2, label='Model')
+            plt.semilogx(experiment.cycles, experiment.frictional_strain, '-' + c, lw=2, label='Experiment (Sun et. al 2016)')
+            plt.semilogx(experiment.cycles, model_strain + experiment.frictional_strain[0], '--' + c, lw=2, label='Model')
         else:
-            plt.semilogx(experiment.cycles, experiment.strain, '-' + c, lw=2)
-            plt.semilogx(experiment.cycles, model_strain + experiment.strain[0], '--' + c, lw=2)
+            plt.semilogx(experiment.cycles, experiment.frictional_strain, '-' + c, lw=2)
+            plt.semilogx(experiment.cycles, model_strain + experiment.frictional_strain[0], '--' + c, lw=2)
     # plt.ylim(0, 0.15)
     plt.xlim(0, 5e5)
     fig.set_size_inches(10, 8., forward=True)

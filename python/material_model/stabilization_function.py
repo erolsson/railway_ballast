@@ -43,8 +43,8 @@ def rate(par, e, p, q, f):
 
 def residual_func_(parameters, experiment):
     cycles = np.exp(np.linspace(0, np.log(experiment.cycles[-1]), 100))
-    e0 = experiment.strain[0]
-    exp_strain = np.interp(np.log(cycles), np.log(experiment.cycles), experiment.strain) - e0
+    e0 = experiment.frictional_strain[0]
+    exp_strain = np.interp(np.log(cycles), np.log(experiment.cycles), experiment.frictional_strain) - e0
     model_strain = permanent_strain(cycles, experiment.p, experiment.q, experiment.f, parameters)
     return np.sum((exp_strain - model_strain)**2), exp_strain[-1] + e0, model_strain[-1] + e0, experiment, cycles[-1]
 
