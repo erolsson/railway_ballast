@@ -57,8 +57,8 @@ def calc_volumetric_residual_for_data_experiment(par, experiment):
     model = MaterialModel(material_parameters=par, frequency=experiment.f)
     model.update(experiment.cycles, cyclic_stress, static_stress)
     model_e = -model.volumetric_strain()
-    idx = np.logical_and(e_exp < 0.3, abs(e_exp) > 1e-2)
-    r = np.sqrt(np.sum((model_e[idx] - e_exp[idx])**2)/e_exp.shape[0])*100
+    idx = np.logical_and(e_exp < 0.3, abs(e_exp) > 1e-3)
+    r = np.sqrt(np.sum((1 - model_e[idx]/e_exp[idx])**2*np.log(experiment.cycles[idx])/e_exp.shape[0]))
 
     return r, round(model_e[-1] + e0, 4), round(e_exp[-1] + e0, 4), experiment.p, experiment.q, experiment.f
 

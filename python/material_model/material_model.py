@@ -37,9 +37,11 @@ class MaterialModel:
             self.fc = 1.
         else:
             self.fd = material_parameters[freq_idx[frequency]]
-            self.fc = material_parameters[c_idx[frequency]]
+            self.fc = abs(material_parameters[c_idx[frequency]])
             if self.fd > 1.:
                 self.fd = 1
+            if self.fc < 1.:
+                self.fc = 1 - (self.fc - 1)
 
         self.frictional_strain = None
         self.compaction_strain = None
