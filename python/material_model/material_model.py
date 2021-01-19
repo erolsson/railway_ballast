@@ -28,14 +28,19 @@ class MaterialModel:
         self.b3 = abs(material_parameters[11])
         self.nb = abs(material_parameters[12])
         self.b4 = abs(material_parameters[13])
+        self.b5 = material_parameters[17]
 
         freq_idx = {10.: 6, 20.: 7, 40.: 8}
+        c_idx = {10.: 14, 20.: 15, 40.: 16}
         if frequency == 5.:
             self.fd = 1.
+            self.fc = 1.
         else:
             self.fd = material_parameters[freq_idx[frequency]]
+            self.fc = material_parameters[c_idx[frequency]]
             if self.fd > 1.:
                 self.fd = 1
+
         self.frictional_strain = None
         self.compaction_strain = None
         self.parameters = material_parameters
@@ -62,12 +67,12 @@ class MaterialModel:
                 f = 0.
 
             ep_eff_dn = self.A*f**self.gf
-            dilatation = self.b1
+            dilatation = self.b1 + self.b5*p0
             deij_dn = ep_eff_dn*(nij + dilatation*np.array([1, 1, 1, 0, 0, 0]))
             return deij_dn
 
         def dkv_dn(_, ev):
-            f = p0 + self.b4*pc - self.b3*ev
+            f = (p0 + self.fc*self.b4*pc - self.b3*ev)
             if f < 0:
                 f = 0
             return self.b2*f**self.nb
@@ -117,13 +122,14 @@ def main():
     plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                       'monospace': ['Computer Modern Typewriter']})
     # 5 Hz
-    base_parameters = np.zeros(14)
+    base_parameters = np.zeros(18)
     base_parameters[6:9] = 1.
+    base_parameters[14:17] = 1.
     # base_parameters[:9] = parameters_common
     cycles = np.exp(np.linspace(np.log(1), np.log(5e5), 100))
 
     colors = {(10, 230): 'b', (30, 230): 'r', (60, 230): 'g', (60, 370): 'k', (30, 276): 'm', (60, 460): 'y'}
-    for i, f in enumerate([5., 10.]):
+    for i, f in enumerate([5., 10., 20., 40.]):
         # par[0:6] = parameters[f]
 
         experimental_data = sun_et_al_16.get_data(f=f)
@@ -135,7 +141,7 @@ def main():
             plt.semilogx(experiment.cycles[edev < 0.9], edev[edev < 0.9], colors[(p, q)], lw=2)
             par1 = np.array(base_parameters)
             par1[0:6] = parameters[f][0:6]
-            par1[9:] = parameters[f][6:]
+            par1[9:14] = parameters[f][6:]
             model = MaterialModel(material_parameters=par1, frequency=f)
             static_stress = -p*np.array([1, 1, 1, 0, 0, 0])
             cyclic_stress = -q*np.array([1, 0, 0, 0, 0, 0])
@@ -150,15 +156,15 @@ def main():
                          '--' + colors[(p, q)], lw=2)
 
             plt.figure(i)
-            par2 = np.array(base_parameters)
-            par2[0:9] = parameters_common
+            par2 = parameters_common
             model = MaterialModel(material_parameters=par2, frequency=f)
             model.update(cycles, cyclic_stress, static_stress)
             edev = -model.deviatoric_strain()[:, 0]
             plt.semilogx(cycles[edev < 0.9], edev[edev < 0.9] + experiment.deviatoric_axial_strain()[0],
                          ':' + colors[(p, q)], lw=2)
-
-
+            plt.figure(i + 4)
+            plt.semilogx(cycles, -model.volumetric_strain() + experiment.volumetric_strain[0],
+                         ':' + colors[(p, q)], lw=2)
 
         plt.figure(i)
         plt.xlim(1, 5e5)

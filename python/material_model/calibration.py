@@ -7,7 +7,7 @@ from scipy.optimize import fmin
 
 from experimental_results import sun_et_al_16
 from material_model import MaterialModel
-from model_parameters import parameters
+from model_parameters import parameters, parameters_common
 from multiprocesser.multiprocesser import multi_processer
 
 
@@ -57,24 +57,26 @@ def calc_volumetric_residual_for_data_experiment(par, experiment):
     model = MaterialModel(material_parameters=par, frequency=experiment.f)
     model.update(experiment.cycles, cyclic_stress, static_stress)
     model_e = -model.volumetric_strain()
-    idx = np.logical_and(e_exp < 0.3, e_exp != 0)
+    idx = np.logical_and(e_exp < 0.3, abs(e_exp) > 1e-2)
     r = np.sqrt(np.sum((model_e[idx] - e_exp[idx])**2)/e_exp.shape[0])*100
 
     return r, round(model_e[-1] + e0, 4), round(e_exp[-1] + e0, 4), experiment.p, experiment.q, experiment.f
 
 
 def main():
-    frequencies = [20]
+    frequencies = [5, 10, 20, 40]
     # parameters_to_fit = list(range(4, 6))
-    parameters_to_fit = list(range(9, 14))
+    parameters_to_fit = list(range(9, 18))
+    # parameters_to_fit = [9]
     # parameters_to_fit = range(6)
-    par = np.array([1.81696447e+00, 3.67922225e-07, 5.25068390e-02, 7.49368438e-04,
-                    1.39169448e+01, 1.86223864e+02, 1, 1,
-                    1, 0, 1e-5, 0,
-                    1., 1.])
+    par = np.array([1.81696447e+00, 3.67922225e-07,   5.25068390e-02, 7.49368438e-04,
+                    1.39169448e+01, 1.86223864e+02,   1,              1.,
+                    1,              0.08608095,  -2.48672886e-10,  2.81664104e+06,  1.09291862e+00, -9.55252021e+02,
+                    1.19911441e+00,  2.12567827e+00,  3.49779516e+00, 0.])
+
     fitting_dataset = sun_et_al_16.get_data(f=frequencies)
-    par[0:6] = parameters[10][0:6]
-    par[9:] = parameters[10][6:]
+    par = np.array(parameters_common)
+    # par[9] = parameters[5][6]
     for i in range(6):
 
         par[parameters_to_fit] = fmin(residual, [par[parameters_to_fit]],
