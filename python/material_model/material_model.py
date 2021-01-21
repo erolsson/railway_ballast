@@ -23,12 +23,13 @@ class MaterialModel:
 
         self.nf = abs(material_parameters[4])
         self.H1 = abs(material_parameters[5])
-        self.b1 = abs(material_parameters[9])
+        self.b1 = material_parameters[9]
         self.b2 = abs(material_parameters[10])
         self.b3 = abs(material_parameters[11])
         self.nb = abs(material_parameters[12])
         self.b4 = abs(material_parameters[13])
         self.b5 = material_parameters[17]
+        self.b6 = material_parameters[18]
 
         freq_idx = {10.: 6, 20.: 7, 40.: 8}
         c_idx = {10.: 14, 20.: 15, 40.: 16}
@@ -40,8 +41,8 @@ class MaterialModel:
             self.fc = abs(material_parameters[c_idx[frequency]])
             if self.fd > 1.:
                 self.fd = 1
-            if self.fc < 1.:
-                self.fc = 1 - (self.fc - 1)
+            # if self.fc < 1.:
+            #     self.fc = 1 - (self.fc - 1)
 
         self.frictional_strain = None
         self.compaction_strain = None
@@ -69,7 +70,7 @@ class MaterialModel:
                 f = 0.
 
             ep_eff_dn = self.A*f**self.gf
-            dilatation = self.b1 + self.b5*p0
+            dilatation = self.b1 + self.b5*p0 + self.b6*pc
             deij_dn = ep_eff_dn*(nij + dilatation*np.array([1, 1, 1, 0, 0, 0]))
             return deij_dn
 
@@ -124,9 +125,10 @@ def main():
     plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                       'monospace': ['Computer Modern Typewriter']})
     # 5 Hz
-    base_parameters = np.zeros(18)
+    base_parameters = np.zeros(19)
     base_parameters[6:9] = 1.
     base_parameters[14:17] = 1.
+    base_parameters[18] = 1
     # base_parameters[:9] = parameters_common
     cycles = np.exp(np.linspace(np.log(1), np.log(5e5), 100))
 
