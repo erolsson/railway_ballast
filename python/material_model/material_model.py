@@ -23,8 +23,8 @@ class MaterialModel:
 
         self.nf = abs(material_parameters[4])
         self.H1 = abs(material_parameters[5])
-        self.b1 = material_parameters[9]
-        self.b2 = abs(material_parameters[10])
+        self.b1 = abs(material_parameters[9])
+        self.b2 = np.exp(-abs(material_parameters[10]))
         self.b3 = abs(material_parameters[11])
         self.nb = abs(material_parameters[12])
         self.b4 = abs(material_parameters[13])
@@ -35,14 +35,12 @@ class MaterialModel:
         c_idx = {10.: 14, 20.: 15, 40.: 16}
         if frequency == 5.:
             self.fd = 1.
-            self.fc = 1.
+            self.fc = 0.
         else:
             self.fd = material_parameters[freq_idx[frequency]]
             self.fc = abs(material_parameters[c_idx[frequency]])
             if self.fd > 1.:
                 self.fd = 1
-            # if self.fc < 1.:
-            #     self.fc = 1 - (self.fc - 1)
 
         self.frictional_strain = None
         self.compaction_strain = None
@@ -55,6 +53,7 @@ class MaterialModel:
         pc = -invariant_1(cyclic_stress)/3
         if p0 < 0:
             p0 = 0
+        pm = (p0 + pc)/2
         q = von_mises(cyclic_stress)
         nij = 1.5*(cyclic_stress - invariant_1(cyclic_stress)/3*np.array([1, 1, 1, 0, 0, 0]))/q
 
@@ -70,12 +69,13 @@ class MaterialModel:
                 f = 0.
 
             ep_eff_dn = self.A*f**self.gf
-            dilatation = self.b1 + self.b5*p0 + self.b6*pc
+            dilatation = self.b1 - self.b5*p0 - self.b6*p0**2 - self.fc
             deij_dn = ep_eff_dn*(nij + dilatation*np.array([1, 1, 1, 0, 0, 0]))
             return deij_dn
 
         def dkv_dn(_, ev):
-            f = (p0 + self.fc*self.b4*pc - self.b3*ev)
+
+            f = (self.b4*p0 + pc - self.b3*ev)
             if f < 0:
                 f = 0
             return self.b2*f**self.nb
@@ -126,9 +126,8 @@ def main():
                       'monospace': ['Computer Modern Typewriter']})
     # 5 Hz
     base_parameters = np.zeros(19)
-    base_parameters[6:9] = 1.
-    base_parameters[14:17] = 1.
-    base_parameters[18] = 1
+    base_parameters[6:9] = 1
+    base_parameters[14:17] = 0
     # base_parameters[:9] = parameters_common
     cycles = np.exp(np.linspace(np.log(1), np.log(5e5), 100))
 
@@ -145,7 +144,9 @@ def main():
             plt.semilogx(experiment.cycles[edev < 0.9], edev[edev < 0.9], colors[(p, q)], lw=2)
             par1 = np.array(base_parameters)
             par1[0:6] = parameters[f][0:6]
-            par1[9:14] = parameters[f][6:]
+            par1[9:14] = parameters[f][6:11]
+            par1[17:19] = parameters[f][11:13]
+            print(par1)
             model = MaterialModel(material_parameters=par1, frequency=f)
             static_stress = -p*np.array([1, 1, 1, 0, 0, 0])
             cyclic_stress = -q*np.array([1, 0, 0, 0, 0, 0])
