@@ -23,7 +23,7 @@ class MaterialModel:
 
         self.nf = abs(material_parameters[4])
         self.H1 = abs(material_parameters[5])
-        self.b1 = abs(material_parameters[9])
+        self.b1 = material_parameters[9]
         self.b2 = np.exp(-abs(material_parameters[10]))
         self.b3 = abs(material_parameters[11])
         self.nb = abs(material_parameters[12])
@@ -136,17 +136,19 @@ def main():
         # par[0:6] = parameters[f]
 
         experimental_data = sun_et_al_16.get_data(f=f)
+        print("\nf=" + str(f) + " Hz")
+        par1 = np.array(base_parameters)
+        par1[0:6] = parameters[f][0:6]
+        par1[9:14] = parameters[f][6:11]
+        par1[17:19] = parameters[f][11:13]
+        print(par1)
         for experiment in experimental_data:
             p = experiment.p
             q = experiment.q
             plt.figure(i)
             edev = experiment.deviatoric_axial_strain()
             plt.semilogx(experiment.cycles[edev < 0.9], edev[edev < 0.9], colors[(p, q)], lw=2)
-            par1 = np.array(base_parameters)
-            par1[0:6] = parameters[f][0:6]
-            par1[9:14] = parameters[f][6:11]
-            par1[17:19] = parameters[f][11:13]
-            print(par1)
+
             model = MaterialModel(material_parameters=par1, frequency=f)
             static_stress = -p*np.array([1, 1, 1, 0, 0, 0])
             cyclic_stress = -q*np.array([1, 0, 0, 0, 0, 0])
@@ -170,8 +172,11 @@ def main():
             plt.figure(i + 4)
             plt.semilogx(cycles, -model.volumetric_strain() + experiment.volumetric_strain[0],
                          ':' + colors[(p, q)], lw=2)
-
+            print(experiment.volumetric_strain[-1],
+                  -model.volumetric_strain()[-1] + experiment.volumetric_strain[0],
+                  experiment.volumetric_strain[0])
         plt.figure(i)
+
         plt.xlim(1, 5e5)
 
     plt.show()
