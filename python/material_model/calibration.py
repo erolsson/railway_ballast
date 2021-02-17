@@ -65,25 +65,26 @@ def calc_volumetric_residual_for_data_experiment(par, experiment):
 
 
 def main():
-    f = 40
-    frequencies = [f]
+    f = 5
+    frequencies = [5, 10, 20, 40]
     # parameters_to_fit = list(range(4, 6))
-    parameters_to_fit = list(range(9, 14)) + list(range(17, 19))
+    # parameters_to_fit = list(range(9, 14)) + list(range(17, 19))
     # parameters_to_fit = list(range(9))
-    # parameters_to_fit = list(range(9, 19))
+    parameters_to_fit = list(range(9, 20))
     # parameters_to_fit = [9]
     # parameters_to_fit = range(6)
 
     fitting_dataset = sun_et_al_16.get_data(f=frequencies)
-    # par = np.array(parameters_common)
-    par = np.zeros(19)
-    par[14:17] = 0
-    # par = np.array(parameters_common)
-    par[0:6] = parameters[f][0:6]
-    par[6:9] = 1.
+    par = np.array(parameters_common)
+    # par = np.zeros(20)
+    # par[14:17] = 0
+    # par[0:9] = parameters_common[0:9]
+    # par[0:6] = parameters[f][0:6]
+    # par[6:9] = 1.
+    # par[10] = 13
     # par[14:17] = 1.
-    par[9:14] = parameters[20][6:11]
-    par[17:19] = parameters[20][11:13]
+    # par[9:14] = parameters[20][6:11]
+    # par[17:19] = parameters[20][11:13]
     print(par)
     for i in range(50):
         par[parameters_to_fit] = fmin(residual, [par[parameters_to_fit]],
