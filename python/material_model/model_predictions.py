@@ -21,7 +21,7 @@ def main():
     base_parameters = np.zeros(20)
     base_parameters[6:9] = 1.
     cycles = np.exp(np.linspace(np.log(1), np.log(5e5), 100))
-    colors = {(10, 230): 'b', (60, 230): 'g', (30, 230): 'r', (30, 276): 'm', (60, 370): 'k', (60, 460): 'y'}
+    colors = {(10, 230): 'b', (30, 230): 'r', (30, 276): 'm', (60, 230): 'g',  (60, 370): 'k', (60, 460): 'y'}
     plt.figure(0, figsize=(14, 12))
     plt.figure(1, figsize=(14, 12))
     gs = gridspec.GridSpec(14, 2)

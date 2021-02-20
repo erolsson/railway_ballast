@@ -30,7 +30,6 @@ class MaterialModel:
         self.b4 = abs(material_parameters[13])
         self.b5 = abs(material_parameters[17])
         self.b6 = material_parameters[18]
-        self.b7 = material_parameters[19]
 
         freq_idx = {10.: 6, 20.: 7, 40.: 8}
         c_idx = {10.: 14, 20.: 15, 40.: 16}
@@ -70,7 +69,7 @@ class MaterialModel:
                 f = 0.
 
             ep_eff_dn = self.A*f**self.gf
-            dilatation = self.b1 - self.b5*p0 - self.b6*p0**2 - self.fc*self.b7*pc
+            dilatation = self.b1 - self.b5*p0 - self.b6*p0**2 - self.fc
             deij_dn = ep_eff_dn*(nij + dilatation*np.array([1, 1, 1, 0, 0, 0]))
             return deij_dn
 

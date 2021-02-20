@@ -12,18 +12,20 @@ from common import abq
 from write_data_to_odb import write_data_to_odb
 from calculate_permanent_deformations import DeformationCalculator
 from abaqus_functions.utilities import BoundaryCondition
+from material_model.model_parameters import get_parameters_for_frequency
 
 
-def evaluate_permanent_strain_for_gp(material_parameters, cycles, static_stress_state, cyclic_stress_state):
+def evaluate_permanent_strain_for_gp(material_parameters, cycles, static_stress_state, cyclic_stress_state,
+                                     frequency):
     n = static_stress_state.shape[0]
     permanent_strain = np.zeros((len(cycles), n, static_stress_state.shape[1]))
     for i in range(n):
-        model = MaterialModel(material_parameters)
+        model = MaterialModel(material_parameters, frequency)
         permanent_strain[:, i, :] = model.update(cycles, cyclic_stress_state[i, :], static_stress_state[i, :])
     return permanent_strain
 
 
-def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycles, material_parameters):
+def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycles, material_parameters, frequency):
     try:
         len(cycles)
     except TypeError:
@@ -70,7 +72,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
     job_list = []
     for i in range(num_cpus):
         args_list = [material_parameters, cycles, static_stresses[indices[i]:indices[i+1]],
-                     cyclic_stresses[indices[i]:indices[i+1]]]
+                     cyclic_stresses[indices[i]:indices[i+1]], frequency]
         job_list.append((evaluate_permanent_strain_for_gp, args_list, {}))
     result = multi_processer(job_list, timeout=7200, cpus=num_cpus)
     for i in range(num_cpus):
@@ -98,13 +100,12 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
 
 def main():
-    par = np.array([1.92596342e+00, 1.33771787e-07, 2.36556786e-02, 6.54713185e-04,
-                    1.59527656e+01, 2.03974910e+02, 1., 1.,
-                    1., 9.05538667e-02, -6.54359191e-03, 7.15099017e-07, 2.62519248e+00])
+    f = 10
+    par = get_parameters_for_frequency(f)
     stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/embankment_30t.odb')
     strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_30t_10Hz.odb')
     cycles = [100, 1000, 10000, 100000, 1000000]
-    calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
+    calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par, frequency=f)
 
 
 if __name__ == '__main__':
