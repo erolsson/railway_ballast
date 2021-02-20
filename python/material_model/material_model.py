@@ -1,9 +1,6 @@
 import numpy as np
 from scipy.integrate import solve_ivp
 
-from experimental_results import sun_et_al_16
-from model_parameters import parameters, parameters_common
-
 
 def invariant_1(tensor):
     return tensor[0] + tensor[1] + tensor[2]
@@ -111,76 +108,3 @@ class MaterialModel:
         for i in range(3):
             e_dev[:, i] -= e_vol/3
         return e_dev
-
-
-def main():
-    import matplotlib.pyplot as plt
-    import matplotlib.style
-
-    matplotlib.style.use('classic')
-    plt.rc('text', usetex=True)
-    plt.rc('font', serif='Computer Modern Roman')
-    plt.rcParams.update({'font.size': 20})
-    plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
-    plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
-                      'monospace': ['Computer Modern Typewriter']})
-    # 5 Hz
-    base_parameters = np.zeros(19)
-    base_parameters[6:9] = 1
-    base_parameters[14:17] = 0
-    # base_parameters[:9] = parameters_common
-    cycles = np.exp(np.linspace(np.log(1), np.log(5e5), 100))
-
-    colors = {(10, 230): 'b', (30, 230): 'r', (60, 230): 'g', (60, 370): 'k', (30, 276): 'm', (60, 460): 'y'}
-    for i, f in enumerate([5., 10., 20., 40.]):
-        # par[0:6] = parameters[f]
-
-        experimental_data = sun_et_al_16.get_data(f=f)
-        print("\nf=" + str(f) + " Hz")
-        par1 = np.array(base_parameters)
-        par1[0:6] = parameters[f][0:6]
-        par1[9:14] = parameters[f][6:11]
-        par1[17:19] = parameters[f][11:13]
-        print(par1)
-        for experiment in experimental_data:
-            p = experiment.p
-            q = experiment.q
-            plt.figure(i)
-            edev = experiment.deviatoric_axial_strain()
-            plt.semilogx(experiment.cycles[edev < 0.9], edev[edev < 0.9], colors[(p, q)], lw=2)
-
-            model = MaterialModel(material_parameters=par1, frequency=f)
-            static_stress = -p*np.array([1, 1, 1, 0, 0, 0])
-            cyclic_stress = -q*np.array([1, 0, 0, 0, 0, 0])
-            model.update(cycles, cyclic_stress, static_stress)
-            edev = -model.deviatoric_strain()[:, 0]
-            plt.semilogx(cycles[edev < 0.9], edev[edev < 0.9] + experiment.deviatoric_axial_strain()[0],
-                         '--' + colors[(p, q)], lw=2)
-
-            plt.figure(i + 4)
-            plt.semilogx(experiment.cycles, experiment.volumetric_strain, colors[(p, q)], lw=2)
-            plt.semilogx(cycles, -model.volumetric_strain() + experiment.volumetric_strain[0],
-                         '--' + colors[(p, q)], lw=2)
-
-            plt.figure(i)
-            par2 = parameters_common
-            model = MaterialModel(material_parameters=par2, frequency=f)
-            model.update(cycles, cyclic_stress, static_stress)
-            edev = -model.deviatoric_strain()[:, 0]
-            plt.semilogx(cycles[edev < 0.9], edev[edev < 0.9] + experiment.deviatoric_axial_strain()[0],
-                         ':' + colors[(p, q)], lw=2)
-            plt.figure(i + 4)
-            plt.semilogx(cycles, -model.volumetric_strain() + experiment.volumetric_strain[0],
-                         ':' + colors[(p, q)], lw=2)
-            print(experiment.volumetric_strain[-1],
-                  -model.volumetric_strain()[-1] + experiment.volumetric_strain[0],
-                  experiment.volumetric_strain[0])
-        plt.figure(i)
-
-        plt.xlim(1, 5e5)
-
-    plt.show()
-
-
-if __name__ == '__main__':
-    main()
