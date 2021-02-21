@@ -86,10 +86,14 @@ class MaterialModel:
 
             e_f = solution_fric.y[:, -1]
             e_c = solution_comp.y[:, -1]
-
+            if np.linalg.norm(e_c) > 1.:
+                e_c /= np.linalg.norm(e_c)
             self.frictional_strain[i, :] = e_f
             for j in range(3):
+                if abs(e_c) > 1:
+                    e_c /= abs(e_c)
                 self.compaction_strain[i, j] = e_c/3
+
         return self.frictional_strain - self.compaction_strain
 
     def _hf(self, ep):

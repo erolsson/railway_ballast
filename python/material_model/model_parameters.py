@@ -51,7 +51,7 @@ parameters_common = [2.20517242e+00, 3.72924098e-08, 3.77027776e-02, 7.16206717e
 
 def get_parameters_for_frequency(f):
     if f == "common":
-        return parameters
+        return parameters_common
     else:
         par = np.zeros(19)
         par[6:9] = 1

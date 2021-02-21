@@ -6,7 +6,7 @@ import matplotlib.style
 
 from experimental_results import sun_et_al_16
 from material_model import MaterialModel
-from model_parameters import parameters, parameters_common
+from model_parameters import get_parameters_for_frequency
 
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)
@@ -29,10 +29,12 @@ def main():
     for i, f in enumerate([5., 10., 20., 40.]):
         experimental_data = sun_et_al_16.get_data(f=f)
         fig_idx = (i//2, i % 2)
-        par1 = np.array(base_parameters)
-        par1[0:6] = parameters[f][0:6]
-        par1[9:14] = parameters[f][6:11]
-        par1[17:19] = parameters[f][11:13]
+        # par1 = np.array(base_parameters)
+        # par1[0:6] = parameters[f][0:6]
+        # par1[9:14] = parameters[f][6:11]
+        # par1[17:19] = parameters[f][11:13]
+        par1 = get_parameters_for_frequency(f)
+        parameters_common = get_parameters_for_frequency('common')
         plt.figure(0)
         ax1 = plt.subplot(gs[5*fig_idx[0] + fig_idx[0]:5*fig_idx[0] + 5 + fig_idx[0], fig_idx[1]:fig_idx[1] + 1])
         ax1.text(2, 0.27, '$f$={f} Hz'.format(f=int(f)))
