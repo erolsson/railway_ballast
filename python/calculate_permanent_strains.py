@@ -102,8 +102,8 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 def main():
     f = 10
     par = get_parameters_for_frequency(f)
-    stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/stresses_1_30t.odb')
-    strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_30t_10Hz.odb')
+    stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/stresses_1_22_5t.odb')
+    strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_22_5t_10Hz.odb')
     cycles = [100, 1000, 10000, 100000, 1000000]
     calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par, frequency=f)
 
