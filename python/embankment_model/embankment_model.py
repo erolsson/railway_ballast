@@ -17,7 +17,7 @@ except ImportError:
     print(" ERROR: This script require Abaqus CAE to run")
     raise
 
-from simulations import simulation2 as simulation_to_run
+from simulations import embankment_21_22_5t as simulation_to_run
 
 
 class RailwayEmbankment:
