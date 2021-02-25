@@ -17,11 +17,14 @@ except ImportError:
     print(" ERROR: This script require Abaqus CAE to run")
     raise
 
-from simulations import simulation2 as simulation_to_run
+import simulations
+reload(simulations)
+from simulations import embankment_21_22_5t_slab as simulation_to_run
 
 
 class RailwayEmbankment:
     def __init__(self, simulation):
+        self.simulation_data = simulation
         Mdb()
         self.mdb = mdb.models['Model-1']
         self.mdb.setValues(noPartsInputFile=ON)
@@ -31,14 +34,16 @@ class RailwayEmbankment:
         self.layers = simulation.layers
         instances = []
         parts = []
-        self.sleeper_length = None
+        self.sleepers = simulation.sleepers
+        self.concrete_slab = simulation.concrete_slab
         self.sleeper_part = None
+        self.concrete_slab_part = None
         self.center_sleeper_part = None
         self.sleeper_instances = []
+        self.concrete_slab_instance = None
         self.rail_part = None
         self.rail_instance = None
         self.track_gauge = simulation.track_gauge
-        self.sleeper_height = 0.175
 
         self.rail_area_inertia = 32520000/1e12
         self.rail_height = 0.172
@@ -77,23 +82,23 @@ class RailwayEmbankment:
                 self.part.PartitionCellByDatumPlane(datumPlane=self.part.datum[datum_plane_vertical.id],
                                                     cells=self.part.cells)
 
-    def create_sleepers(self, sleeper_cc_distance, sleeper_width, sleeper_length, center_sleeper=True):
+    def create_sleepers(self):
         # Sketching a sleeper
         sketch = self.mdb.ConstrainedSketch(name='sketch_sleeper', sheetSize=800.0)
         p1 = (0, self.total_height)
-        p2 = (sleeper_length, self.total_height)
-        p3 = (sleeper_length, self.total_height + self.sleeper_height)
-        p4 = (0, self.total_height + self.sleeper_height)
+        p2 = (self.sleepers.length, self.total_height)
+        p3 = (self.sleepers.length, self.total_height + self.sleepers.height)
+        p4 = (0, self.total_height + self.sleepers.height)
 
         sketch.Line(point1=p1, point2=p2)
         sketch.Line(point1=p2, point2=p3)
         sketch.Line(point1=p3, point2=p4)
         sketch.Line(point1=p4, point2=p1)
         sleeper_names = ['sleeper']
-        sleeper_widths = [sleeper_width]
-        if center_sleeper:
+        sleeper_widths = [self.sleepers.width]
+        if self.sleepers.center_sleeper:
             sleeper_names.append('center_sleeper')
-            sleeper_widths.append(sleeper_width/2)
+            sleeper_widths.append(self.sleepers.width/2)
         for name, width in zip(sleeper_names, sleeper_widths):
             part = self.mdb.Part(name='part_' + name, dimensionality=THREE_D, type=DEFORMABLE_BODY)
             part.BaseSolidExtrude(sketch=sketch, depth=width)
@@ -117,18 +122,17 @@ class RailwayEmbankment:
                 self.center_sleeper_part = part
 
         datum_plane_vertical = self.part.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE,
-                                                                    offset=sleeper_length)
+                                                                    offset=self.sleepers.length)
         self.part.PartitionCellByDatumPlane(datumPlane=self.part.datum[datum_plane_vertical.id],
                                             cells=self.part.cells)
-        self.sleeper_length = sleeper_length
-        if center_sleeper:
-            start_point = sleeper_cc_distance - sleeper_width/2
+        if self.sleepers.center_sleeper:
+            start_point = self.sleepers.cc_distance - self.sleepers.width/2
             datum_plane_vertical = self.part.DatumPlaneByPrincipalPlane(principalPlane=XYPLANE,
-                                                                        offset=sleeper_width/2)
+                                                                        offset=self.sleepers.width/2)
             self.part.PartitionCellByDatumPlane(datumPlane=self.part.datum[datum_plane_vertical.id],
                                                 cells=self.part.cells)
             datum_plane_vertical = self.rail_part.DatumPlaneByPrincipalPlane(principalPlane=XYPLANE,
-                                                                             offset=sleeper_width/2)
+                                                                             offset=self.sleepers.width/2)
             self.rail_part.PartitionCellByDatumPlane(datumPlane=self.rail_part.datum[datum_plane_vertical.id],
                                                      cells=self.rail_part.cells)
             instance = self.assembly.Instance(name='sleeper_0', part=self.center_sleeper_part, dependent=ON)
@@ -143,28 +147,28 @@ class RailwayEmbankment:
             self.mdb.Tie(name='tie_sleeper_0', slave=sleeper_surface, master=ballast_surface)
 
             sleeper_face = instance.faces.findAt(((self.track_gauge/2,
-                                                   self.total_height + self.sleeper_height,
+                                                   self.total_height + self.sleepers.height,
                                                    1e-3),))
             sleeper_surface = self.assembly.Surface(side1Faces=sleeper_face,
                                                     name='upper_sleeper_surface_0')
             rail_face = self.rail_instance.faces.findAt(((self.track_gauge/2,
-                                                          self.total_height + self.sleeper_height,
+                                                          self.total_height + self.sleepers.height,
                                                           1e-3),))
             rail_surface = self.assembly.Surface(side1Faces=rail_face,
                                                  name='rail_lower_surface_0')
             self.mdb.Tie(name='tie_rail_0', slave=sleeper_surface, master=rail_surface)
 
         else:
-            start_point = sleeper_cc_distance/2 - sleeper_width/2
+            start_point = self.sleepers.cc_distance/2 - self.sleepers.width/2
         sleeper_idx = 1
 
-        while start_point + sleeper_width < self.length:
+        while start_point + self.sleepers.width < self.length:
             for part in [self.part, self.rail_part]:
                 datum_plane_vertical = part.DatumPlaneByPrincipalPlane(principalPlane=XYPLANE,
                                                                        offset=start_point)
                 part.PartitionCellByDatumPlane(datumPlane=part.datum[datum_plane_vertical.id], cells=part.cells)
                 datum_plane_vertical = part.DatumPlaneByPrincipalPlane(principalPlane=XYPLANE,
-                                                                       offset=start_point + sleeper_width)
+                                                                       offset=start_point + self.sleepers.width)
                 part.PartitionCellByDatumPlane(datumPlane=part.datum[datum_plane_vertical.id], cells=part.cells)
 
             instance = self.assembly.Instance(name='sleeper' + str(sleeper_idx), part=self.sleeper_part, dependent=ON)
@@ -182,26 +186,87 @@ class RailwayEmbankment:
             self.mdb.Tie(name='tie_sleeper_' + str(sleeper_idx), slave=ballast_surface, master=sleeper_surface)
 
             rail_face = self.rail_instance.faces.findAt(((self.track_gauge/2,
-                                                         self.total_height + self.sleeper_height,
+                                                         self.total_height + self.sleepers.height,
                                                          start_point + 1e-3),))
             sleeper_face = instance.faces.findAt(((self.track_gauge/2,
-                                                   self.total_height + self.sleeper_height,
+                                                   self.total_height + self.sleepers.height,
                                                    start_point + 1e-3),))
             sleeper_surface = self.assembly.Surface(side1Faces=(sleeper_face,),
                                                     name='upper_sleeper_surface_' + str(sleeper_idx))
             rail_surface = self.assembly.Surface(side1Faces=rail_face,
                                                  name='rail_surface_' + str(sleeper_idx))
             self.mdb.Tie(name='tie_rail_' + str(sleeper_idx), slave=sleeper_surface, master=rail_surface)
-            start_point += sleeper_cc_distance
+            start_point += self.sleepers.cc_distance
 
             sleeper_idx += 1
 
+    def create_concrete_slab(self):
+        # Sketching a sleeper
+        sketch = self.mdb.ConstrainedSketch(name='sketch_sleeper', sheetSize=800.0)
+        p1 = (0, self.total_height)
+        p2 = (self.concrete_slab.width, self.total_height)
+        p3 = (self.concrete_slab.width, self.total_height + self.concrete_slab.height)
+        p4 = (0, self.total_height + self.concrete_slab.height)
+
+        sketch.Line(point1=p1, point2=p2)
+        sketch.Line(point1=p2, point2=p3)
+        sketch.Line(point1=p3, point2=p4)
+        sketch.Line(point1=p4, point2=p1)
+
+        self.concrete_slab_part = self.mdb.Part(name='concrete_slab', dimensionality=THREE_D, type=DEFORMABLE_BODY)
+        self.concrete_slab_part.BaseSolidExtrude(sketch=sketch, depth=self.length)
+        part = self.concrete_slab_part
+        x = self.track_gauge/2 - self.rail_width/2
+        datum_plane_vertical = part.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE, offset=x)
+        part.PartitionCellByDatumPlane(datumPlane=part.datum[datum_plane_vertical.id], cells=part.cells)
+
+        x = self.track_gauge/2 + self.rail_width/2
+        datum_plane_vertical = part.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE, offset=x)
+        part.PartitionCellByDatumPlane(datumPlane=part.datum[datum_plane_vertical.id], cells=part.cells)
+
+        # meshing the plate
+        self.concrete_slab_part.seedPart(size=0.1)
+        elem_type1 = mesh.ElemType(elemCode=C3D20, elemLibrary=STANDARD)
+        self.concrete_slab_part.setElementType(regions=(self.concrete_slab_part.cells,), elemTypes=(elem_type1,))
+        self.concrete_slab_part.generateMesh()
+
+        self.concrete_slab_instance = self.assembly.Instance(name='concrete_slab_instance',
+                                                             part=self.concrete_slab_part,
+                                                             dependent=ON)
+
+        datum_plane_vertical = self.part.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE,
+                                                                    offset=self.concrete_slab.width)
+        self.part.PartitionCellByDatumPlane(datumPlane=self.part.datum[datum_plane_vertical.id],
+                                            cells=self.part.cells)
+
+        # Creating a tie between the slab and the ballast and between the rail and the slab
+        ballast_instance = self.assembly.instances['embankment_instance']
+        ballast_face = ballast_instance.faces.findAt(((1e-3, self.total_height, 1e-3),))
+        ballast_surface = self.assembly.Surface(side1Faces=ballast_face,
+                                                name='ballast_slab_surface')
+        slab_face = self.concrete_slab_instance.faces.findAt((1e-3, self.total_height, 1e-3)).getFacesByFaceAngle(0.)
+        slab_surface = self.assembly.Surface(side1Faces=slab_face,
+                                             name='slab_surface')
+        self.mdb.Tie(name='tie_slab_ballast', slave=ballast_surface, master=slab_surface)
+
+        rail_face = self.rail_instance.faces.findAt(((self.track_gauge/2,
+                                                      self.simulation_data.track_lower_height,
+                                                      1e-3),))
+        slab_face = self.concrete_slab_instance.faces.findAt(((self.track_gauge/2,
+                                                               self.simulation_data.track_lower_height,
+                                                               1e-3),))
+        slab_surface = self.assembly.Surface(side1Faces=(slab_face,),
+                                             name='upper_slab_surface')
+        rail_surface = self.assembly.Surface(side1Faces=rail_face,
+                                             name='rail_surface')
+        self.mdb.Tie(name='tie_rail_slab', slave=slab_surface, master=rail_surface)
+
     def create_rail(self):
         sketch = self.mdb.ConstrainedSketch(name='sketch_sleeper', sheetSize=800.0)
-        p1 = (self.track_gauge/2 - self.rail_width/2, self.total_height + self.sleeper_height)
-        p2 = (self.track_gauge/2 + self.rail_width/2, self.total_height + self.sleeper_height)
-        p3 = (self.track_gauge/2 + self.rail_width/2, self.total_height + self.sleeper_height + self.rail_height)
-        p4 = (self.track_gauge/2 - self.rail_width/2, self.total_height + self.sleeper_height + self.rail_height)
+        p1 = (self.track_gauge/2 - self.rail_width/2, self.simulation_data.track_lower_height)
+        p2 = (self.track_gauge/2 + self.rail_width/2, self.simulation_data.track_lower_height)
+        p3 = (self.track_gauge/2 + self.rail_width/2, self.simulation_data.track_lower_height + self.rail_height)
+        p4 = (self.track_gauge/2 - self.rail_width/2, self.simulation_data.track_lower_height + self.rail_height)
 
         sketch.Line(point1=p1, point2=p2)
         sketch.Line(point1=p2, point2=p3)
@@ -246,22 +311,28 @@ class RailwayEmbankment:
                                                          yMax=ballast_top_height + 1e-3,
                                                          zMin=-1e-3,
                                                          zMax=self.length + 1e-3)
-        length_ballast_edges = []
+        length_edges = []
         width_ballast_edges_size_seeds = []
         height_ballast_edges = []
         seed_layer_y = self.total_height - self.layers[-1].height
+        track_x = 0
+        if self.sleepers:
+            track_x = self.sleepers.length
+        elif self.concrete_slab:
+            track_x = self.concrete_slab.width
+        for edge in self.part.edges:
+            n = get_edge_direction(edge)
+            if n[0] == 0 and n[1] == 0:
+                length_edges.append(edge)
         for ballast_edge in ballast_edges:
             n = get_edge_direction(ballast_edge)
-            if n[0] == 0 and n[1] == 0:
-                length_ballast_edges.append(ballast_edge)
-
             if n[1] == 0 and n[2] == 0 and ballast_edge.pointOn[0][1] == seed_layer_y:
                 width_ballast_edges_size_seeds.append(ballast_edge)
-            if n[0] == 0 and n[2] == 0 and ballast_edge.pointOn[0][0] < self.sleeper_length:
+            if n[0] == 0 and n[2] == 0 and ballast_edge.pointOn[0][0] < track_x:
                 height_ballast_edges.append(ballast_edge)
 
         self.part.seedEdgeBySize(edges=height_ballast_edges, size=element_size_ballast_height, constraint=FIXED)
-        self.part.seedEdgeBySize(edges=length_ballast_edges, size=element_size_ballast_length, constraint=FIXED)
+        self.part.seedEdgeBySize(edges=length_edges, size=element_size_ballast_length, constraint=FIXED)
         self.part.seedEdgeBySize(edges=width_ballast_edges_size_seeds, size=element_size_ballast_width,
                                  constraint=FIXED)
 
@@ -352,12 +423,17 @@ class RailwayEmbankment:
         x_sym_faces = self.instance.faces.findAt((0, 1e-3, 1e-3)).getFacesByFaceAngle(0.)
         for sleeper in self.sleeper_instances:
             x_sym_faces += sleeper.faces.getByBoundingBox(xMax=1e-3)
+        if self.concrete_slab_instance:
+            x_sym_faces += self.concrete_slab_instance.faces.getByBoundingBox(xMax=1e-3)
         x_sym_nodes = self.assembly.Set(name='x_sym_nodes', faces=x_sym_faces)
 
         z_sym_faces = self.instance.faces.findAt((1e-3, 1e-3, 0)).getFacesByFaceAngle(0.)
         z1_faces = self.instance.faces.findAt((1e-3, 1e-3, self.length)).getFacesByFaceAngle(0.)
         if self.center_sleeper_part:
             z_sym_faces += self.sleeper_instances[0].faces.getByBoundingBox(zMax=1e-3)
+        elif self.concrete_slab_instance:
+            z_sym_faces += self.concrete_slab_instance.faces.getByBoundingBox(zMax=1e-3)
+            z1_faces += self.concrete_slab_instance.faces.getByBoundingBox(zMin=self.length - 1e-3)
         if self.rail_part:
             z_sym_faces += self.rail_instance.faces.getByBoundingBox(zMax=1e-3)
             z1_faces += self.rail_instance.faces.getByBoundingBox(zMin=self.length - 1e-3)
@@ -391,16 +467,19 @@ class RailwayEmbankment:
             self.part.SectionAssignment(region=(layer_elements,), sectionName='section_' + layer.name)
             layer_start_height += layer.height
 
+        mat = self.mdb.Material('concrete')
+        mat.Density(table=((2570,),))
+        mat.Elastic(table=((30e9, 0.2),))
+        self.mdb.HomogeneousSolidSection(name='concrete_section', material='concrete')
+
         if self.sleeper_instances:
-            mat = self.mdb.Material('concrete')
-            mat.Density(table=((2570,),))
-            mat.Elastic(table=((30e9, 0.2),))
-            self.mdb.HomogeneousSolidSection(name='section_sleeper', material='concrete')
-            self.sleeper_part.SectionAssignment(region=(self.sleeper_part.elements,), sectionName='section_sleeper')
+            self.sleeper_part.SectionAssignment(region=(self.sleeper_part.elements,), sectionName='concrete_section')
             if self.center_sleeper_part:
                 self.center_sleeper_part.SectionAssignment(region=(self.center_sleeper_part.elements,),
-                                                           sectionName='section_sleeper')
-
+                                                           sectionName='concrete_section')
+        if self.concrete_slab_instance:
+            self.concrete_slab_part.SectionAssignment(region=(self.concrete_slab_part.elements,),
+                                                      sectionName='concrete_section')
         if self.rail_instance:
             mat = self.mdb.Material('rail')
             mat.Density(table=((self.rail_density,),))
@@ -428,7 +507,7 @@ class RailwayEmbankment:
                                                            0.75, 0.85, 0.25, 0.25, 1.5, 0.75),
                                        resetDefaultValues=OFF)
         load_faces = self.rail_instance.faces.findAt(((self.track_gauge/2,
-                                                       self.total_height + self.sleeper_height + self.rail_height,
+                                                       self.simulation_data.track_lower_height + self.rail_height,
                                                        1e-3),))
         axes_force = axes_load*1000*9.82/4
         load_region = self.assembly.Surface(side1Faces=load_faces, name='load_face')
@@ -444,7 +523,10 @@ class RailwayEmbankment:
 def main():
     embankment = RailwayEmbankment(simulation_to_run)
     embankment.create_rail()
-    embankment.create_sleepers(sleeper_cc_distance=0.65, sleeper_width=0.265, sleeper_length=1.)
+    if not simulation_to_run.concrete_slab:
+        embankment.create_sleepers()
+    else:
+        embankment.create_concrete_slab()
     embankment.mesh()
     embankment.apply_boundary_conditions()
     embankment.create_materials()
