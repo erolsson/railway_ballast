@@ -19,7 +19,7 @@ except ImportError:
 
 import simulations
 reload(simulations)
-from simulations import embankment_21_22_5t_slab as simulation_to_run
+from simulations import embankment_21_22_5t as simulation_to_run
 
 
 class RailwayEmbankment:
