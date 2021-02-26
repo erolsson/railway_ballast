@@ -22,7 +22,7 @@ import numpy as np
 
 import simulations
 reload(simulations)
-from simulations import embankment_21_30t as simulation_to_run
+from simulations import embankment_21_22_5t_low as simulation_to_run
 
 
 class RailwayEmbankment:
@@ -454,6 +454,7 @@ class RailwayEmbankment:
         self.mdb.DisplacementBC(name='z1_bc', region=z1_nodes, createStepName='Initial', u3=0)
 
     def create_materials(self):
+        self.assembly.regenerate()
         layer_start_height = 0
         for layer in self.layers:
             mat = self.mdb.Material('material_' + layer.name)

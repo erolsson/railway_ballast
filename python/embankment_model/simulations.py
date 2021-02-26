@@ -51,19 +51,6 @@ class Simulation:
 sleepers = Sleeper(cc_distance=0.65, width=0.265, length=1., height=0.175)
 concrete_slab = ConcreteSlab(width=1.25, height=0.5)
 
-simulation1 = Simulation(job_name='embankment_second_order_2', cycles=np.array([100, 1000, 10000, 100000, 1000000]),
-                         embankment_length=5.5, axes_load=22.5,
-                         layers=[ElasticLayer(name='soil', bottom_width=20, top_width=20.,
-                                              height=2., E=50e6, v=0.2, density=2000),
-                                 ElasticLayer(name='clay', bottom_width=20, top_width=20.,
-                                              height=4., E=50e6, v=0.2, density=2000),
-                                 ElasticLayer(name='subgrade', bottom_width=20, top_width=20.,
-                                              height=1., E=50e6, v=0.2, density=2000),
-                                 ElasticLayer(name='ballast_1', bottom_width=9.3, top_width=3.6,
-                                              height=3.8, E=200e6, v=0.35, density=1600),
-                                 ElasticLayer(name='ballast_2', bottom_width=2.55, top_width=1.8,
-                                              height=0.5, E=200e6, v=0.35, density=1600)])
-
 embankment_21_22_5t = Simulation(job_name='embankment_21_22_5t', cycles=np.array([100, 1000, 10000, 100000, 1000000]),
                                  embankment_length=5.5, axes_load=22.5,
                                  layers=[ElasticLayer(name='soil', bottom_width=20, top_width=20.,
@@ -77,9 +64,20 @@ embankment_21_22_5t = Simulation(job_name='embankment_21_22_5t', cycles=np.array
                                          ElasticLayer(name='ballast_2', bottom_width=2.55, top_width=1.8,
                                                       height=0.5, E=200e6, v=0.35, density=1600)])
 
-simulation1.sleepers = sleepers
+embankment_21_22_5t_low = Simulation(job_name='embankment_21_22_5t_low',
+                                     cycles=np.array([100, 1000, 10000, 100000, 1000000]),
+                                     embankment_length=5.5, axes_load=22.5,
+                                     layers=[ElasticLayer(name='soil', bottom_width=20, top_width=20.,
+                                                          height=2., E=50e6, v=0.2, density=2000),
+                                             ElasticLayer(name='clay', bottom_width=20, top_width=20.,
+                                                          height=4., E=50e6, v=0.2, density=2000),
+                                             ElasticLayer(name='subgrade', bottom_width=20, top_width=20.,
+                                                          height=1., E=50e6, v=0.2, density=2000),
+                                             ElasticLayer(name='ballast_1', bottom_width=6.9, top_width=3.6,
+                                                          height=1.65, E=200e6, v=0.35, density=1600),
+                                             ElasticLayer(name='ballast_2', bottom_width=2.55, top_width=1.8,
+                                                          height=0.5, E=200e6, v=0.35, density=1600)])
 
-simulation2 = deepcopy(simulation1)
 embankment_21_22_5t_slab = deepcopy(embankment_21_22_5t)
 embankment_21_30t = deepcopy(embankment_21_22_5t)
 embankment_21_30t.axes_load = 30.
@@ -88,5 +86,4 @@ embankment_21_22_5t.sleepers = sleepers
 embankment_21_30t.sleepers = sleepers
 embankment_21_22_5t_slab.job_name += '_slab1'
 embankment_21_22_5t_slab.concrete_slab = concrete_slab
-simulation2.axes_load = 30.
-simulation2.job_name = 'embankment_30t'
+embankment_21_22_5t_low.sleepers = sleepers
