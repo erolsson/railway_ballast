@@ -85,6 +85,7 @@ embankment_21_30t = deepcopy(embankment_21_22_5t)
 embankment_21_30t.axes_load = 30.
 embankment_21_30t.job_name = 'embankment_21_30t'
 embankment_21_22_5t.sleepers = sleepers
+embankment_21_30t.sleepers = sleepers
 embankment_21_22_5t_slab.job_name += '_slab1'
 embankment_21_22_5t_slab.concrete_slab = concrete_slab
 simulation2.axes_load = 30.
