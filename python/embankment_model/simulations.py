@@ -86,4 +86,7 @@ embankment_21_22_5t.sleepers = sleepers
 embankment_21_30t.sleepers = sleepers
 embankment_21_22_5t_slab.job_name += '_slab1'
 embankment_21_22_5t_slab.concrete_slab = concrete_slab
+embankment_21_22_5t_low_slab = deepcopy(embankment_21_22_5t_slab)
 embankment_21_22_5t_low.sleepers = sleepers
+embankment_21_22_5t_low_slab.concrete_slab = concrete_slab
+embankment_21_22_5t_low_slab.job_name += '_slab'
