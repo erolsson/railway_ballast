@@ -48,7 +48,7 @@ class RailwayEmbankment:
         self.rail_instance = None
         self.track_gauge = simulation.track_gauge
 
-        self.rail_area_inertia = 32520000/1e12
+        self.rail_area_inertia = 30550000/1e12
         self.rail_height = 0.172
         self.rail_width = 12*self.rail_area_inertia/self.rail_height**3
         self.rail_density = 60.4/self.rail_width/self.rail_height
