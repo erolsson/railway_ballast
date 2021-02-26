@@ -79,14 +79,12 @@ embankment_21_low = Simulation(job_name='embankment',
                                                     height=0.5, E=200e6, v=0.35, density=1600)])
 
 embankment_21_slab = deepcopy(embankment_21)
-embankment_21_slab.sleepers = sleepers
-
-embankment_21_slab.job_name += '_slab1'
+embankment_21.sleepers = sleepers
 embankment_21_slab.concrete_slab = concrete_slab
+
 embankment_21_low_slab = deepcopy(embankment_21_low)
 embankment_21_low.sleepers = sleepers
 embankment_21_low_slab.concrete_slab = concrete_slab
-embankment_21_low_slab.job_name += '_slab'
 
 simulations = {'sleepers_high': embankment_21,
                'sleepers_low': embankment_21_low,
