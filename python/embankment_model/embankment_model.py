@@ -8,6 +8,7 @@ try:
     import step
     import mesh
     import interaction
+    import regionToolset
     from abaqusConstants import COORDINATE, STANDALONE, ON, DEFORMABLE_BODY, AXISYM, OFF, THREE_D, DELETE, GEOMETRY
     from abaqusConstants import SINGLE, FIXED, SWEEP, MEDIAL_AXIS, DC3D8, DC3D6, C3D8, C3D6, C3D20, STANDARD, ANALYSIS
     from abaqusConstants import PERCENTAGE, DOMAIN, DEFAULT, INDEX, YZPLANE, XYPLANE, HEX, TOTAL_FORCE, NUMBER
@@ -17,9 +18,11 @@ except ImportError:
     print(" ERROR: This script require Abaqus CAE to run")
     raise
 
+import numpy as np
+
 import simulations
 reload(simulations)
-from simulations import embankment_21_22_5t as simulation_to_run
+from simulations import embankment_21_22_5t_slab as simulation_to_run
 
 
 class RailwayEmbankment:
@@ -506,11 +509,19 @@ class RailwayEmbankment:
                                                            20.0, 6.0, 3.0, 10.0, 0.5, 0.5,
                                                            0.75, 0.85, 0.25, 0.25, 1.5, 0.75),
                                        resetDefaultValues=OFF)
-        load_faces = self.rail_instance.faces.findAt(((self.track_gauge/2,
-                                                       self.simulation_data.track_lower_height + self.rail_height,
-                                                       1e-3),))
+
+        load_elements_nodes = self.rail_part.nodes.getByBoundingBox(yMin=(self.simulation_data.track_lower_height
+                                                                          + self.rail_height - 1e-3),
+                                                                    zMax=1e-3)
+        load_element_labels = []
+
+        for node in load_elements_nodes:
+            load_element_labels.extend(e.label for e in node.getElements())
+        load_element_labels = np.unique(np.array(load_element_labels))
+        self.assembly.regenerate()
+        load_elements = self.rail_instance.elements.sequenceFromLabels([int(e) for e in load_element_labels])
         axes_force = axes_load*1000*9.82/4
-        load_region = self.assembly.Surface(side1Faces=load_faces, name='load_face')
+        load_region = regionToolset.Region(face1Elements=load_elements)
         self.mdb.Pressure(name='train_wheel', createStepName='loading', region=load_region, magnitude=axes_force,
                           distributionType=TOTAL_FORCE)
 
