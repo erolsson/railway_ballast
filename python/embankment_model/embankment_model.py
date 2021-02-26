@@ -1,5 +1,5 @@
 from __future__ import print_function, division
-
+import sys
 try:
     import mesh
     from abaqus import session, Mdb, mdb
@@ -22,7 +22,7 @@ import numpy as np
 
 import simulations
 reload(simulations)
-from simulations import embankment_21_22_5t_low_slab as simulation_to_run
+from simulations import simulations
 
 
 class RailwayEmbankment:
@@ -526,13 +526,17 @@ class RailwayEmbankment:
         self.mdb.Pressure(name='train_wheel', createStepName='loading', region=load_region, magnitude=axes_force,
                           distributionType=TOTAL_FORCE)
 
-    def run_job(self, cpus=12):
-        job = mdb.Job(name=self.job_name, model=self.mdb, numCpus=cpus, numDomains=cpus)
+    def run_job(self, job_name, cpus=12):
+        job = mdb.Job(name=job_name, model=self.mdb, numCpus=cpus, numDomains=cpus)
         job.submit()
         job.waitForCompletion()
 
 
 def main():
+    sim_name = sys.argv[-2]
+    load = float(sys.argv[-1])
+    simulation_to_run = simulations[sim_name]
+    job_name = simulation_to_run.job_name + '_' + sim_name + '_' + str(load).replace('.', '_') + 't'
     embankment = RailwayEmbankment(simulation_to_run)
     embankment.create_rail()
     if not simulation_to_run.concrete_slab:
@@ -542,9 +546,9 @@ def main():
     embankment.mesh()
     embankment.apply_boundary_conditions()
     embankment.create_materials()
-    embankment.create_load_steps(axes_load=simulation_to_run.axes_load)
+    embankment.create_load_steps(axes_load=load)
     embankment.assembly.regenerate()
-    embankment.run_job()
+    embankment.run_job(job_name)
 
 
 if __name__ == '__main__':
