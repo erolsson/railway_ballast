@@ -22,7 +22,7 @@ import numpy as np
 
 import simulations
 reload(simulations)
-from simulations import embankment_21_22_5t_slab as simulation_to_run
+from simulations import embankment_21_30t as simulation_to_run
 
 
 class RailwayEmbankment:
