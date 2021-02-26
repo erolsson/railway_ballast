@@ -49,7 +49,7 @@ class Simulation:
 
 
 sleepers = Sleeper(cc_distance=0.65, width=0.265, length=1., height=0.175)
-concrete_slab = ConcreteSlab(width=1.25, height=0.2)
+concrete_slab = ConcreteSlab(width=1.25, height=0.5)
 
 simulation1 = Simulation(job_name='embankment_second_order_2', cycles=np.array([100, 1000, 10000, 100000, 1000000]),
                          embankment_length=5.5, axes_load=22.5,
