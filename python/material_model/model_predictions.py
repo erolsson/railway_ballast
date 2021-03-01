@@ -6,7 +6,7 @@ import matplotlib.style
 
 from experimental_results import sun_et_al_16
 from material_model import MaterialModel
-from model_parameters import get_parameters_for_frequency
+from model_parameters import get_parameters
 
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)
@@ -33,8 +33,9 @@ def main():
         # par1[0:6] = parameters[f][0:6]
         # par1[9:14] = parameters[f][6:11]
         # par1[17:19] = parameters[f][11:13]
-        par1 = get_parameters_for_frequency(f)
-        parameters_common = get_parameters_for_frequency('common')
+        par1 = get_parameters(frequency=f)
+        par2 = get_parameters(frequency=f, common=True)
+        print(f, par2)
         plt.figure(0)
         ax1 = plt.subplot(gs[5*fig_idx[0] + fig_idx[0]:5*fig_idx[0] + 5 + fig_idx[0], fig_idx[1]:fig_idx[1] + 1])
         ax1.text(2, 0.27, '$f$={f} Hz'.format(f=int(f)))
@@ -53,10 +54,10 @@ def main():
             q = experiment.q
             static_stress = -p*np.array([1, 1, 1, 0, 0, 0])
             cyclic_stress = -q*np.array([1, 0, 0, 0, 0, 0])
-            model_1 = MaterialModel(par1, f)
+            model_1 = MaterialModel(par1)
             model_1.update(cycles, cyclic_stress, static_stress)
 
-            model_2 = MaterialModel(parameters_common, f)
+            model_2 = MaterialModel(par2)
             model_2.update(cycles, cyclic_stress, static_stress)
 
             ea_1 = -model_1.deviatoric_strain()[:, 0]

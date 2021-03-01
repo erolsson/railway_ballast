@@ -14,7 +14,7 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
 parameters = OrderedDict()
-
+frequency_levels = [5, 10, 20, 40]
 
 parameters[5] = [2.78174304e+00, 5.67424219e-09, 4.79444140e-02, 1.21521435e-03,
                  1.25454110e+01, 1.94706613e+02, 1.46936052e-01,  4.51955283e+01,
@@ -38,15 +38,34 @@ parameters[40] = [1.40956811e+00, 1.10662626e-06, 7.38373606e-02, 4.52749231e-04
 
 parameters_common = [2.20517242e+00, 3.72924098e-08, 3.77027776e-02, 7.16206717e-04,
                     1.34590082e+01, 2.12620654e+02, 8.65661146e-01, 5.17534627e-01,
-                    3.43653164e-01,   1.35237246e-01,  2.11811921e+01, -7.13402604e+03,
-                     -2.00586879e+00, -2.82053712e+00,  3.81672072e-02, -1.03244401e-01,
-                     1.32865400e-01,  4.18561848e-03, -4.99218275e-05]
-
-parameters_common = [2.20517242e+00, 3.72924098e-08, 3.77027776e-02, 7.16206717e-04,
-                    1.34590082e+01, 2.12620654e+02, 8.65661146e-01, 5.17534627e-01,
                     3.43653164e-01,  1.35287088e-01,  2.11853188e+01, -7.13235258e+03, -2.00711284e+00,
-                     -2.81461850e+00,  3.82300562e-02, -1.03239331e-01,  1.32871815e-01,
+                     -2.81461850e+00,  3.82300562e-02, 1.03239331e-01,  1.32871815e-01,
                     4.19011276e-03, -4.99458815e-05]
+
+
+def get_parameters(frequency=None, velocity=None, axle_distance=3., common=False):
+    if frequency is not None and not common:
+        try:
+            return parameters[frequency]
+        except KeyError:
+            raise KeyError("Parameters for frequency {f} not found".format(f=frequency))
+    else:
+        if velocity is not None:
+            frequency = velocity/3.6/axle_distance
+            if frequency < frequency_levels[0] or frequency > frequency_levels[-1]:
+                min_vel = frequency_levels[0]*axle_distance*3.6
+                max_vel = frequency_levels[-1]*axle_distance*3.6
+                if velocity < min_vel:
+                    raise ValueError("The minimum allowed velocity is {v}".format(v=min_vel))
+                if velocity < max_vel:
+                    raise ValueError("The maximum allowed velocity is {v}".format(v=max_vel))
+        par = np.zeros(13)
+        par[0:6] = parameters_common[0:6]
+        par[6:11] = parameters_common[9:14]
+        par[11:13] = parameters_common[17:19]
+        par[4] *= np.interp(frequency, frequency_levels, [1.] + parameters_common[6:9])
+        par[6] -= np.interp(frequency, frequency_levels, [0] + parameters_common[14:17])
+        return par
 
 
 def get_parameters_for_frequency(f):
