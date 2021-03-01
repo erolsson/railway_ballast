@@ -282,8 +282,18 @@ class RailwayEmbankment:
                                                      self.simulation_data.track_lower_height + self.rail_height,
                                                      1e-3))
         datum_plane_vertical = self.rail_part.DatumPlaneByPrincipalPlane(principalPlane=XYPLANE, offset=0.05)
+
         self.rail_part.PartitionFaceByDatumPlane(rail_top_face, self.rail_part.datum[datum_plane_vertical.id])
         self.rail_instance = self.assembly.Instance(name='rail_instance', part=self.rail_part, dependent=ON)
+
+        datum_plane_vertical = self.part.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE,
+                                                                    offset=self.track_gauge - self.rail_width/2)
+        self.part.PartitionCellByDatumPlane(datumPlane=self.part.datum[datum_plane_vertical.id],
+                                            cells=self.part.cells)
+        datum_plane_vertical = self.part.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE,
+                                                                    offset=self.track_gauge + self.rail_width/2)
+        self.part.PartitionCellByDatumPlane(datumPlane=self.part.datum[datum_plane_vertical.id],
+                                            cells=self.part.cells)
 
     def mesh(self):
         def get_edge_direction(edge):
@@ -534,7 +544,7 @@ def main():
     sim_name = sys.argv[-2]
     load = float(sys.argv[-1])
     # sim_name = 'sleepers_high'
-    load = 22.5
+    # load = 22.5
     simulation_to_run = simulations[sim_name]
     job_name = simulation_to_run.job_name + '_' + sim_name + '_' + str(load).replace('.', '_') + 't'
     embankment = RailwayEmbankment(simulation_to_run)
