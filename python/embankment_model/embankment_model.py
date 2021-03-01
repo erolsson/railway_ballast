@@ -11,7 +11,7 @@ try:
     import regionToolset
     from abaqusConstants import COORDINATE, STANDALONE, ON, DEFORMABLE_BODY, AXISYM, OFF, THREE_D, DELETE, GEOMETRY
     from abaqusConstants import SINGLE, FIXED, SWEEP, MEDIAL_AXIS, DC3D8, DC3D6, C3D8, C3D6, C3D20, STANDARD, ANALYSIS
-    from abaqusConstants import PERCENTAGE, DOMAIN, DEFAULT, INDEX, YZPLANE, XYPLANE, HEX, TOTAL_FORCE, NUMBER
+    from abaqusConstants import PERCENTAGE, DOMAIN, DEFAULT, INDEX, YZPLANE, XYPLANE, HEX, TOTAL_FORCE, NUMBER, SMALL
     from abaqus import backwardCompatibility
     backwardCompatibility.setValues(reportDeprecated=False)
 except ImportError:
@@ -252,7 +252,10 @@ class RailwayEmbankment:
         slab_face = self.concrete_slab_instance.faces.findAt((1e-3, self.total_height, 1e-3)).getFacesByFaceAngle(0.)
         slab_surface = self.assembly.Surface(side1Faces=slab_face,
                                              name='slab_surface')
-        self.mdb.Tie(name='tie_slab_ballast', slave=ballast_surface, master=slab_surface)
+        self.mdb.ContactProperty(name='frictionless')
+        self.mdb.SurfaceToSurfaceContactStd(name='tie_slab_ballast', slave=ballast_surface, master=slab_surface,
+                                            createStepName='Initial', interactionProperty='frictionless',
+                                            sliding=SMALL)
 
         rail_face = self.rail_instance.faces.findAt(((self.track_gauge/2,
                                                       self.simulation_data.track_lower_height,
