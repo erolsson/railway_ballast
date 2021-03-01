@@ -180,7 +180,9 @@ class RailwayEmbankment:
 
             # Creating a tie between the sleeper and the ballast and between the rail and the sleeper
             ballast_instance = self.assembly.instances['embankment_instance']
-            ballast_face = ballast_instance.faces.findAt(((1e-3, self.total_height, start_point + 1e-3),))
+            ballast_face = ballast_instance.faces.findAt((1e-3,
+                                                          self.total_height,
+                                                          start_point + 1e-3)).getFacesByFaceAngle(0.)
             ballast_surface = self.assembly.Surface(side1Faces=ballast_face,
                                                     name='ballast_sleeper_surface_' + str(sleeper_idx))
             sleeper_face = instance.faces.findAt((1e-3, self.total_height, start_point + 1e-3)).getFacesByFaceAngle(0.)
@@ -244,7 +246,7 @@ class RailwayEmbankment:
 
         # Creating a tie between the slab and the ballast and between the rail and the slab
         ballast_instance = self.assembly.instances['embankment_instance']
-        ballast_face = ballast_instance.faces.findAt(((1e-3, self.total_height, 1e-3),))
+        ballast_face = ballast_instance.faces.findAt((1e-3, self.total_height, 1e-3)).getFacesByFaceAngle(0.)
         ballast_surface = self.assembly.Surface(side1Faces=ballast_face,
                                                 name='ballast_slab_surface')
         slab_face = self.concrete_slab_instance.faces.findAt((1e-3, self.total_height, 1e-3)).getFacesByFaceAngle(0.)
@@ -287,11 +289,11 @@ class RailwayEmbankment:
         self.rail_instance = self.assembly.Instance(name='rail_instance', part=self.rail_part, dependent=ON)
 
         datum_plane_vertical = self.part.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE,
-                                                                    offset=self.track_gauge - self.rail_width/2)
+                                                                    offset=self.track_gauge/2 - self.rail_width/2)
         self.part.PartitionCellByDatumPlane(datumPlane=self.part.datum[datum_plane_vertical.id],
                                             cells=self.part.cells)
         datum_plane_vertical = self.part.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE,
-                                                                    offset=self.track_gauge + self.rail_width/2)
+                                                                    offset=self.track_gauge/2 + self.rail_width/2)
         self.part.PartitionCellByDatumPlane(datumPlane=self.part.datum[datum_plane_vertical.id],
                                             cells=self.part.cells)
 
@@ -543,7 +545,7 @@ class RailwayEmbankment:
 def main():
     sim_name = sys.argv[-2]
     load = float(sys.argv[-1])
-    # sim_name = 'sleepers_high'
+    # sim_name = 'slab_high'
     # load = 22.5
     simulation_to_run = simulations[sim_name]
     job_name = simulation_to_run.job_name + '_' + sim_name + '_' + str(load).replace('.', '_') + 't'
