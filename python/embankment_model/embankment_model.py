@@ -278,6 +278,11 @@ class RailwayEmbankment:
 
         self.rail_part = self.mdb.Part(name='part_rail', dimensionality=THREE_D, type=DEFORMABLE_BODY)
         self.rail_part.BaseSolidExtrude(sketch=sketch, depth=self.length)
+        rail_top_face = self.rail_part.faces.findAt((self.track_gauge/2,
+                                                     self.simulation_data.track_lower_height + self.rail_height,
+                                                     1e-3))
+        datum_plane_vertical = self.rail_part.DatumPlaneByPrincipalPlane(principalPlane=XYPLANE, offset=0.05)
+        self.rail_part.PartitionFaceByDatumPlane(rail_top_face, self.rail_part.datum[datum_plane_vertical.id])
         self.rail_instance = self.assembly.Instance(name='rail_instance', part=self.rail_part, dependent=ON)
 
     def mesh(self):
@@ -511,30 +516,25 @@ class RailwayEmbankment:
                                                            0.75, 0.85, 0.25, 0.25, 1.5, 0.75),
                                        resetDefaultValues=OFF)
 
-        load_elements_nodes = self.rail_part.nodes.getByBoundingBox(yMin=(self.simulation_data.track_lower_height
-                                                                          + self.rail_height - 1e-3),
-                                                                    zMax=1e-3)
-        load_element_labels = []
-
-        for node in load_elements_nodes:
-            load_element_labels.extend(e.label for e in node.getElements())
-        load_element_labels = np.unique(np.array(load_element_labels))
-        self.assembly.regenerate()
-        load_elements = self.rail_instance.elements.sequenceFromLabels([int(e) for e in load_element_labels])
+        load_face = self.rail_instance.faces.findAt(((self.track_gauge/2,
+                                                      self.simulation_data.track_lower_height + self.rail_height,
+                                                      1e-3),))
         axes_force = axes_load*1000*9.82/4
-        load_region = regionToolset.Region(face1Elements=load_elements)
+        load_region = self.assembly.Surface(name='load_surface', side1Faces=load_face)
         self.mdb.Pressure(name='train_wheel', createStepName='loading', region=load_region, magnitude=axes_force,
                           distributionType=TOTAL_FORCE)
 
     def run_job(self, job_name, cpus=12):
         job = mdb.Job(name=job_name, model=self.mdb, numCpus=cpus, numDomains=cpus)
-        job.submit()
-        job.waitForCompletion()
+        # job.submit()
+        # job.waitForCompletion()
 
 
 def main():
     sim_name = sys.argv[-2]
     load = float(sys.argv[-1])
+    # sim_name = 'sleepers_high'
+    load = 22.5
     simulation_to_run = simulations[sim_name]
     job_name = simulation_to_run.job_name + '_' + sim_name + '_' + str(load).replace('.', '_') + 't'
     embankment = RailwayEmbankment(simulation_to_run)
