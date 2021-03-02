@@ -63,8 +63,8 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
     n = static_stresses.shape[0]
     permanent_strains = np.zeros((len(cycles), n, static_stresses.shape[1]))
-    # n = 1000
-    num_cpus = 12
+
+    num_cpus = 8
     chunksize = n//num_cpus
     indices = [i*chunksize for i in range(num_cpus)]
     indices.append(n)
@@ -101,7 +101,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 def main():
     f = 20
     sim_name = 'sleepers_low_22_5t'
-    cycles = [100, 1000, 10000, 100000, 1000000]
+    cycles = [1, 10, 100, 1000, 10000, 100000, 1000000]
     stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/embankment_' + sim_name
                                              + '.odb')
 
