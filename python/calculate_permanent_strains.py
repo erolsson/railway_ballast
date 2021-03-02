@@ -15,6 +15,7 @@ from abaqus_functions.utilities import BoundaryCondition
 from material_model.model_parameters import get_parameters
 from common import create_temp_dir_name
 
+
 def evaluate_permanent_strain_for_gp(material_parameters, cycles, static_stress_state, cyclic_stress_state):
     n = static_stress_state.shape[0]
     permanent_strain = np.zeros((len(cycles), n, static_stress_state.shape[1]))
