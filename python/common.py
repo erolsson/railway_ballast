@@ -22,4 +22,5 @@ def create_temp_dir_name(odb_file_name):
     work_directory = os.path.splitext(odb_file_name)[0] + '_tempdir' + str(i)
     while os.path.isdir(work_directory + str(i)):
         i += 1
+        work_directory = os.path.splitext(odb_file_name)[0] + '_tempdir' + str(i)
     return work_directory
