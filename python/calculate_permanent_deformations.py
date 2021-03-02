@@ -22,6 +22,7 @@ class DeformationCalculator:
         print("Init calculator")
         self.odb_file_name = strain_odb_file_name
         self.work_directory = create_temp_dir_name(strain_odb_file_name)
+        os.makedirs(self.work_directory)
         self.stain_field_id = strain_field_id
         self.instance_name = instance_name
         self.set_name = set_name
