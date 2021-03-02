@@ -8,7 +8,7 @@ from scipy.sparse import coo_matrix
 import scipy.sparse as sp
 from scipy.sparse.linalg import lsqr, norm
 
-from common import abq
+from common import abq, create_temp_dir_name
 from FEM_functions.elements import C3D8
 from read_data_from_odb import read_data_from_odb
 from multiprocesser.multiprocesser import multi_processer
@@ -21,7 +21,7 @@ class DeformationCalculator:
                  strain_field_id='E'):
         print("Init calculator")
         self.odb_file_name = strain_odb_file_name
-        self.work_directory = os.path.dirname(os.path.abspath(self.odb_file_name))
+        self.work_directory = create_temp_dir_name(strain_odb_file_name)
         self.stain_field_id = strain_field_id
         self.instance_name = instance_name
         self.set_name = set_name
@@ -89,6 +89,7 @@ class DeformationCalculator:
         scale_array = sp.diags([1./self.scale_factors], offsets=[0])
         self.B_red *= scale_array
         print("Init done")
+        os.removedirs(self.work_directory)
 
     def calculate_deformations(self, step_name, frame_number=-1):
         strain = read_data_from_odb(self.stain_field_id, self.odb_file_name, step_name=step_name,
