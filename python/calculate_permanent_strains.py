@@ -32,7 +32,8 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
     cycles = np.array(cycles)
 
     work_directory = os.path.abspath(strain_odb_file_name)
-    work_directory = os.path.dirname(work_directory)
+    work_directory = os.path.splitext(work_directory)[0] + '_tempdir'
+    os.makedirs(work_directory)
 
     if not os.path.isfile(strain_odb_file_name):
         os.chdir('abaqus_functions')
@@ -96,6 +97,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
                           frame_number=0, set_name='EMBANKMENT_INSTANCE_BALLAST_NODES')
         write_data_to_odb(err, 'ERR', strain_odb_file_name, step_name='cycles_' + str(n), frame_number=0,
                           set_name=element_set_name)
+    os.removedirs(work_directory)
 
 
 def main():

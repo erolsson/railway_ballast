@@ -10,7 +10,8 @@ from common import abq
 def write_data_to_odb(field_data, field_id, odb_file_name, step_name, instance_name='', set_name='',
                       step_description='', frame_number=None, frame_value=None, field_description='',
                       position='INTEGRATION_POINT'):
-    work_directory = os.path.dirname(os.path.abspath(odb_file_name))
+    work_directory = os.path.splitext(odb_file_name)[0] + '_tempdir'
+    os.makedirs(work_directory)
     pickle_filename = work_directory + r'/load_field_to_odb_pickle.pkl'
     data_filename = work_directory + r'/field_data.npy'
     np.save(data_filename, field_data)
@@ -29,3 +30,4 @@ def write_data_to_odb(field_data, field_id, odb_file_name, step_name, instance_n
 
     os.remove(pickle_filename)
     os.remove(data_filename)
+    os.removedirs(work_directory)

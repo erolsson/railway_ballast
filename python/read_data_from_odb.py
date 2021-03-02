@@ -7,7 +7,9 @@ from common import abq
 
 def read_data_from_odb(field_id, odb_file_name, step_name=None, frame_number=-1, set_name='', instance_name='',
                        get_position_numbers=False, get_frame_value=False, position='INTEGRATION_POINT'):
-    work_directory = os.path.dirname(os.path.abspath(odb_file_name))
+    work_directory = os.path.splitext(odb_file_name)[0] + '_tempdir'
+    os.makedirs(work_directory)
+
     parameter_pickle_name = work_directory + '/parameter_pickle.pkl'
     results_pickle_name = work_directory + '/results.pkl'
     with open(parameter_pickle_name, 'wb') as pickle_file:
@@ -25,6 +27,7 @@ def read_data_from_odb(field_id, odb_file_name, step_name=None, frame_number=-1,
         data = pickle.load(results_pickle, encoding='latin1')
     os.remove(parameter_pickle_name)
     os.remove(results_pickle_name)
+    os.removedirs(work_directory)
     if not get_position_numbers and not get_frame_value:
         return data['data']
     elif not get_position_numbers:
