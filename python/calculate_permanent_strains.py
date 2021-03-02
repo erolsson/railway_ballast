@@ -32,7 +32,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
         cycles = np.array(cycles)
     cycles = np.array(cycles)
 
-    work_directory = create_temp_dir_name(odb_file_name)
+    work_directory = create_temp_dir_name(strain_odb_file_name)
     os.makedirs(work_directory)
 
     if not os.path.isfile(strain_odb_file_name):
