@@ -15,3 +15,11 @@ if distro.linux_distribution()[0] == 'Ubuntu':
 else:
     abq = '/scratch/users/erik/SIMULIA/CAE/2018/linux_a64/code/bin/ABQLauncher'
     abq_viewer = '/scratch/users/erik/SIMULIA/CAE/2018/linux_a64/code/bin/ABQLauncher viewer -mesa'
+
+
+def create_temp_dir_name(odb_file_name):
+    i = 0
+    work_directory = os.path.splitext(odb_file_name)[0] + '_tempdir' + str(i)
+    while os.path.isdir(work_directory + str(i)):
+        i += 1
+    return work_directory

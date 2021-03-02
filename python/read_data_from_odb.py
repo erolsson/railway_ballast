@@ -2,14 +2,14 @@ import os
 import pickle
 import subprocess
 
-from common import abq
+from common import abq, create_temp_dir_name
 
 
 def read_data_from_odb(field_id, odb_file_name, step_name=None, frame_number=-1, set_name='', instance_name='',
                        get_position_numbers=False, get_frame_value=False, position='INTEGRATION_POINT'):
-    work_directory = os.path.splitext(odb_file_name)[0] + '_tempdir'
-    os.makedirs(work_directory)
 
+    work_directory = create_temp_dir_name(odb_file_name)
+    os.makedirs(work_directory)
     parameter_pickle_name = work_directory + '/parameter_pickle.pkl'
     results_pickle_name = work_directory + '/results.pkl'
     with open(parameter_pickle_name, 'wb') as pickle_file:
