@@ -100,7 +100,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
 def main():
     f = 20
-    sim_name = 'slab_high_22_5t'
+    sim_name = 'slab_low_22_5t'
     cycles = [1, 10, 100, 1000, 10000, 100000, 1000000]
     stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/embankment_' + sim_name
                                              + '.odb')
