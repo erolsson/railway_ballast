@@ -29,10 +29,6 @@ def main():
     for i, f in enumerate([5., 10., 20., 40.]):
         experimental_data = sun_et_al_16.get_data(f=f)
         fig_idx = (i//2, i % 2)
-        # par1 = np.array(base_parameters)
-        # par1[0:6] = parameters[f][0:6]
-        # par1[9:14] = parameters[f][6:11]
-        # par1[17:19] = parameters[f][11:13]
         par1 = get_parameters(frequency=f)
         par2 = get_parameters(frequency=f, common=True)
         print(f, par2)
