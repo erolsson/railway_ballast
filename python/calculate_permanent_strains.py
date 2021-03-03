@@ -112,10 +112,10 @@ def main():
     par = get_parameters(frequency=f)
     calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
 
-    # strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_' + sim_name +
-    #                                          '_20Hz_commonf.odb')
-    # par = get_parameters(frequency=f, common=True)
-    # calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
+    strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_' + sim_name +
+                                             '_20Hz_commonf.odb')
+    par = get_parameters(frequency=f, common=True)
+    calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
 
 
 if __name__ == '__main__':
