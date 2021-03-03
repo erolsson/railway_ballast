@@ -83,7 +83,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
                           step_name='cycles_' + str(n), instance_name=instance_name, set_name=element_set_name)
 
     boundary_conditions = [BoundaryCondition('X1_NODES', 'node_set', 1),
-                           BoundaryCondition('BOTTOM_NODES', 'node_set', 2),
+                           BoundaryCondition('ballast_bottom_nodes', 'node_set', 2),
                            BoundaryCondition('X_SYM_NODES', 'node_set', 1),
                            BoundaryCondition('Z_SYM_NODES', 'node_set', 3),
                            BoundaryCondition('Z1_NODES', 'node_set', 3)]

@@ -20,4 +20,6 @@ def add_node_set_to_odb(odb_file_name, node_set_name, x_min=-1e99, x_max=1e99, y
 
 
 if __name__ == '__main__':
-    add_node_set_to_odb('embankment_slab_high_22_5t.odb', 'ballast_bottom_nodes', y_min=7-1e-3, y_max=7+1e-3)
+    add_node_set_to_odb('embankment_slab_low_22_5t.odb', 'ballast_bottom_nodes', y_min=7-1e-3, y_max=7+1e-3)
+    add_node_set_to_odb('embankment_sleepers_low_22_5t.odb', 'ballast_bottom_nodes', y_min=7-1e-3, y_max=7+1e-3)
+    add_node_set_to_odb('embankment_sleepers_high_22_5t.odb', 'ballast_bottom_nodes', y_min=7-1e-3, y_max=7+1e-3)
