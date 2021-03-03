@@ -6,7 +6,8 @@ import matplotlib.style
 import numpy as np
 from scipy.optimize import fmin
 
-from functional_shapes import permanent_strain
+from material_model import MaterialModel
+from model_parameters import get_parameters
 from multiprocesser.multiprocesser import multi_processer
 
 matplotlib.style.use('classic')
@@ -19,7 +20,12 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
 
 
 def residual(deviator, strain, cycles, pressure, parameters):
-    return (strain - permanent_strain(cycles, pressure, deviator, parameters)[-1])**2
+    static_stress = -pressure*np.array([1, 1, 1, 0, 0, 0])
+    cyclic_stress = -deviator*np.array([1, 0, 0, 0, 0, 0])
+    model = MaterialModel(parameters)
+    model.update(cycles, cyclic_stress, static_stress)
+    e = -model.deviatoric_strain()[-1, 0]
+    return (e-strain)**2
 
 
 def calc_deviator(strain, n, p, par):
@@ -27,25 +33,27 @@ def calc_deviator(strain, n, p, par):
 
 
 def main():
-    par = np.array([3.78059234e+00, 2.28236862e-06, 8.14579983e+01, -9.66505289e-13, 6.80152840e+00,
-                    1.28249309e+01])
+    frequencies = [5, 10, 20, 40]
 
+    lines = ['-', '--']
+    colors = ['r', 'b', 'g', 'k']
     cycles = 100000
-
-    pressures = np.linspace(0, 60, 100)
-    strain_levels = [0.01, 0.05, 0.1]
+    pressures = np.linspace(0, 30, 100)
+    strain = 0.05
     n = np.exp(np.linspace(0, np.log(cycles)))
-    for strain in strain_levels:
-        job_list = []
-        for i, p in enumerate(pressures):
-            job_list.append((calc_deviator, [strain, n, p, par],
-                             {}))
-        q = np.array(multi_processer(job_list, delay=0., timeout=3600, cpus=12))
-        plt.plot(-3*pressures, q, lw=2)
+    for j, f in enumerate(frequencies):
+        parameters = [get_parameters(f, common=False), get_parameters(f, common=True)]
+        for i, par in enumerate(parameters):
+            job_list = []
+            for p in pressures:
+                job_list.append((calc_deviator, [strain, n, p, par],
+                                 {}))
+            q = np.array(multi_processer(job_list, delay=0., timeout=3600, cpus=12))
+            plt.plot(pressures, q, lines[i] + colors[j], lw=2)
     plt.xlabel('$I_{1, static}$ [kPa]')
     plt.ylabel(r'$\sigma_{vM, cyclc}$ [kPa]')
     plt.tight_layout()
-    plt.savefig('strain_life.png')
+    # plt.savefig('strain_life.png')
     plt.show()
 
 

@@ -7,7 +7,7 @@ from scipy.optimize import fmin
 
 from experimental_results import sun_et_al_16
 from material_model import MaterialModel
-from model_parameters import parameters, parameters_common
+from model_parameters import get_parameters
 from multiprocesser.multiprocesser import multi_processer
 
 
@@ -41,7 +41,7 @@ def calc_deviatoric_residual_for_data_experiment(par, experiment):
     e_exp = experiment.deviatoric_axial_strain() - e0
     static_stress = -experiment.p*np.array([1, 1, 1, 0, 0, 0])
     cyclic_stress = -experiment.q*np.array([1, 0, 0, 0, 0, 0])
-    model = MaterialModel(material_parameters=par, frequency=experiment.f)
+    model = MaterialModel(material_parameters=par)
     model.update(experiment.cycles, cyclic_stress, static_stress)
     model_e = -model.deviatoric_strain()[:, 0]
     idx = np.logical_and(e_exp < 0.3, abs(e_exp) != 0)
@@ -54,7 +54,7 @@ def calc_volumetric_residual_for_data_experiment(par, experiment):
     e_exp = experiment.volumetric_strain - e0
     static_stress = -experiment.p*np.array([1, 1, 1, 0, 0, 0])
     cyclic_stress = -experiment.q*np.array([1, 0, 0, 0, 0, 0])
-    model = MaterialModel(material_parameters=par, frequency=experiment.f)
+    model = MaterialModel(material_parameters=par)
     model.update(experiment.cycles, cyclic_stress, static_stress)
     model_e = -model.volumetric_strain()
     idx = np.logical_and(e_exp < 0.3, abs(e_exp) > 1e-3)
@@ -65,31 +65,17 @@ def calc_volumetric_residual_for_data_experiment(par, experiment):
 
 
 def main():
-    f = 5
-    frequencies = [5, 10, 20, 40]
-    # parameters_to_fit = list(range(4, 6))
-    # parameters_to_fit = list(range(9, 14)) + list(range(17, 19))
-    # parameters_to_fit = list(range(9))
-    parameters_to_fit = list(range(9, 20))
-    # parameters_to_fit = [9]
-    # parameters_to_fit = range(6)
-
+    f = 20
+    frequencies = [f]
+    parameters_to_fit = [2]
     fitting_dataset = sun_et_al_16.get_data(f=frequencies)
-    par = np.array(parameters_common)
-    # par = np.zeros(20)
-    # par[14:17] = 0
-    # par[0:9] = parameters_common[0:9]
-    # par[0:6] = parameters[f][0:6]
-    # par[6:9] = 1.
-    # par[10] = 13
-    # par[14:17] = 1.
-    # par[9:14] = parameters[20][6:11]
-    # par[17:19] = parameters[20][11:13]
+    par = np.array(get_parameters(f, common=False))
+
     print(par)
     for i in range(50):
         par[parameters_to_fit] = fmin(residual, [par[parameters_to_fit]],
                                       args=(par, parameters_to_fit, fitting_dataset,
-                                            calc_volumetric_residual_for_data_experiment), maxfun=1e6,
+                                            calc_deviatoric_residual_for_data_experiment), maxfun=1e6,
                                       maxiter=1e6)
         print(par[parameters_to_fit])
 
