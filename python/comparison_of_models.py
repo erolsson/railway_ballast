@@ -60,9 +60,14 @@ def main():
     plt.plot([-1, -2], [-1, -1], 'b', lw=2, label='slab')
     plt.plot([-1, -2], [-1, -1], 'r', lw=2, label='sleepers')
 
-    plt.plot([-1, -2], [-1, -1], '--k', lw=2, label='One freq.')
-    plt.plot([-1, -2], [-1, -1], ':k', lw=2, label='All freq.')
+    plt.plot([-1, -2], [-1, -1], '--k', lw=2, label='One frequency')
+    plt.plot([-1, -2], [-1, -1], ':k', lw=2, label='All frequencies')
     plt.legend(loc='best')
+    plt.xlabel('Distance from ballast surface [m]', fontsize=24)
+    plt.ylabel('Settlement [mm]', fontsize=24)
+    plt.legend(loc='best')
+    plt.tight_layout()
+    plt.savefig('different_mdoels.png')
     plt.show()
 
 
