@@ -46,7 +46,6 @@ def main():
     for i, geometry in enumerate(['low', 'high']):
         for rail_fixture, c in zip(['slab', 'sleepers'], ['b', 'r']):
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
-            print(path_points)
 
             for calibration, ltype in zip(['', '_commonf'], ['--', ':']):
                 odb_file_name = (odb_directory + '/results_' + rail_fixture + '_' + geometry + '_'
@@ -55,7 +54,7 @@ def main():
 
                 up = get_data_from_path(path_points, odb_file_name, 'UP', 'UP2', output_position='NODAL',
                                         step_name=step_name)
-                plt.plot(path_points[1, 0] - path_points[1, :], -up*1000, lw=2)
+                plt.plot(path_points[0, 1] - path_points[:, 1], -up*1000, lw=2)
     plt.show()
 
 
