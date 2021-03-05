@@ -14,7 +14,7 @@ if distro.linux_distribution()[0] == 'Ubuntu':
                  ' vglrun -d :1 /opt/abaqus/2018/Commands/abq2018 viewer'
 else:
     abq = '/scratch/users/erik/SIMULIA/CAE/2018/linux_a64/code/bin/ABQLauncher'
-    abq_viewer = '/scratch/users/erik/SIMULIA/CAE/2018/linux_a64/code/bin/ABQLauncher viewer -mesa'
+    abq_viewer = '/scratch/users/erik/SIMULIA/CAE/2018/linux_a64/code/bin/ABQLauncher viewer'
 
 
 def create_temp_dir_name(odb_file_name):
