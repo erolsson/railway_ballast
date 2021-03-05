@@ -67,7 +67,7 @@ def main():
     plt.ylabel('Settlement [mm]', fontsize=24)
     plt.legend(loc='best')
     plt.tight_layout()
-    plt.savefig('different_mdoels.png')
+    plt.savefig('different_models.png')
     plt.show()
 
 
