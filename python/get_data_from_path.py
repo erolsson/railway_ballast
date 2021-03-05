@@ -34,6 +34,7 @@ def get_data_from_path(path_points, odb_filename, variable, component=None, step
     print(abq_viewer + ' noGUI=write_data_along_path.py -- ' + parameter_pickle_name)
     job = subprocess.Popen(abq_viewer + ' noGUI=write_data_along_path.py -- ' + parameter_pickle_name,
                            shell=True)
+    dfgfdgdfgdg
     job.wait()
     os.chdir('..')
     data = np.unique(np.load(data_filename), axis=0)
