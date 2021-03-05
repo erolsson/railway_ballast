@@ -114,7 +114,7 @@ class RailwayEmbankment:
             datum_plane_vertical = part.DatumPlaneByPrincipalPlane(principalPlane=YZPLANE, offset=x)
             part.PartitionCellByDatumPlane(datumPlane=part.datum[datum_plane_vertical.id], cells=part.cells)
 
-            # meshing the sleeper
+            # meshing the sleeperdsfsd
             part.seedPart(size=0.025)
             elem_type1 = mesh.ElemType(elemCode=C3D20, elemLibrary=STANDARD)
             part.setElementType(regions=(part.cells,), elemTypes=(elem_type1,))
