@@ -16,7 +16,7 @@ plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
-odb_directory = 'embankment_model/'
+odb_directory = os.path.expanduser('~/railway_ballast/python/embankment_model')
 
 
 def get_path_points_for_fem_simulation(sim_name):
@@ -49,7 +49,7 @@ def main():
             print(path_points)
 
             for calibration, ltype in zip(['', '_commonf'], ['--', ':']):
-                odb_file_name = (odb_directory + 'results_' + rail_fixture + '_' + geometry + '_'
+                odb_file_name = (odb_directory + '/results_' + rail_fixture + '_' + geometry + '_'
                                  + str(load).replace('.', '_') + 't_' + str(int(frequency)) + 'Hz'
                                  + calibration + '.odb')
 
