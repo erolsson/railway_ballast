@@ -54,7 +54,15 @@ def main():
 
                 up = get_data_from_path(path_points, odb_file_name, 'UP', 'UP2', output_position='NODAL',
                                         step_name=step_name)
-                plt.plot(path_points[0, 1] - path_points[:, 1], -up*1000, lw=2)
+                plt.plot(path_points[0, 1] - path_points[:, 1], -up*1000, ltype + c, lw=2)
+    plt.ylim(0, 50)
+    plt.xlim(0, 4.5)
+    plt.plot([-1, -2], [-1, -1], 'b', lw=2, label='slab')
+    plt.plot([-1, -2], [-1, -1], 'r', lw=2, label='sleepers')
+
+    plt.plot([-1, -2], [-1, -1], '--k', lw=2, label='One freq.')
+    plt.plot([-1, -2], [-1, -1], ':k', lw=2, label='All freq.')
+    plt.legend(loc='best')
     plt.show()
 
 
