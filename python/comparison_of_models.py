@@ -58,5 +58,6 @@ def main():
                 plt.plot(path_points[1, 0] - path_points[1, :], -up*1000, lw=2)
     plt.show()
 
+
 if __name__ == '__main__':
     main()

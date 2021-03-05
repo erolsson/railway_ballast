@@ -31,7 +31,7 @@ def get_data_from_path(path_points, odb_filename, variable, component=None, step
         path_points = np.array(path_points)
     np.save(path_points_filename, path_points)
     os.chdir('abaqus_functions')
-    print(abq_viewer)
+    print(abq_viewer + ' noGUI=write_data_along_path.py -- ' + parameter_pickle_name)
     job = subprocess.Popen(abq_viewer + ' noGUI=write_data_along_path.py -- ' + parameter_pickle_name,
                            shell=True)
     job.wait()
