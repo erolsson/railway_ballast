@@ -104,7 +104,7 @@ def main():
     frequencies = [5., 10., 20., 40]
     load = 30.
     for f in frequencies:
-        sim_name = 'slab_high_' + str(load).replace('.', '_') + 't'
+        sim_name = 'sleepers_high_' + str(load).replace('.', '_') + 't'
         cycles = [1, 10, 100, 1000, 10000, 100000, 1000000]
         stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/embankment_' + sim_name
                                                  + '.odb')
