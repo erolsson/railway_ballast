@@ -74,6 +74,7 @@ class MaterialModel:
             solution_comp = solve_ivp(dkv_dn, [n0, cycles[i]], [e_comp[0] + e_comp[1] + e_comp[2]])
 
             e_f = solution_fric.y[:, -1]
+            e_f[3:] *= 2                    # Calculating gamma_xy instead of e_xy etc
             e_c = solution_comp.y[:, -1]
             if np.linalg.norm(e_f) > 1.:
                 e_f /= np.linalg.norm(e_f)
