@@ -9,11 +9,8 @@ import scipy.sparse as sp
 from scipy.sparse.linalg import lsqr, norm
 
 from common import abq, create_temp_dir_name
-from FEM_functions.elements import C3D8
 from read_data_from_odb import read_data_from_odb
 from multiprocesser.multiprocesser import multi_processer
-simulation_directory = os.path.expanduser('~/railway_ballast/abaqus2014/')
-results_odb_filename = simulation_directory + '/Job-14.odb'
 
 
 class DeformationCalculator:
@@ -59,6 +56,7 @@ class DeformationCalculator:
         row = np.zeros(b_components)
         col = np.zeros(b_components)
         values = np.zeros(b_components)
+        self.gauss_point_volumes = np.zeros(strain_components)
         print("Assembling B-matrix")
         job_list = []
         for i, element in enumerate(elements):
@@ -71,7 +69,8 @@ class DeformationCalculator:
             col[i*n:(i + 1)*n] = data[0]
             row[i*n:(i + 1)*n] = data[1]
             values[i*n:(i + 1)*n] = data[2]
-
+            gps = data[3].shape[0]//6
+            self.gauss_point_volumes[i*gps*6:(i+1)*gps*6] = data[3]
         self.B_matrix = coo_matrix((values, (row, col)),
                                    shape=(strain_components, displacement_components)).tocsc()
         print("Shape of B-matrix:", self.B_matrix.shape)
@@ -79,11 +78,9 @@ class DeformationCalculator:
         self.bc_cols = np.where(np.in1d(all_cols, bc_dofs))[0]
         self.cols_to_keep = np.where(np.logical_not(np.in1d(all_cols, bc_dofs)))[0]
         print("Computing scale factors")
-        job_list = []
+        scale_array = sp.diags([self.gauss_point_volumes], offsets=[0])
+        self.B_matrix = scale_array*self.B_matrix
         self.B_red = self.B_matrix[:, self.cols_to_keep]
-        num_cols = self.B_red.shape[1]
-        for col in range(num_cols):
-            job_list.append((calculate_scale_factor, [self.B_red[:, col]], {}))
 
         print("Scaling B-matrix")
         self.scale_factors = norm(self.B_red, axis=0)
@@ -95,7 +92,7 @@ class DeformationCalculator:
     def calculate_deformations(self, step_name, frame_number=-1):
         strain = read_data_from_odb(self.stain_field_id, self.odb_file_name, step_name=step_name,
                                     frame_number=frame_number, set_name=self.set_name, instance_name=self.instance_name)
-        strain = strain.flatten()
+        strain = strain.flatten()*self.gauss_point_volumes
 
         calc_displacements = lsqr(self.B_red, strain - self.B_matrix[:, self.bc_cols]*self.bc_vals,
                                   show=True)[0]
@@ -114,6 +111,7 @@ def calculate_element_data(element, idx):
     col = np.zeros(n)
     row = np.zeros(n)
     values = np.zeros(n)
+    gp_volume = np.zeros(element.gauss_points.shape[0]*6)
     strain_line = 0
     for k, n in enumerate(element.node_labels):
         displacement_comp[3*k] = 3*n
@@ -121,12 +119,15 @@ def calculate_element_data(element, idx):
         displacement_comp[3*k + 2] = 3*n + 2
     for j, gp in enumerate(element.gauss_points):
         B = element.B(*gp)
+
         for comp in range(6):
             col[strain_line*dofs:strain_line*dofs + dofs] = displacement_comp
             row[strain_line*dofs:strain_line*dofs + element.dofs] = strain_line + idx*element.strains_components
             values[strain_line*dofs:strain_line*dofs + dofs] = B[comp, :]
             strain_line += 1
-    return col, row, values
+
+        gp_volume[6*j:6*j + 6] = element.gp_volume(j)
+    return col, row, values, gp_volume
 
 
 def calculate_scale_factor(column):

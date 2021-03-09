@@ -33,6 +33,10 @@ class Element:
     def B(self, xi, eta, zeta):
         pass
 
+    def gp_volume(self, i):
+        gp = self.gauss_points[i, :]
+        return np.linalg.det(self.J(*gp))
+
 
 class C3D8(Element):
     dofs = 24
