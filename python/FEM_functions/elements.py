@@ -35,7 +35,7 @@ class Element:
 
     def gp_volume(self, i):
         gp = self.gauss_points[i, :]
-        return np.linalg.det(self.J(*gp))
+        return np.linalg.det(self.J(*gp))*self.gauss_weights[i]
 
 
 class C3D8(Element):
