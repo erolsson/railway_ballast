@@ -22,6 +22,7 @@ def evaluate_permanent_strain_for_gp(material_parameters, cycles, static_stress_
     for i in range(n):
         model = MaterialModel(material_parameters)
         permanent_strain[:, i, :] = model.update(cycles, cyclic_stress_state[i, :], static_stress_state[i, :])
+    permanent_strain[:, :, 3:] *= 2
     return permanent_strain
 
 

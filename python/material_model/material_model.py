@@ -89,9 +89,7 @@ class MaterialModel:
         return self.H1*(1 - np.exp(-self.nf*ep))
 
     def strain(self):
-        e = self.frictional_strain - self.compaction_strain
-        e[:, 3:] *= 2
-        return e
+        return self.frictional_strain - self.compaction_strain
 
     def volumetric_strain(self):
         e = self.strain()
@@ -99,7 +97,6 @@ class MaterialModel:
 
     def deviatoric_strain(self):
         e_dev = np.array(self.strain())
-        e_dev[:, 3:] *= 2
         e_vol = self.volumetric_strain()
         for i in range(3):
             e_dev[:, i] -= e_vol/3
