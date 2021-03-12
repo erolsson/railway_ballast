@@ -103,7 +103,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
 def main():
     frequencies = [5., 10., 20., 40]
-    load = 22.5
+    load = 30.
     for f in frequencies:
         sim_name = 'slab_low_' + str(load).replace('.', '_') + 't'
         cycles = [1, 10, 100, 1000, 10000, 100000, 1000000]
