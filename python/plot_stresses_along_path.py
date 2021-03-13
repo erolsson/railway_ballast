@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.style
 
-from embankment_model.simulations import simulations
+from finite_element_model.simulations import simulations
 from get_data_from_path import get_data_from_path
 from comparison_of_models import get_path_points_for_fem_simulation
 
@@ -17,7 +17,7 @@ plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
-odb_directory = os.path.expanduser('~/railway_ballast/python/embankment_model')
+odb_directory = os.path.expanduser('/')
 
 for geometry in ['low', 'high']:
     for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):

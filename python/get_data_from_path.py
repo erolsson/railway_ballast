@@ -44,7 +44,7 @@ def get_data_from_path(path_points, odb_filename, variable, component=None, step
 
 
 def main():
-    odb_file_name = os.path.expanduser('~/railway_ballast/python/embankment_model/results_2.odb')
+    odb_file_name = os.path.expanduser('//results_2.odb')
     path_points = np.zeros((100, 3))
     path_points[:, 0] = np.linspace(0.1, 0.2, 100)
     path_points[:, 1] += 8.
