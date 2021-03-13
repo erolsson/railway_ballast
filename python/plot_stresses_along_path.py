@@ -25,5 +25,5 @@ for geometry in ['low', 'high']:
             odb_file_name = (odb_directory + '/embankment_' + rail_fixture + '_' + geometry + '_'
                              + str(load).replace('.', '_') + 't.odb')
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
-            stress = get_data_from_path(path_points, odb_file_name, 'S')
+            stress = get_data_from_path(path_points, odb_file_name, 'S', component='S11')
             print(stress)
