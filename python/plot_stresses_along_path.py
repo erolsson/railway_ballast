@@ -17,7 +17,7 @@ plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
-odb_directory = os.path.expanduser('~/railway_ballast/python/finite_element_model')
+odb_directory = os.path.expanduser('~/railway_ballast/python/embankment_model')
 
 for geometry in ['low', 'high']:
     for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
