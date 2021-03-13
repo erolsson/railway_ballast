@@ -17,14 +17,13 @@ plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
-odb_directory = os.path.expanduser('/')
+odb_directory = os.path.expanduser('~/railway_ballast/python/finite_element_model')
 
 for geometry in ['low', 'high']:
     for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
         for load, c in zip([22.5, 30.], ['r', 'b']):
-            odb_file_name = os.path.expanduser(odb_directory + '/embankment_' + rail_fixture + '_' + geometry
-                                               + '_' + str(load).replace('.', '_') + 't.odb')
-            print(odb_file_name)
+            odb_file_name = (odb_directory + '/embankment_' + rail_fixture + '_' + geometry + '_'
+                             + str(load).replace('.', '_') + 't.odb')
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
             stress = get_data_from_path(path_points, odb_file_name, 'S')
             print(stress)
