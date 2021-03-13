@@ -10,7 +10,6 @@ from common import abq_viewer
 def get_data_from_path(path_points, odb_filename, variable, component=None, step_name=None, frame_number=None,
                        output_position='ELEMENT_NODAL'):
     work_directory = os.path.dirname(os.path.abspath(odb_filename))
-    print(work_directory)
     parameter_pickle_name = work_directory + '/parameter_pickle.pkl'
     path_points_filename = work_directory + '/path_points.npy'
     data_filename = work_directory + '/path_data.npy'
