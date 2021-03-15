@@ -29,10 +29,10 @@ def get_path_points_for_fem_simulation(sim_name):
     total_height = sum([layer.height for layer in fem_simulation.layers])
 
     path_points = np.zeros((1000, 3))
-    y = np.linspace(total_height-1e-6, ballast_start_height+1e-6, 1000)
+    y = np.linspace(total_height-1e-3, ballast_start_height+1e-3, 1000)
     path_points[:, 1] = y
     path_points[:, 0] = fem_simulation.track_gauge/2
-    path_points[:, 2] += 1e-6
+    path_points[:, 2] += 1e-3
 
     return path_points
 
