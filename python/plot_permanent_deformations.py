@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.style
 
-from embankment_model.simulations import simulation1
+from finite_element_model.simulations import simulation1
 from get_data_from_path import get_data_from_path
 
 matplotlib.style.use('classic')
@@ -18,7 +18,7 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
 
 
 def main():
-    results_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_2.odb')
+    results_odb_filename = os.path.expanduser('//results_2.odb')
     ballast_start_height = 0
     for layer in simulation1.layers:
         if layer.name.lower().startswith('ballast'):

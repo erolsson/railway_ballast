@@ -13,6 +13,7 @@ from write_data_to_odb import write_data_to_odb
 from calculate_permanent_deformations import DeformationCalculator
 from abaqus_functions.utilities import BoundaryCondition
 from material_model.model_parameters import get_parameters
+from common import create_temp_dir_name
 
 
 def evaluate_permanent_strain_for_gp(material_parameters, cycles, static_stress_state, cyclic_stress_state):
@@ -21,6 +22,7 @@ def evaluate_permanent_strain_for_gp(material_parameters, cycles, static_stress_
     for i in range(n):
         model = MaterialModel(material_parameters)
         permanent_strain[:, i, :] = model.update(cycles, cyclic_stress_state[i, :], static_stress_state[i, :])
+    permanent_strain[:, :, 3:] *= 2
     return permanent_strain
 
 
@@ -31,8 +33,8 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
         cycles = np.array(cycles)
     cycles = np.array(cycles)
 
-    work_directory = os.path.abspath(strain_odb_file_name)
-    work_directory = os.path.dirname(work_directory)
+    work_directory = create_temp_dir_name(strain_odb_file_name)
+    os.makedirs(work_directory)
 
     if not os.path.isfile(strain_odb_file_name):
         os.chdir('abaqus_functions')
@@ -63,8 +65,8 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
     n = static_stresses.shape[0]
     permanent_strains = np.zeros((len(cycles), n, static_stresses.shape[1]))
-    # n = 1000
-    num_cpus = 12
+
+    num_cpus = 8
     chunksize = n//num_cpus
     indices = [i*chunksize for i in range(num_cpus)]
     indices.append(n)
@@ -82,7 +84,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
                           step_name='cycles_' + str(n), instance_name=instance_name, set_name=element_set_name)
 
     boundary_conditions = [BoundaryCondition('X1_NODES', 'node_set', 1),
-                           BoundaryCondition('BOTTOM_NODES', 'node_set', 2),
+                           BoundaryCondition('ballast_bottom_nodes', 'node_set', 2),
                            BoundaryCondition('X_SYM_NODES', 'node_set', 1),
                            BoundaryCondition('Z_SYM_NODES', 'node_set', 3),
                            BoundaryCondition('Z1_NODES', 'node_set', 3)]
@@ -96,24 +98,27 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
                           frame_number=0, set_name='EMBANKMENT_INSTANCE_BALLAST_NODES')
         write_data_to_odb(err, 'ERR', strain_odb_file_name, step_name='cycles_' + str(n), frame_number=0,
                           set_name=element_set_name)
+    os.removedirs(work_directory)
 
 
 def main():
-    f = 20
-    sim_name = 'slab_low_22_5t'
-    cycles = [100, 1000, 10000, 100000, 1000000]
-    stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/embankment_' + sim_name
-                                             + '.odb')
+    frequencies = [5., 10., 20., 40]
+    load = 30.
+    for f in frequencies:
+        sim_name = 'slab_high_' + str(load).replace('.', '_') + 't'
+        cycles = [1, 10, 100, 1000, 10000, 100000, 1000000]
+        stress_odb_filename = os.path.expanduser('~/railway_ballast/python/finite_element_model/embankment_' + sim_name
+                                                 + '.odb')
 
-    strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_' + sim_name
-                                             + '_20Hz.odb')
-    par = get_parameters(frequency=f)
-    calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
+        strain_odb_filename = os.path.expanduser('~/railway_ballast/python/finite_element_model/results_' + sim_name
+                                                 + '_' + str(int(f)) + 'Hz.odb')
+        par = get_parameters(frequency=f)
+        calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
 
-    strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_' + sim_name +
-                                             '_20Hz_commonf.odb')
-    par = get_parameters(frequency=f, common=True)
-    calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
+        strain_odb_filename = os.path.expanduser('~/railway_ballast/python/finite_element_model/results_' + sim_name +
+                                                 '_' + str(int(f)) + 'Hz_commonf.odb')
+        par = get_parameters(frequency=f, common=True)
+        calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
 
 
 if __name__ == '__main__':
