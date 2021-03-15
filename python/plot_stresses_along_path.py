@@ -41,7 +41,7 @@ def main():
             plt.figure(0)
             plt.plot(path_points[0, 1] - path_points[:, 1], static_pressure/1e3, 'k' + line, lw=2)
             for load, c in zip([22.5, 30.], ['r', 'b']):
-                if load != 30. and rail_fixture != 'sleepers':
+                if load != 30. or rail_fixture != 'sleepers':
                     step_name = 'cyclic_stresses_' + str(load).replace('.', '_') + 't'
                     s = get_stress_tensor_from_path(odb_filename, path_points, step_name=step_name)
                     von_mises = (np.sum(s[:, :3]**2, axis=1) + 3*np.sum(s[:, 3:]**2, axis=1)
