@@ -43,6 +43,8 @@ def main():
             for load, c in zip([22.5, 30.], ['r', 'b']):
                 pass
                 # max_stresses = get_stress_tensor_from_path(odb_file_name, path_points)
+        name = rail_fixture
+        name = rail_fixture[0].upper() + rail_fixture[1:]
         plt.plot([0, -1], [-1, -1], 'k' + line, lw=2, label=rail_fixture)
 
     plt.figure(0)
@@ -51,8 +53,8 @@ def main():
     plt.ylabel('Static pressure, $p_s$ [kPa]')
     plt.xlim(0, 4.3)
     plt.ylim(0, 30)
-    plt.legend(loc='best')
     plt.text(0.05, 0.9, '(c)', horizontalalignment='left', verticalalignment='bottom', transform=ax.transAxes)
+    plt.legend(loc='best')
     plt.tight_layout()
     plt.savefig('../Figures/pressure_graph.png')
     plt.show()
