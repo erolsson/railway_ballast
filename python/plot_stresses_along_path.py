@@ -43,7 +43,8 @@ def main():
             for load, c in zip([22.5, 30.], ['r', 'b']):
                 step_name = 'cyclic_stresses_' + str(load).replace('.', '_') + 't'
                 s = get_stress_tensor_from_path(odb_filename, path_points, step_name=step_name)
-                von_mises = (np.sum(s[: 0:3]**2, axis=1) + 3*np.sum(s[:, 3:], axis=1)
+                print(np.sum(s[:, :3]**2, axis=1), 3*np.sum(s[:, 3:], axis=1))
+                von_mises = (np.sum(s[:, :3]**2, axis=1) + 3*np.sum(s[:, 3:], axis=1)
                              - s[:, 0]*s[:, 1] - s[:, 0]*s[:, 2] - s[:, 1]*s[:, 2])**0.5
                 plt.figure(1)
                 plt.plot(path_points[0, 1] - path_points[:, 1], von_mises/1e3, c + line, lw=2)
