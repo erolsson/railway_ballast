@@ -536,7 +536,7 @@ class RailwayEmbankment:
         self.mdb.Pressure(name='train_wheel', createStepName='loading', region=load_region, magnitude=axes_force,
                           distributionType=TOTAL_FORCE)
 
-    def run_job(self, job_name, cpus=24):
+    def run_job(self, job_name, cpus=12):
         job = mdb.Job(name=job_name, model=self.mdb, numCpus=cpus, numDomains=cpus)
         job.submit()
         job.waitForCompletion()
