@@ -80,7 +80,7 @@ def main():
     for fig in [0, 1]:
         plt.figure(fig)
         for (p, q), c in colors.items():
-            plt.plot([-2, -1], [-1, -1], c, lw=2, label='$p={p}$ kPa, $q={q}$ kPa'.format(p=p, q=q))
+            plt.plot([-2, -1], [-1, -1], c, lw=2, label='$p_s={p}$ kPa, $q={q}$ kPa'.format(p=p, q=q))
         plt.plot([-2, -1], [-1, -1], 'k', lw=2, label='Experiment')
         plt.plot([-2, -1], [-1, -1], '--k', lw=2, label='One Frequency')
         plt.plot([-2, -1], [-1, -1], ':k', lw=2, label='All Frequencies')

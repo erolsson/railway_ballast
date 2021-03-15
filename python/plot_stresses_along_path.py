@@ -67,7 +67,7 @@ def main():
     plt.ylim(0, 30)
     plt.text(0.05, 0.9, '(c)', horizontalalignment='left', verticalalignment='bottom', transform=ax.transAxes,
              fontsize=24)
-    plt.legend(loc='best')
+    plt.legend(loc='upper left', bbox_to_anchor=[0.6, 0.5])
     plt.tight_layout()
     plt.savefig('../Figures/pressure_graph.png')
 
