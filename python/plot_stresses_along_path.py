@@ -32,17 +32,30 @@ def get_stress_tensor_from_path(odb_file_name, path_points, step_name=None, fram
 
 
 def main():
-    for geometry in ['low', 'high']:
-        for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
+    for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
+        for geometry in ['low', 'high']:
             min_stresses = None
             odb_filename = odb_directory + '/stresses_' + rail_fixture + '_' + geometry + '.odb'
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
             min_stresses = get_stress_tensor_from_path(odb_filename, path_points, step_name='gravity')
             static_pressure = -np.sum(min_stresses[:, :3], axis=1)/3
-            plt.plot(path_points[0, 1] - path_points[:, 1], static_pressure, line, lw=2)
+            plt.figure(0)
+            plt.plot(path_points[0, 1] - path_points[:, 1], static_pressure/1e3, 'k' + line, lw=2)
             for load, c in zip([22.5, 30.], ['r', 'b']):
                 pass
                 # max_stresses = get_stress_tensor_from_path(odb_file_name, path_points)
+        plt.plot([0, -1], [-1, -1], 'k' + line, lw=2, label=rail_fixture)
+
+    plt.figure(0)
+    ax = plt.gca()
+    plt.xlabel('Distance from ballast surface [m]', fontsize=24)
+    plt.ylabel('Static pressure, $p_s$ [kPa]')
+    plt.xlim(0, 4.3)
+    plt.ylim(0, 30)
+    plt.legend(loc='best')
+    plt.text(0.05, 0.9, '(c)', horizontalalignment='left', verticalalignment='bottom', transform=ax.transAxes)
+    plt.tight_layout()
+    plt.savefig('../Figures/pressure_graph.png')
     plt.show()
 
 
