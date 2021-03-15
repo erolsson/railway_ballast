@@ -41,15 +41,23 @@ def main():
             plt.figure(0)
             plt.plot(path_points[0, 1] - path_points[:, 1], static_pressure/1e3, 'k' + line, lw=2)
             for load, c in zip([22.5, 30.], ['r', 'b']):
-                step_name = 'cyclic_stresses_' + str(load).replace('.', '_') + 't'
-                s = get_stress_tensor_from_path(odb_filename, path_points, step_name=step_name)
-                von_mises = (np.sum(s[:, :3]**2, axis=1) + 3*np.sum(s[:, 3:]**2, axis=1)
-                             - s[:, 0]*s[:, 1] - s[:, 0]*s[:, 2] - s[:, 1]*s[:, 2])**0.5
-                plt.figure(1)
-                plt.plot(path_points[0, 1] - path_points[:, 1], von_mises/1e3, c + line, lw=2)
+                if load != 30. or rail_fixture != 'sleepers':
+                    step_name = 'cyclic_stresses_' + str(load).replace('.', '_') + 't'
+                    s = get_stress_tensor_from_path(odb_filename, path_points, step_name=step_name)
+                    von_mises = (np.sum(s[:, :3]**2, axis=1) + 3*np.sum(s[:, 3:]**2, axis=1)
+                                 - s[:, 0]*s[:, 1] - s[:, 0]*s[:, 2] - s[:, 1]*s[:, 2])**0.5
+                    plt.figure(1)
+                    plt.plot(path_points[0, 1] - path_points[:, 1], von_mises/1e3, c + line, lw=2)
         name = rail_fixture[0].upper() + rail_fixture[1:]
         plt.figure(0)
         plt.plot([0, -1], [-1, -1], 'k' + line, lw=2, label=name)
+
+        plt.figure(1)
+        plt.plot([0, -1], [-1, -1], 'k' + line, lw=2, label=name)
+
+    plt.figure(1)
+    plt.plot([0, -1], [-1, -1], 'r', lw=2, label='22.5 t')
+    plt.plot([0, -1], [-1, -1], 'b', lw=2, label='30 t')
 
     plt.figure(0)
     ax = plt.gca()
@@ -57,10 +65,24 @@ def main():
     plt.ylabel('Static pressure, $p_s$ [kPa]')
     plt.xlim(0, 4.3)
     plt.ylim(0, 30)
-    plt.text(0.05, 0.9, '(c)', horizontalalignment='left', verticalalignment='bottom', transform=ax.transAxes)
-    plt.legend(loc='best')
+    plt.text(0.05, 0.9, '(c)', horizontalalignment='left', verticalalignment='bottom', transform=ax.transAxes,
+             fontsize=24)
+    plt.legend(loc='upper left', bbox_to_anchor=[0.6, 0.5])
     plt.tight_layout()
     plt.savefig('../Figures/pressure_graph.png')
+
+    plt.figure(1)
+    ax = plt.gca()
+    plt.xlabel('Distance from ballast surface [m]', fontsize=24)
+    plt.ylabel('Cyclic von Mises stress, $q$ [kPa]')
+    plt.xlim(0, 4.3)
+    plt.ylim(0, 150)
+    plt.text(0.05, 0.9, '(d)', horizontalalignment='left', verticalalignment='bottom', transform=ax.transAxes,
+             fontsize=24)
+    plt.legend(loc='best')
+    plt.tight_layout()
+    plt.savefig('../Figures/von_mises_graph.png')
+
     plt.show()
 
 
