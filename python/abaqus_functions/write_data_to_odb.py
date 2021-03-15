@@ -4,7 +4,7 @@ import pickle
 import numpy as np
 
 from odb_io_functions import write_field_to_odb
-from abaqusConstants import NODAL, INTEGRATION_POINT, ELEMENT_NODAL
+from abaqusConstants import NODAL, INTEGRATION_POINT, ELEMENT_NODAL, PRESSURE, MISES
 
 
 def write_data_to_odb(array_file_name, pickle_file_name):
@@ -24,9 +24,13 @@ def write_data_to_odb(array_file_name, pickle_file_name):
     if data['position'] == 'NODAL':
         position = NODAL
 
+    invariants = None
+    if field_id == 'S':
+        invariants = [PRESSURE, MISES]
     write_field_to_odb(field, field_id, odb_file, step_name=step_name, instance_name=instance_name,
                        set_name=set_name, step_description=step_description, frame_number=frame_number,
-                       frame_value=frame_value, field_description=field_description, position=position)
+                       frame_value=frame_value, field_description=field_description, position=position,
+                       invariants=invariants)
 
 
 if __name__ == '__main__':

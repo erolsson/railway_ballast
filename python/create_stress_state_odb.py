@@ -14,11 +14,12 @@ def main():
     loads = [22.5, 30.]
     for geometry in ['low', 'high']:
         for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
+            static_stresses = None
+            stress_state_odb_filename = odb_directory + '/stresses_' + rail_fixture + '_' + geometry + '.odb'
             for load in loads:
                 sim_odb_filename = (odb_directory + '/embankment_' + rail_fixture + '_' + geometry + '_'
                                     + str(load).replace('.', '_') + 't.odb')
                 if load == loads[0]:
-                    stress_state_odb_filename = odb_directory + '/stresses_' + rail_fixture + '_' + geometry + '.odb'
                     if os.path.isfile(stress_state_odb_filename):
                         os.remove(stress_state_odb_filename)
                     os.chdir('abaqus_functions')
@@ -31,6 +32,10 @@ def main():
                                                          set_name=ballast_element_set)
                     write_data_to_odb(static_stresses, 'S', stress_state_odb_filename, set_name=ballast_element_set,
                                       step_name='gravity')
+                max_stresses = read_data_from_odb('S', sim_odb_filename, set_name=ballast_element_set)
+                cyclic_stresses = max_stresses - static_stresses
+                write_data_to_odb(cyclic_stresses, 'S', stress_state_odb_filename, set_name=ballast_element_set,
+                                  step_name='cyclic_stresses_' + str(load).replace('.', '_') + 't')
 
 
 if __name__ == '__main__':
