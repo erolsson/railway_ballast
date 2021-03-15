@@ -22,13 +22,12 @@ odb_directory = os.path.expanduser('~/railway_ballast/python/embankment_model')
 
 def get_stress_tensor_from_path(odb_file_name, path_points, step_name=None, frame_number=None):
     stress_components = ['S11', 'S22', 'S33', 'S12', 'S13', 'S23']
-    data = np.zeros((path_points.shape[0], 9))
-    data[:, :3] = path_points
+    data = np.zeros((path_points.shape[0], 6))
     for i, component in enumerate(stress_components):
         stress = get_data_from_path(path_points, odb_file_name, 'S', step_name=step_name,
                                     frame_number=frame_number, output_position='INTEGRATION_POINT',
                                     component=component)
-        data[:, i+3] = stress
+        data[:, i] = stress
     return data
 
 
@@ -42,7 +41,7 @@ def main():
                 path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
                 max_stresses = get_stress_tensor_from_path(odb_file_name, path_points)
                 min_stresses = get_stress_tensor_from_path(odb_file_name, path_points, step_name='gravity')
-                static_pressure = np.sum(min_stresses[:, 3:6], axis=1)
+                static_pressure = np.sum(min_stresses[:, :3], axis=1)
                 print(static_pressure)
 
 
