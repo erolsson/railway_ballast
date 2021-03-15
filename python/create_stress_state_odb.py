@@ -32,7 +32,8 @@ def main():
                                                          set_name=ballast_element_set)
                     write_data_to_odb(static_stresses, 'S', stress_state_odb_filename, set_name=ballast_element_set,
                                       step_name='gravity')
-                max_stresses = read_data_from_odb('S', sim_odb_filename, set_name=ballast_element_set)
+                max_stresses = read_data_from_odb('S', sim_odb_filename, step_name='loading',
+                                                  set_name=ballast_element_set)
                 cyclic_stresses = max_stresses - static_stresses
                 write_data_to_odb(cyclic_stresses, 'S', stress_state_odb_filename, set_name=ballast_element_set,
                                   step_name='cyclic_stresses_' + str(load).replace('.', '_') + 't')
