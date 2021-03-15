@@ -22,7 +22,7 @@ odb_directory = os.path.expanduser('~/railway_ballast/python/embankment_model')
 
 def get_stress_tensor_from_path(odb_file_name, path_points, step_name=None, frame_number=None):
     stress_components = ['S11', 'S22', 'S33', 'S12', 'S13', 'S23']
-    data = np.zeros(path_points.shape[0], 7)
+    data = np.zeros((path_points.shape[0], 7))
     data[:, 0] = path_points
     for i, component in enumerate(stress_components):
         stress = get_data_from_path(path_points, odb_file_name, 'S', step_name=step_name,
