@@ -47,5 +47,6 @@ def main():
                 # max_stresses = get_stress_tensor_from_path(odb_file_name, path_points)
     plt.show()
 
+
 if __name__ == '__main__':
     main()
