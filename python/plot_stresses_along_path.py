@@ -60,25 +60,19 @@ def main():
     plt.plot([0, -1], [-1, -1], 'b', lw=2, label='30 t')
 
     plt.figure(0)
-    ax = plt.gca()
     plt.xlabel('Distance from ballast surface [m]', fontsize=24)
     plt.ylabel('Static pressure, $p_s$ [kPa]')
     plt.xlim(0, 4.3)
     plt.ylim(0, 30)
-    plt.text(0.05, 0.9, '(c)', horizontalalignment='left', verticalalignment='bottom', transform=ax.transAxes,
-             fontsize=24)
     plt.legend(loc='upper left', bbox_to_anchor=[0.6, 0.5])
     plt.tight_layout()
     plt.savefig('../Figures/pressure_graph.png')
 
     plt.figure(1)
-    ax = plt.gca()
     plt.xlabel('Distance from ballast surface [m]', fontsize=24)
     plt.ylabel('Cyclic von Mises stress, $q$ [kPa]')
     plt.xlim(0, 4.3)
     plt.ylim(0, 150)
-    plt.text(0.05, 0.9, '(d)', horizontalalignment='left', verticalalignment='bottom', transform=ax.transAxes,
-             fontsize=24)
     plt.legend(loc='best')
     plt.tight_layout()
     plt.savefig('../Figures/von_mises_graph.png')
