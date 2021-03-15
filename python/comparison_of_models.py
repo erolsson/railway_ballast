@@ -16,7 +16,7 @@ plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
-odb_directory = os.path.expanduser('/')
+odb_directory = os.path.expanduser('~/railway_ballast/python/embankment_model')
 
 
 def get_path_points_for_fem_simulation(sim_name):
@@ -29,7 +29,7 @@ def get_path_points_for_fem_simulation(sim_name):
     total_height = sum([layer.height for layer in fem_simulation.layers])
 
     path_points = np.zeros((1000, 3))
-    y = np.linspace(total_height, ballast_start_height, 1000)
+    y = np.linspace(total_height-1e-6, ballast_start_height+1e-6, 1000)
     path_points[:, 1] = y
     path_points[:, 0] = fem_simulation.track_gauge/2
     path_points[:, 2] += 1e-6
@@ -55,6 +55,7 @@ def main():
                 up = get_data_from_path(path_points, odb_file_name, 'UP', 'UP2', output_position='NODAL',
                                         step_name=step_name)
                 plt.plot(path_points[0, 1] - path_points[:, 1], -up*1000, ltype + c, lw=2)
+
     plt.ylim(0, 50)
     plt.xlim(0, 4.5)
     plt.plot([-1, -2], [-1, -1], 'b', lw=2, label='slab')
