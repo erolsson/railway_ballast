@@ -35,15 +35,13 @@ def main():
     for geometry in ['low', 'high']:
         for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
             min_stresses = None
+            odb_filename = odb_directory + '/stresses_' + rail_fixture + '_' + geometry + '.odb'
+            path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
+            min_stresses = get_stress_tensor_from_path(odb_filename, path_points, step_name='gravity')
+            static_pressure = -np.sum(min_stresses[:, :3], axis=1)/3
+            plt.plot(path_points[0, 1] - path_points[:, 1], static_pressure, line, lw=2)
             for load, c in zip([22.5, 30.], ['r', 'b']):
-                odb_file_name = (odb_directory + '/embankment_' + rail_fixture + '_' + geometry + '_'
-                                 + str(load).replace('.', '_') + 't.odb')
-
-                path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
-                if load == 22.5:
-                    min_stresses = get_stress_tensor_from_path(odb_file_name, path_points, step_name='gravity')
-                    static_pressure = -np.sum(min_stresses[:, :3], axis=1)/3
-                    plt.plot(path_points[0, 1] - path_points[:, 1], static_pressure, line + c, lw=2)
+                pass
                 # max_stresses = get_stress_tensor_from_path(odb_file_name, path_points)
     plt.show()
 
