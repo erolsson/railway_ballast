@@ -489,7 +489,7 @@ class RailwayEmbankment:
             layer_start_height += layer.height
 
         mat = self.mdb.Material('concrete')
-        mat.Density(table=((2570,),))
+        mat.Density(table=((2570.,),))
         mat.Elastic(table=((30e9, 0.2),))
         self.mdb.HomogeneousSolidSection(name='concrete_section', material='concrete')
 
@@ -538,15 +538,15 @@ class RailwayEmbankment:
 
     def run_job(self, job_name, cpus=12):
         job = mdb.Job(name=job_name, model=self.mdb, numCpus=cpus, numDomains=cpus)
-        job.submit()
-        job.waitForCompletion()
+        # job.submit()
+        # job.waitForCompletion()
 
 
 def main():
     sim_name = sys.argv[-2]
     load = float(sys.argv[-1])
-    # sim_name = 'slab_high'
-    # load = 22.5
+    # sim_name = 'sleepers_high'
+    # load = 30.
     simulation_to_run = simulations[sim_name]
     job_name = simulation_to_run.job_name + '_' + sim_name + '_' + str(load).replace('.', '_') + 't'
     embankment = RailwayEmbankment(simulation_to_run)
