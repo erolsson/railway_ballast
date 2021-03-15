@@ -34,11 +34,10 @@ def get_stress_tensor_from_path(odb_file_name, path_points, step_name=None, fram
 def main():
     for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
         for geometry in ['low', 'high']:
-            min_stresses = None
             odb_filename = odb_directory + '/stresses_' + rail_fixture + '_' + geometry + '.odb'
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
-            min_stresses = get_stress_tensor_from_path(odb_filename, path_points, step_name='gravity')
-            static_pressure = -np.sum(min_stresses[:, :3], axis=1)/3
+            static_stresses = get_stress_tensor_from_path(odb_filename, path_points, step_name='gravity')
+            static_pressure = -np.sum(static_stresses[:, :3], axis=1)/3
             plt.figure(0)
             plt.plot(path_points[0, 1] - path_points[:, 1], static_pressure/1e3, 'k' + line, lw=2)
             for load, c in zip([22.5, 30.], ['r', 'b']):
