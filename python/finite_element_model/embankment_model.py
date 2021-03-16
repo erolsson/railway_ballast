@@ -141,7 +141,7 @@ class RailwayEmbankment:
             instance = self.assembly.Instance(name='sleeper_0', part=self.center_sleeper_part, dependent=ON)
             self.sleeper_instances.append(instance)
             ballast_instance = self.assembly.instances['embankment_instance']
-            ballast_face = ballast_instance.faces.findAt(((1e-3, self.total_height, 1e-3),))
+            ballast_face = ballast_instance.faces.findAt((1e-3, self.total_height, 1e-3)).getFacesByFaceAngle(0.)
             ballast_surface = self.assembly.Surface(side1Faces=ballast_face,
                                                     name='ballast_sleeper_surface_0')
             sleeper_face = instance.faces.findAt((1e-3, self.total_height, 1e-3)).getFacesByFaceAngle(0.)
@@ -536,7 +536,7 @@ class RailwayEmbankment:
         self.mdb.Pressure(name='train_wheel', createStepName='loading', region=load_region, magnitude=axes_force,
                           distributionType=TOTAL_FORCE)
 
-    def run_job(self, job_name, cpus=12):
+    def run_job(self, job_name, cpus=24):
         job = mdb.Job(name=job_name, model=self.mdb, numCpus=cpus, numDomains=cpus)
         job.submit()
         job.waitForCompletion()
