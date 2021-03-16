@@ -5,7 +5,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.style
 
-from finite_element_model.simulations import simulations
 from get_data_from_path import get_data_from_path
 from comparison_of_models import get_path_points_for_fem_simulation
 
@@ -31,6 +30,11 @@ def get_tensor_from_path(odb_file_name, path_points, field_id, step_name=None, f
     return data
 
 
+def mises(tensor):
+    return (np.sum(tensor[:, :3]**2, axis=1) + 3*np.sum(tensor[:, 3:]**2, axis=1)
+            - tensor[:, 0]*tensor[:, 1] - tensor[:, 0]*tensor[:, 2] - tensor[:, 1]*tensor[:, 2])**0.5
+
+
 def main():
     for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
         for geometry in ['low', 'high']:
@@ -44,8 +48,7 @@ def main():
                 if load != 30. or rail_fixture != 'sleepers':
                     step_name = 'cyclic_stresses_' + str(load).replace('.', '_') + 't'
                     s = get_tensor_from_path(odb_filename, path_points, 'S', step_name=step_name)
-                    von_mises = (np.sum(s[:, :3]**2, axis=1) + 3*np.sum(s[:, 3:]**2, axis=1)
-                                 - s[:, 0]*s[:, 1] - s[:, 0]*s[:, 2] - s[:, 1]*s[:, 2])**0.5
+                    von_mises = mises(s)
                     plt.figure(1)
                     plt.plot(path_points[0, 1] - path_points[:, 1], von_mises/1e3, c + line, lw=2)
         name = rail_fixture[0].upper() + rail_fixture[1:]
