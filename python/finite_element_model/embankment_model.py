@@ -141,7 +141,7 @@ class RailwayEmbankment:
             instance = self.assembly.Instance(name='sleeper_0', part=self.center_sleeper_part, dependent=ON)
             self.sleeper_instances.append(instance)
             ballast_instance = self.assembly.instances['embankment_instance']
-            ballast_face = ballast_instance.faces.findAt(((1e-3, self.total_height, 1e-3),)).getFacesByFaceAngle(0.)
+            ballast_face = ballast_instance.faces.findAt((1e-3, self.total_height, 1e-3)).getFacesByFaceAngle(0.)
             ballast_surface = self.assembly.Surface(side1Faces=ballast_face,
                                                     name='ballast_sleeper_surface_0')
             sleeper_face = instance.faces.findAt((1e-3, self.total_height, 1e-3)).getFacesByFaceAngle(0.)
