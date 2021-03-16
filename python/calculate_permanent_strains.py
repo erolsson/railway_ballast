@@ -22,6 +22,8 @@ def evaluate_permanent_strain_for_gp(material_parameters, cycles, static_stress_
     for i in range(n):
         model = MaterialModel(material_parameters)
         permanent_strain[:, i, :] = model.update(cycles, cyclic_stress_state[i, :], static_stress_state[i, :])
+        if i % 1000 == 0:
+            print("Evaluated {i} out of {n} points".format(i=i, n=n))
     permanent_strain[:, :, 3:] *= 2
     return permanent_strain
 
@@ -66,7 +68,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
     n = static_stresses.shape[0]
     permanent_strains = np.zeros((len(cycles), n, static_stresses.shape[1]))
 
-    num_cpus = 8
+    num_cpus = 12
     chunksize = n//num_cpus
     indices = [i*chunksize for i in range(num_cpus)]
     indices.append(n)
@@ -107,15 +109,15 @@ def main():
     for f in frequencies:
         sim_name = 'sleepers_low_' + str(load).replace('.', '_') + 't'
         cycles = [1, 10, 100, 1000, 10000, 100000, 1000000]
-        stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/embankment_' + sim_name
+        stress_odb_filename = os.path.expanduser('~/railway_ballast/odbs/embankment_' + sim_name
                                                  + '.odb')
 
-        strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_' + sim_name
+        strain_odb_filename = os.path.expanduser('~/railway_ballast/odbs/results_' + sim_name
                                                  + '_' + str(int(f)) + 'Hz.odb')
         par = get_parameters(frequency=f)
         calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
 
-        strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_' + sim_name +
+        strain_odb_filename = os.path.expanduser('~/railway_ballast/odbs/results_' + sim_name +
                                                  '_' + str(int(f)) + 'Hz_commonf.odb')
         par = get_parameters(frequency=f, common=True)
         calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
