@@ -107,15 +107,15 @@ def main():
     for f in frequencies:
         sim_name = 'sleepers_low_' + str(load).replace('.', '_') + 't'
         cycles = [1, 10, 100, 1000, 10000, 100000, 1000000]
-        stress_odb_filename = os.path.expanduser('~/railway_ballast/python/finite_element_model/embankment_' + sim_name
+        stress_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/embankment_' + sim_name
                                                  + '.odb')
 
-        strain_odb_filename = os.path.expanduser('~/railway_ballast/python/finite_element_model/results_' + sim_name
+        strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_' + sim_name
                                                  + '_' + str(int(f)) + 'Hz.odb')
         par = get_parameters(frequency=f)
         calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
 
-        strain_odb_filename = os.path.expanduser('~/railway_ballast/python/finite_element_model/results_' + sim_name +
+        strain_odb_filename = os.path.expanduser('~/railway_ballast/python/embankment_model/results_' + sim_name +
                                                  '_' + str(int(f)) + 'Hz_commonf.odb')
         par = get_parameters(frequency=f, common=True)
         calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
