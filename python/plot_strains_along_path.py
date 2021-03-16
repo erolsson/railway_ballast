@@ -23,15 +23,19 @@ def main():
         for geometry in ['low', 'high']:
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
             for load, c in zip([22.5, 30.], ['r', 'b']):
-                odb_filename = (odb_directory + '/results_' + rail_fixture + '_' + geometry + '_'
-                                + str(load).replace('.', '_') + 't_' + str(frequency) + 'Hz.odb')
-                ep = get_tensor_from_path(odb_filename, path_points, 'EP')
-                e_eff = mises(ep)
-                e_vol = ep[:, 0] + ep[:, 1] + ep[:, 2]
-                plt.figure(0)
-                plt.plot(path_points[0, 1] - path_points[:, 1], e_eff, c + line, lw=2)
-                plt.figure(1)
-                plt.plot(path_points[0, 1] - path_points[:, 1], -e_vol, c + line, lw=2)
+                if load != 30. or rail_fixture != 'sleepers':
+                    print('\n========================================================================================')
+                    print(rail_fixture, geometry, load)
+                    print('========================================================================================')
+                    odb_filename = (odb_directory + '/results_' + rail_fixture + '_' + geometry + '_'
+                                    + str(load).replace('.', '_') + 't_' + str(frequency) + 'Hz.odb')
+                    ep = get_tensor_from_path(odb_filename, path_points, 'EP')
+                    e_eff = mises(ep)
+                    e_vol = ep[:, 0] + ep[:, 1] + ep[:, 2]
+                    plt.figure(0)
+                    plt.plot(path_points[0, 1] - path_points[:, 1], e_eff, c + line, lw=2)
+                    plt.figure(1)
+                    plt.plot(path_points[0, 1] - path_points[:, 1], -e_vol, c + line, lw=2)
     plt.show()
 
 
