@@ -36,6 +36,8 @@ def mises(tensor):
 
 
 def main():
+    plt.figure(1)
+    plt.plot([0, -1], [-1, -1], 'w', lw=2, label='Model')
     for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
         for geometry in ['low', 'high']:
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
@@ -61,6 +63,8 @@ def main():
         plt.plot([0, -1], [-1, -1], 'k' + line, lw=2, label=name)
 
     plt.figure(1)
+    plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'$\quad$')
+    plt.plot([0, -1], [-1, -1], 'w', lw=2, label='Axle load')
     plt.plot([0, -1], [-1, -1], 'r', lw=2, label='22.5 t')
     plt.plot([0, -1], [-1, -1], 'b', lw=2, label='30 t')
 

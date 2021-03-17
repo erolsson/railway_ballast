@@ -25,7 +25,7 @@ def main():
         for geometry in ['low', 'high']:
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
             for load, c in zip([22.5, 30.], ['r', 'b']):
-                if load != 30. or rail_fixture != 'sleepers' or geometry != 'high':
+                if load != 30. or rail_fixture != 'sleepers':
                     print('\n========================================================================================')
                     print(rail_fixture, geometry, load)
                     print('========================================================================================')
@@ -39,6 +39,32 @@ def main():
                     plt.figure(1)
                     plt.plot(path_points[0, 1] - path_points[:, 1], ep_eff, line + c, lw=2)
 
+        name = rail_fixture[0].upper() + rail_fixture[1:]
+        for fig in [0, 1]:
+            plt.figure(fig)
+            plt.plot([0, -1], [-1, -1], 'k' + line, lw=2, label=name)
+    plt.figure(0)
+    plt.ylabel('Volumetric strain')
+    plt.figure(1)
+    plt.ylabel('Deviatoric strain')
+
+    for fig in [0, 1]:
+        plt.figure(fig)
+        plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'$\quad$')
+        plt.plot([0, -1], [-1, -1], 'w', lw=2, label='Axle load')
+        plt.plot([0, -1], [-1, -1], 'r', lw=2, label='22.5 t')
+        plt.plot([0, -1], [-1, -1], 'b', lw=2, label='30 t')
+        plt.xlim(0, 4.3)
+        plt.xlabel('Distance from ballast surface [m]', fontsize=24)
+        plt.legend(loc='best')
+
+    plt.figure(0)
+    plt.tight_layout()
+    plt.savefig('../Figures/volumetric_strain_graph.png')
+
+    plt.figure(1)
+    plt.tight_layout()
+    plt.savefig('../Figures/deviatoric_strain_graph.png')
     plt.show()
 
 
