@@ -1,10 +1,12 @@
 import os
 
+import numpy as np
+
 import matplotlib.pyplot as plt
 import matplotlib.style
 
 from comparison_of_models import get_path_points_for_fem_simulation
-from plot_stresses_along_path import get_data_from_path, mises
+from plot_stresses_along_path import get_tensor_from_path, mises
 
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)
@@ -15,11 +17,11 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
 odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
-frequency = 5
+frequency = 10
 
 
 def main():
-    for i, rail_fixture in enumerate(['slab', 'sleepers']):
+    for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
         for geometry in ['low', 'high']:
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
             for load, c in zip([22.5, 30.], ['r', 'b']):
@@ -29,15 +31,14 @@ def main():
                     print('========================================================================================')
                     odb_filename = (odb_directory + '/results_' + rail_fixture + '_' + geometry + '_'
                                     + str(load).replace('.', '_') + 't_' + str(frequency) + 'Hz.odb')
-                    ep = get_data_from_path(path_points, odb_filename, 'EP', component='EP22',
-                                            output_position='INTEGRATION_POINT')
-                    plt.figure(i)
-                    plt.plot(path_points[0, 1] - path_points[:, 1], ep, '--' + c, lw=2)
-                    odb_filename = (odb_directory + '/results_' + rail_fixture + '_' + geometry + '_'
-                                    + str(load).replace('.', '_') + 't_' + str(frequency) + 'Hz_commonf.odb')
-                    ep = get_data_from_path(path_points, odb_filename, 'EP', component='EP22',
-                                            output_position='INTEGRATION_POINT')
-                    plt.plot(path_points[0, 1] - path_points[:, 1], ep, ':' + c, lw=2)
+                    ep = get_tensor_from_path(odb_filename, path_points, 'EP')
+                    ep_eff = mises(ep)
+                    ep_vol = -np.sum(ep[:, :3], axis=1)
+                    plt.figure(0)
+                    plt.plot(path_points[0, 1] - path_points[:, 1], ep_vol, line + c, lw=2)
+                    plt.figure(1)
+                    plt.plot(path_points[0, 1] - path_points[:, 1], ep_eff, line + c, lw=2)
+
     plt.show()
 
 

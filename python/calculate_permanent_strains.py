@@ -67,8 +67,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
     n = static_stresses.shape[0]
     permanent_strains = np.zeros((len(cycles), n, static_stresses.shape[1]))
-
-    num_cpus = 12
+    num_cpus = 8
     chunksize = n//num_cpus
     indices = [i*chunksize for i in range(num_cpus)]
     indices.append(n)
@@ -104,8 +103,8 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
 
 def main():
-    frequencies = [10.]
-    load = 22.5
+    frequencies = [5., 10., 20., 40.]
+    load = 30.
     for f in frequencies:
         sim_name = 'sleepers_low_' + str(load).replace('.', '_') + 't'
         cycles = [1, 10, 100, 1000, 10000, 100000, 1000000]
@@ -115,11 +114,6 @@ def main():
         strain_odb_filename = os.path.expanduser('~/railway_ballast/odbs/results_' + sim_name
                                                  + '_' + str(int(f)) + 'Hz.odb')
         par = get_parameters(frequency=f)
-        calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
-
-        strain_odb_filename = os.path.expanduser('~/railway_ballast/odbs/results_' + sim_name +
-                                                 '_' + str(int(f)) + 'Hz_commonf.odb')
-        par = get_parameters(frequency=f, common=True)
         calculate_permanent_strains(stress_odb_filename, strain_odb_filename, cycles, par)
 
 
