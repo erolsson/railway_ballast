@@ -7,7 +7,6 @@ from write_data_to_odb import write_data_to_odb
 
 
 odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
-odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
 ballast_element_set = 'EMBANKMENT_INSTANCE_BALLAST_ELEMENTS'
 
 
