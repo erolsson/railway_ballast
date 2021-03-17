@@ -7,11 +7,12 @@ from write_data_to_odb import write_data_to_odb
 
 
 odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
+odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
 ballast_element_set = 'EMBANKMENT_INSTANCE_BALLAST_ELEMENTS'
 
 
 def main():
-    loads = [30.]
+    loads = [22.5, 30.]
     for geometry in ['low', 'high']:
         for rail_fixture in ['sleepers']:
             static_stresses = None
