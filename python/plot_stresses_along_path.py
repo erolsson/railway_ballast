@@ -16,7 +16,7 @@ plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
 plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
-odb_directory = os.path.expanduser('~/railway_ballast/python/embankment_model')
+odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
 
 
 def get_tensor_from_path(odb_file_name, path_points, field_id, step_name=None, frame_number=None):
@@ -45,12 +45,11 @@ def main():
             plt.figure(0)
             plt.plot(path_points[0, 1] - path_points[:, 1], static_pressure/1e3, 'k' + line, lw=2)
             for load, c in zip([22.5, 30.], ['r', 'b']):
-                if load != 30. or rail_fixture != 'sleepers':
-                    step_name = 'cyclic_stresses_' + str(load).replace('.', '_') + 't'
-                    s = get_tensor_from_path(odb_filename, path_points, 'S', step_name=step_name)
-                    von_mises = mises(s)
-                    plt.figure(1)
-                    plt.plot(path_points[0, 1] - path_points[:, 1], von_mises/1e3, c + line, lw=2)
+                step_name = 'cyclic_stresses_' + str(load).replace('.', '_') + 't'
+                s = get_tensor_from_path(odb_filename, path_points, 'S', step_name=step_name)
+                von_mises = mises(s)
+                plt.figure(1)
+                plt.plot(path_points[0, 1] - path_points[:, 1], von_mises/1e3, c + line, lw=2)
         name = rail_fixture[0].upper() + rail_fixture[1:]
         plt.figure(0)
         plt.plot([0, -1], [-1, -1], 'k' + line, lw=2, label=name)
