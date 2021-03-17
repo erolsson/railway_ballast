@@ -65,8 +65,8 @@ def main():
             ax1.semilogx(cycles, ea_1 + experiment.deviatoric_axial_strain()[0],
                          '--' + colors[(p, q)], lw=2)
 
-            ax1 .semilogx(cycles, ea_2 + experiment.deviatoric_axial_strain()[0],
-                          ':' + colors[(p, q)], lw=2)
+            # ax1 .semilogx(cycles, ea_2 + experiment.deviatoric_axial_strain()[0],
+            #               ':' + colors[(p, q)], lw=2)
 
             ax2.semilogx(experiment.cycles, experiment.volumetric_strain,
                          '-' + colors[(p, q)], lw=2)
@@ -74,8 +74,8 @@ def main():
             ax2.semilogx(cycles, -model_1.volumetric_strain() + experiment.volumetric_strain[0],
                          '--' + colors[(p, q)], lw=2)
 
-            ax2.semilogx(cycles, -model_2.volumetric_strain() + experiment.volumetric_strain[0],
-                         ':' + colors[(p, q)], lw=2)
+            # ax2.semilogx(cycles, -model_2.volumetric_strain() + experiment.volumetric_strain[0],
+            #              ':' + colors[(p, q)], lw=2)
             ax2.yaxis.set_label_coords(-0.12, 0.5)
     for fig in [0, 1]:
         plt.figure(fig)
@@ -83,7 +83,7 @@ def main():
             plt.plot([-2, -1], [-1, -1], c, lw=2, label='$p_s={p}$ kPa, $q={q}$ kPa'.format(p=p, q=q))
         plt.plot([-2, -1], [-1, -1], 'k', lw=2, label='Experiment')
         plt.plot([-2, -1], [-1, -1], '--k', lw=2, label='One Frequency')
-        plt.plot([-2, -1], [-1, -1], ':k', lw=2, label='All Frequencies')
+        # plt.plot([-2, -1], [-1, -1], ':k', lw=2, label='All Frequencies')
         plt.legend(ncol=3, bbox_to_anchor=(-1.35, -0.2), loc='upper left', columnspacing=0.7, handletextpad=0.5)
     plt.figure(0)
     plt.savefig('../../Figures/axial_strain.png')
