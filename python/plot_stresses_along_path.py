@@ -38,15 +38,18 @@ def mises(tensor):
 def main():
     for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
         for geometry in ['low', 'high']:
-            odb_filename = odb_directory + '/stresses_' + rail_fixture + '_' + geometry + '.odb'
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
-            static_stresses = get_tensor_from_path(odb_filename, path_points, 'S', step_name='gravity')
-            static_pressure = -np.sum(static_stresses[:, :3], axis=1)/3
-            plt.figure(0)
-            plt.plot(path_points[0, 1] - path_points[:, 1], static_pressure/1e3, 'k' + line, lw=2)
             for load, c in zip([22.5, 30.], ['r', 'b']):
-                step_name = 'cyclic_stresses_' + str(load).replace('.', '_') + 't'
-                s = get_tensor_from_path(odb_filename, path_points, 'S', step_name=step_name)
+                odb_filename = (odb_directory + '/stresses_' + rail_fixture + '_' + geometry + '_'
+                                + str(load).replace('.', '_') + 't.odb')
+
+                if load == 22.5:
+                    static_stresses = get_tensor_from_path(odb_filename, path_points, 'S', step_name='gravity')
+                    static_pressure = -np.sum(static_stresses[:, :3], axis=1)/3
+                    plt.figure(0)
+                    plt.plot(path_points[0, 1] - path_points[:, 1], static_pressure/1e3, 'k' + line, lw=2)
+
+                s = get_tensor_from_path(odb_filename, path_points, 'S', step_name='cyclic_stresses')
                 von_mises = mises(s)
                 plt.figure(1)
                 plt.plot(path_points[0, 1] - path_points[:, 1], von_mises/1e3, c + line, lw=2)

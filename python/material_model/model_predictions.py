@@ -82,7 +82,7 @@ def main():
         for (p, q), c in colors.items():
             plt.plot([-2, -1], [-1, -1], c, lw=2, label='$p_s={p}$ kPa, $q={q}$ kPa'.format(p=p, q=q))
         plt.plot([-2, -1], [-1, -1], 'k', lw=2, label='Experiment')
-        plt.plot([-2, -1], [-1, -1], '--k', lw=2, label='One Frequency')
+        plt.plot([-2, -1], [-1, -1], '--k', lw=2, label='Model')
         # plt.plot([-2, -1], [-1, -1], ':k', lw=2, label='All Frequencies')
         plt.legend(ncol=3, bbox_to_anchor=(-1.35, -0.2), loc='upper left', columnspacing=0.7, handletextpad=0.5)
     plt.figure(0)
