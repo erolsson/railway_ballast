@@ -103,7 +103,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
 
 def main():
-    frequencies = [5., 10., 20., 40.]
+    frequencies = [10., 5., 20., 40.]
     load = 30.
     for f in frequencies:
         sim_name = 'sleepers_high_' + str(load).replace('.', '_') + 't'
