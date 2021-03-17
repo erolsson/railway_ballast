@@ -13,7 +13,7 @@ ballast_element_set = 'EMBANKMENT_INSTANCE_BALLAST_ELEMENTS'
 def main():
     loads = [30.]
     for geometry in ['low', 'high']:
-        for rail_fixture, in ['sleepers']:
+        for rail_fixture in ['sleepers']:
             static_stresses = None
             stress_state_odb_filename = odb_directory + '/stresses_' + rail_fixture + '_' + geometry + '.odb'
             for load in loads:
