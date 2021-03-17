@@ -5,7 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.style
 
-from finite_element_model.simulations import simulation1
+# from finite_element_model.simulations import simulation1
 from get_data_from_path import get_data_from_path
 
 matplotlib.style.use('classic')

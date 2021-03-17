@@ -21,6 +21,9 @@ frequency = 10
 
 
 def main():
+    for fig in [0, 1]:
+        plt.figure(fig)
+        plt.plot([0, -1], [-1, -1], 'w', lw=2, label='Model')
     for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
         for geometry in ['low', 'high']:
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
@@ -44,8 +47,10 @@ def main():
             plt.figure(fig)
             plt.plot([0, -1], [-1, -1], 'k' + line, lw=2, label=name)
     plt.figure(0)
+    plt.ylim(-0.01, 0.01)
     plt.ylabel('Volumetric strain')
     plt.figure(1)
+    plt.ylim(0, 0.06)
     plt.ylabel('Deviatoric strain')
 
     for fig in [0, 1]:
@@ -56,7 +61,7 @@ def main():
         plt.plot([0, -1], [-1, -1], 'b', lw=2, label='30 t')
         plt.xlim(0, 4.3)
         plt.xlabel('Distance from ballast surface [m]', fontsize=24)
-        plt.legend(loc='best')
+        plt.legend(loc='best', framealpha=0.5)
 
     plt.figure(0)
     plt.tight_layout()
