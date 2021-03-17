@@ -25,7 +25,7 @@ def main():
         for geometry in ['low', 'high']:
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
             for load, c in zip([22.5, 30.], ['r', 'b']):
-                if load != 30. or rail_fixture != 'sleepers':
+                if load != 30. or rail_fixture != 'sleepers' or geometry != 'high':
                     print('\n========================================================================================')
                     print(rail_fixture, geometry, load)
                     print('========================================================================================')

@@ -67,7 +67,7 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
 
     n = static_stresses.shape[0]
     permanent_strains = np.zeros((len(cycles), n, static_stresses.shape[1]))
-    num_cpus = 8
+    num_cpus = 12
     chunksize = n//num_cpus
     indices = [i*chunksize for i in range(num_cpus)]
     indices.append(n)
