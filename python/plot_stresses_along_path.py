@@ -3,6 +3,7 @@ import os
 import numpy as np
 
 import matplotlib.pyplot as plt
+import matplotlib.gridspec as gridspec
 import matplotlib.style
 
 from get_data_from_path import get_data_from_path
@@ -36,9 +37,26 @@ def mises(tensor):
 
 
 def main():
-    plt.figure(1)
-    plt.plot([0, -1], [-1, -1], 'w', lw=2, label='Model')
+    plt.figure(0, figsize=(12, 8))
+    gs = gridspec.GridSpec(3, 2)
+    ax1 = plt.subplot(gs[0:2, 0:1])
+    plt.xlabel('Distance from ballast surface [m]', fontsize=24)
+    plt.ylabel('Static pressure, $p_s$ [kPa]', fontsize=24)
+    plt.xlim(0, 4.3)
+    plt.ylim(0, 30)
+    ax1.yaxis.set_label_coords(-0.12, 0.5)
+    plt.tight_layout()
+
+    ax2 = plt.subplot(gs[0:2, 1:2])
+    plt.xlabel('Distance from ballast surface [m]', fontsize=24)
+    plt.ylabel('Cyclic von Mises stress, $q$ [kPa]', fontsize=24)
+    plt.xlim(0, 4.3)
+    plt.ylim(0, 150)
+    ax2.yaxis.set_label_coords(-0.12, 0.5)
+    plt.tight_layout()
+
     for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
+
         for geometry in ['low', 'high']:
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
             for load, c in zip([22.5, 30.], ['r', 'b']):
@@ -48,43 +66,22 @@ def main():
                 if load == 22.5:
                     static_stresses = get_tensor_from_path(odb_filename, path_points, 'S', step_name='gravity')
                     static_pressure = -np.sum(static_stresses[:, :3], axis=1)/3
-                    plt.figure(0)
-                    plt.plot(path_points[0, 1] - path_points[:, 1], static_pressure/1e3, 'k' + line, lw=2)
+                    ax1.plot(path_points[0, 1] - path_points[:, 1], static_pressure/1e3, 'k' + line, lw=2)
 
                 s = get_tensor_from_path(odb_filename, path_points, 'S', step_name='cyclic_stresses')
                 von_mises = mises(s)
-                plt.figure(1)
-                plt.plot(path_points[0, 1] - path_points[:, 1], von_mises/1e3, c + line, lw=2)
-        name = rail_fixture[0].upper() + rail_fixture[1:]
-        plt.figure(0)
-        plt.plot([0, -1], [-1, -1], 'k' + line, lw=2, label=name)
+                ax2.plot(path_points[0, 1] - path_points[:, 1], von_mises/1e3, c + line, lw=2)
 
-        plt.figure(1)
-        plt.plot([0, -1], [-1, -1], 'k' + line, lw=2, label=name)
-
-    plt.figure(1)
-    plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'$\quad$')
-    plt.plot([0, -1], [-1, -1], 'w', lw=2, label='Axle load')
-    plt.plot([0, -1], [-1, -1], 'r', lw=2, label='22.5 t')
-    plt.plot([0, -1], [-1, -1], 'b', lw=2, label='30 t')
-
-    plt.figure(0)
-    plt.xlabel('Distance from ballast surface [m]', fontsize=24)
-    plt.ylabel('Static pressure, $p_s$ [kPa]')
-    plt.xlim(0, 4.3)
-    plt.ylim(0, 30)
-    plt.legend(loc='upper left', bbox_to_anchor=[0.6, 0.5])
-    plt.tight_layout()
-    plt.savefig('../Figures/pressure_graph.png')
-
-    plt.figure(1)
-    plt.xlabel('Distance from ballast surface [m]', fontsize=24)
-    plt.ylabel('Cyclic von Mises stress, $q$ [kPa]')
-    plt.xlim(0, 4.3)
-    plt.ylim(0, 150)
-    plt.legend(loc='best')
-    plt.tight_layout()
-    plt.savefig('../Figures/von_mises_graph.png')
+    lines = [
+        plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'\textbf{Model}')[0],
+        plt.plot([0, -1], [-1, -1], 'k', lw=2, label='Sleepers')[0],
+        plt.plot([0, -1], [-1, -1], '--k', lw=2, label='Slab')[0],
+        plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'\textbf{Axle load}')[0],
+        plt.plot([0, -1], [-1, -1], 'r', lw=2, label='22.5 t')[0],
+        plt.plot([0, -1], [-1, -1], 'b', lw=2, label='30 t')[0]
+    ]
+    _ = plt.legend(handles=lines, ncol=2, bbox_to_anchor=(-0.8, -0.2), loc='upper left')
+    plt.savefig('../Figures/stress_graphs.png')
 
     plt.show()
 
