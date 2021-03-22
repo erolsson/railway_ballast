@@ -39,25 +39,25 @@ def main():
     plt.subplot(axes[0][0])
     plt.ylim(-0.005, 10)
     plt.xlim(0, 2.2)
-    plt.text(0.35, 0.7, r'\noindent \textbf{Concrete Slab\\Low Embankment}', transform=axes[0][0].transAxes,
+    plt.text(0.35, 0.7, r'\noindent \textbf{Low Embankment\\Concrete Slab}', transform=axes[0][0].transAxes,
              ma='left', fontweight='bold')
 
     plt.subplot(axes[0][1])
     plt.ylim(-0.005, 30)
     plt.xlim(0, 2.2)
-    plt.text(0.35, 0.7, r'\noindent \textbf{Sleepers\\Low Embankment}', transform=axes[0][1].transAxes,
+    plt.text(0.35, 0.7, r'\noindent \textbf{Low Embankment\\Sleepers}', transform=axes[0][1].transAxes,
              ma='left', fontweight='bold')
 
     plt.subplot(axes[1][0])
     plt.ylim(-0.005, 20)
     plt.xlim(0, 4.3)
-    plt.text(0.35, 0.7, r'\noindent \textbf{Concrete Slab\\High Embankment}', transform=axes[1][0].transAxes,
+    plt.text(0.35, 0.7, r'\noindent \textbf{High Embankment\\Concrete Slab}', transform=axes[1][0].transAxes,
              ma='left', fontweight='bold')
 
     plt.subplot(axes[1][1])
     plt.ylim(-0.005, 40)
     plt.xlim(0, 4.3)
-    plt.text(0.35, 0.7, r'\noindent \textbf{Sleepers\\High Embankment}', transform=axes[1][1].transAxes,
+    plt.text(0.35, 0.7, r'\noindent \textbf{High Embankment\\Sleepers}', transform=axes[1][1].transAxes,
              ma='left', fontweight='bold')
 
     colors = ['r', 'b', 'g', 'k', 'c', 'm']

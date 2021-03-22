@@ -16,6 +16,8 @@ else:
     abq = '/scratch/users/erik/SIMULIA/CAE/2018/linux_a64/code/bin/ABQLauncher'
     abq_viewer = '/scratch/users/erik/SIMULIA/CAE/2018/linux_a64/code/bin/ABQLauncher viewer'
 
+abaqus_function_dir = os.path.expanduser('~/railway_ballast/python/abaqus_functions')
+
 
 def create_temp_dir_name(odb_file_name):
     i = 0

@@ -4,7 +4,7 @@ import subprocess
 
 import numpy as np
 
-from common import abq_viewer
+from common import abq_viewer, abaqus_function_dir
 
 
 def get_data_from_path(path_points, odb_filename, variable, component=None, step_name=None, frame_number=None,
@@ -30,11 +30,12 @@ def get_data_from_path(path_points, odb_filename, variable, component=None, step
     if not isinstance(path_points, np.ndarray):
         path_points = np.array(path_points)
     np.save(path_points_filename, path_points)
-    os.chdir('abaqus_functions')
+    current_dir = os.getcwd()
+    os.chdir(abaqus_function_dir)
     job = subprocess.Popen(abq_viewer + ' noGUI=write_data_along_path.py -- ' + parameter_pickle_name,
                            shell=True)
     job.wait()
-    os.chdir('..')
+    os.chdir(current_dir)
     data = np.unique(np.load(data_filename), axis=0)
     os.remove(parameter_pickle_name)
     os.remove(path_points_filename)
