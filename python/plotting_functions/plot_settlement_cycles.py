@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.style
 
 from comparison_of_models import get_path_points_for_fem_simulation
-from plot_permanent_deformations import get_data_from_path
+from get_data_from_path import get_data_from_path
 
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)
@@ -18,17 +18,18 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
 odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
+figure_directory = os.path.expanduser('~/railway_ballast/Figures/')
 
 
 def main():
     cycles = np.array([float(10**i) for i in range(7)])
 
-    plt.figure(0, figsize=(12, 14))
-    gs = gridspec.GridSpec(5, 2)
+    plt.figure(0, figsize=(12, 16))
+    gs = gridspec.GridSpec(16, 2)
     axes = [[], []]
     for i in range(2):
         for j in range(2):
-            ax = plt.subplot(gs[i*2:(i+1)*2, j:j+1])
+            ax = plt.subplot(gs[i*6:(i+1)*6, j:j+1])
             plt.ylabel('Settlement [mm]', fontsize=24)
             plt.xlabel('Load Cycles [-]', fontsize=24)
             plt.ylim(bottom=0)
@@ -49,7 +50,7 @@ def main():
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
             ax = plt.subplot(axes[i][j])
             max_y = 0
-            for load, line in zip([22.5, 30.], ['-', '--']):
+            for load, line in zip([17.5, 22.5, 30.], [':', '-', '--']):
                 for f, c, sym in zip(frequencies, colors, symbols):
                     odb_filename = (odb_directory + '/results_' + rail_fixture + '_' + geometry + '_'
                                     + str(load).replace('.', '_') + 't_' + str(int(f)) + 'Hz.odb')
@@ -94,8 +95,9 @@ def main():
 
     lines = [
         plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'\textbf{Axle load}')[0],
+        plt.plot([0, -1], [-1, -1], ':k', lw=2, label='17.5 t')[0],
         plt.plot([0, -1], [-1, -1], 'k', lw=2, label='22.5 t')[0],
-        plt.plot([0, -1], [-1, -1], '--k', lw=2, label='30 t')[0],
+        plt.plot([0, -1], [-1, -1], '--k', lw=2, label='30.0 t')[0],
         plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'\textbf{Frequency}')[0]
     ]
     for f, c, sym, in zip(frequencies, colors, symbols):
@@ -106,9 +108,9 @@ def main():
 
     leg = plt.legend(handles=lines, ncol=3, bbox_to_anchor=(-1.2, -0.2), loc='upper left',
                      numpoints=1)
-    leg.get_texts()[6].set_color("white")
+    leg.get_texts()[7].set_color("white")
     plt.ioff()
-    plt.savefig('../Figures/settlement_cycles.png')
+    plt.savefig(figure_directory + '/settlement_cycles.png')
 
     plt.show()
 

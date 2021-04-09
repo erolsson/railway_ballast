@@ -3,10 +3,11 @@ import os
 import numpy as np
 
 import matplotlib.pyplot as plt
+import matplotlib.patches as patches
 import matplotlib.gridspec as gridspec
 import matplotlib.style
 
-from get_data_from_path import get_data_from_path
+from plotting_functions.get_data_from_path import get_data_from_path
 from comparison_of_models import get_path_points_for_fem_simulation
 
 matplotlib.style.use('classic')
@@ -18,6 +19,7 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
 odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
+figure_directory = os.path.expanduser('~/railway_ballast/Figures/')
 
 
 def get_tensor_from_path(odb_file_name, path_points, field_id, step_name=None, frame_number=None):
@@ -58,19 +60,26 @@ def main():
     plt.figure(1, figsize=(12, 9))
     gs = gridspec.GridSpec(3, 2)
     ax3 = plt.subplot(gs[0:2, 0:1])
-    plt.xlabel('Distance from ballast surface [m]', fontsize=24)
+    plt.xlabel('Distance along the embankment [m]', fontsize=24)
     plt.ylabel('Cyclic von Mises stress, $q$ [kPa]', fontsize=24)
-    plt.xlim(0, 2)
+    plt.xlim(0, 5)
     plt.ylim(0, 30)
     ax3.yaxis.set_label_coords(-0.12, 0.5)
     plt.tight_layout()
 
     ax4 = plt.subplot(gs[0:2, 1:2])
-    plt.xlabel('Distance from ballast surface [m]', fontsize=24)
+    plt.xlabel('Distance along the embankment [m]', fontsize=24)
     plt.ylabel('Cyclic von Mises stress, $q$ [kPa]', fontsize=24)
-    plt.xlim(0, 2)
+    plt.xlim(0, 3)
     plt.ylim(0, 150)
     ax4.yaxis.set_label_coords(-0.12, 0.5)
+    rect = patches.Rectangle((0, 0), 0.265/2, height=150, ec='gray', fc='gray', alpha=0.5)
+    ax4.add_patch(rect)
+    sleeper_cc = 0.65
+    while sleeper_cc < 3 + 0.265/2:
+        rect = patches.Rectangle((sleeper_cc - 0.265/2, 0), 0.265, height=150, ec='gray', fc='gray', alpha=0.5)
+        sleeper_cc += 0.65
+        ax4.add_patch(rect)
     plt.tight_layout()
     axes = [ax1, ax2, ax3, ax4]
 
@@ -89,12 +98,23 @@ def main():
                 von_mises = mises(s)
                 axes[1].plot(path_points[0, 1] - path_points[:, 1], von_mises/1e3, c + line, lw=2)
                 if geometry == 'high':
+                    z_max = 3.
+                    if rail_fixture == 'slab':
+                        z_max = 5
                     path_along = np.zeros((1000, 3))
                     path_along[:, 0:2] = path_points[np.argmax(von_mises), 0:2]
-                    path_along[:, 2] = np.linspace(path_points[np.argmax(von_mises), 2], 2., 1000)
+                    path_along[:, 2] = np.linspace(path_points[np.argmax(von_mises), 2], z_max, 1000)
                     s = get_tensor_from_path(odb_filename, path_along, 'S', step_name='cyclic_stresses')
                     von_mises = mises(s)
                     axes[2 + j].plot(path_along[:, 2], von_mises/1e3, c + line, lw=2)
+
+    plt.subplot(axes[2])
+    plt.text(0.3, 0.85, r'\noindent \textbf{High Embankment\\Concrete Slab}', transform=axes[2].transAxes,
+             ma='left', fontweight='bold')
+
+    plt.subplot(axes[3])
+    plt.text(0.3, 0.85, r'\noindent \textbf{High Embankment\\Sleepers}', transform=axes[3].transAxes,
+             ma='left', fontweight='bold')
 
     for fig in [0, 1]:
         plt.figure(fig)
@@ -106,12 +126,15 @@ def main():
             plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'\textbf{Axle load}')[0],
             plt.plot([0, -1], [-1, -1], 'g', lw=2, label='17.5 t')[0],
             plt.plot([0, -1], [-1, -1], 'r', lw=2, label='22.5 t')[0],
-            plt.plot([0, -1], [-1, -1], 'b', lw=2, label='30 t')[0]
+            plt.plot([0, -1], [-1, -1], 'b', lw=2, label='30.0 t')[0]
         ]
         leg = plt.legend(handles=lines, ncol=2, bbox_to_anchor=(-0.8, -0.2), loc='upper left')
         leg.get_texts()[3].set_color("white")
     plt.figure(0)
-    plt.savefig('../Figures/stress_graphs.png')
+    plt.savefig(figure_directory + 'stress_graphs.png')
+
+    plt.figure(1)
+    plt.savefig(figure_directory + 'stresses_x.png')
 
     plt.show()
 

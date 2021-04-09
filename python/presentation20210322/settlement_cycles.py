@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.style
 
 from comparison_of_models import get_path_points_for_fem_simulation
-from plot_permanent_deformations import get_data_from_path
+from plotting_functions.plot_permanent_deformations import get_data_from_path
 
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)

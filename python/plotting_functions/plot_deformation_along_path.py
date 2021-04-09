@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import matplotlib.style
 
 from comparison_of_models import get_path_points_for_fem_simulation
-from plot_permanent_deformations import get_data_from_path
+from get_data_from_path import get_data_from_path
 
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)
@@ -17,19 +17,20 @@ plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}", r"\usepackage{xc
 plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
-odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
-frequency = 10
+odb_directory = os.path.expanduser('~/railway_ballast/odbs')
+figure_directory = os.path.expanduser('~/railway_ballast/Figures/')
+frequency = 5
 
 
 def main():
     cycles = [10**i for i in range(1, 7)]
 
-    plt.figure(0, figsize=(12, 14))
-    gs = gridspec.GridSpec(5, 2)
+    plt.figure(0, figsize=(12, 16))
+    gs = gridspec.GridSpec(16, 2)
     axes = [[], []]
     for i in range(2):
         for j in range(2):
-            ax = plt.subplot(gs[i*2:(i+1)*2, j:j+1])
+            ax = plt.subplot(gs[i*6:(i+1)*6, j:j+1])
             plt.xlabel('Distance from ballast surface [m]', fontsize=24)
             plt.ylabel('Vertical displacement [mm]', fontsize=24)
             ax.yaxis.set_label_coords(-0.15, 0.5)
@@ -49,7 +50,7 @@ def main():
              ma='left', fontweight='bold')
 
     plt.subplot(axes[1][0])
-    plt.ylim(-0.005, 20)
+    plt.ylim(-0.005, 10)
     plt.xlim(0, 4.3)
     plt.text(0.35, 0.7, r'\noindent \textbf{High Embankment\\Concrete Slab}', transform=axes[1][0].transAxes,
              ma='left', fontweight='bold')
@@ -66,7 +67,7 @@ def main():
         for i, geometry in enumerate(['low', 'high']):
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
             ax = plt.subplot(axes[i][j])
-            for load, line in zip([22.5, 30.], ['-', '--']):
+            for load, line in zip([17.5, 22.5, 30.], [':', '-', '--']):
                 odb_filename = (odb_directory + '/results_' + rail_fixture + '_' + geometry + '_'
                                 + str(load).replace('.', '_') + 't_' + str(frequency) + 'Hz.odb')
                 for n, c in zip(cycles, colors):
@@ -83,20 +84,20 @@ def main():
 
     lines = [
         plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'\textbf{Axle load}')[0],
+        plt.plot([0, -1], [-1, -1], ':k', lw=2, label='17.5 t')[0],
         plt.plot([0, -1], [-1, -1], 'k', lw=2, label='22.5 t')[0],
-        plt.plot([0, -1], [-1, -1], '--k', lw=2, label='30 t')[0],
+        plt.plot([0, -1], [-1, -1], '--k', lw=2, label='30.0 t')[0],
+        plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'\textbf{Load Cycles}')[0]
     ]
     for n, c, in zip(cycles, colors):
-        if n in [10, 100000]:
+        if n in [10000]:
             lines.append(plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'white')[0])
-        if n == 1000:
-            lines.append(plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'\textbf{Load Cycles}')[0])
         lines.append(plt.plot([0, -1], [-1, -1], c, lw=2, label=str(int(n)))[0])
 
-    leg = plt.legend(handles=lines, ncol=4, bbox_to_anchor=(-1.6, -0.2), loc='upper left')
-    leg.get_texts()[3].set_color("white")
-    leg.get_texts()[9].set_color("white")
-    plt.savefig('../Figures/deformation_graphs.png')
+    leg = plt.legend(handles=lines, ncol=3, bbox_to_anchor=(-1.25, -0.2), loc='upper left')
+    leg.get_texts()[8].set_color("white")
+
+    plt.savefig(figure_directory + 'deformation_graphs.png')
     plt.show()
 
 
