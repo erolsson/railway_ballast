@@ -30,17 +30,18 @@ def main():
         experimental_data = sun_et_al_16.get_data(f=f)
         fig_idx = (i//2, i % 2)
         par1 = get_parameters(frequency=f)
-        par2 = get_parameters(frequency=f, common=True)
-        print(f, par2)
+        print('b1', par1[6])
+        print('b2', np.exp(-abs(par1[7])))
         plt.figure(0)
         ax1 = plt.subplot(gs[5*fig_idx[0] + fig_idx[0]:5*fig_idx[0] + 5 + fig_idx[0], fig_idx[1]:fig_idx[1] + 1])
-        ax1.text(2, 0.27, '$f$={f} Hz'.format(f=int(f)))
+        ax1.text(2, 0.27, r'\bf{$\boldsymbol  f$=' + str(int(f)) + ' Hz}')
         plt.ylim(0, 0.3)
         plt.xlabel('Cycles')
         plt.ylabel('Deviatoric axial strain')
         plt.figure(1)
         ax2 = plt.subplot(gs[5*fig_idx[0] + fig_idx[0]:5*fig_idx[0] + 5 + fig_idx[0], fig_idx[1]:fig_idx[1] + 1])
-        ax2.text(2, y_lim_vol[i][0] + 0.27/0.30*(y_lim_vol[i][1] - y_lim_vol[i][0]), '$f$={f} Hz'.format(f=int(f)))
+        ax2.text(2, y_lim_vol[i][0] + 0.27/0.30*(y_lim_vol[i][1] - y_lim_vol[i][0]),
+                 r'\bf{$\boldsymbol f$=' + str(int(f)) + ' Hz}')
         plt.xlabel('Cycles')
         plt.ylabel('Volumetric strain')
         plt.ylim(*y_lim_vol[i])
@@ -53,17 +54,28 @@ def main():
             model_1 = MaterialModel(par1)
             model_1.update(cycles, cyclic_stress, static_stress)
 
-            model_2 = MaterialModel(par2)
-            model_2.update(cycles, cyclic_stress, static_stress)
-
             ea_1 = -model_1.deviatoric_strain()[:, 0]
-            ea_2 = -model_2.deviatoric_strain()[:, 0]
 
             ax1.semilogx(experiment.cycles, experiment.deviatoric_axial_strain(),
                          '-' + colors[(p, q)], lw=2)
 
             ax1.semilogx(cycles, ea_1 + experiment.deviatoric_axial_strain()[0],
                          '--' + colors[(p, q)], lw=2)
+            if f == 5.:
+                plt.figure(2)
+                plt.semilogx(experiment.cycles, experiment.deviatoric_axial_strain(),
+                             '-r', lw=2)
+
+                plt.semilogx(cycles, ea_1 + experiment.deviatoric_axial_strain()[0],
+                             '--r', lw=2)
+
+            if f == 20.:
+                plt.figure(2)
+                plt.semilogx(experiment.cycles, experiment.deviatoric_axial_strain(),
+                             '-g', lw=2)
+
+                plt.semilogx(cycles, ea_1 + experiment.deviatoric_axial_strain()[0],
+                             '--g', lw=2)
 
             # ax1 .semilogx(cycles, ea_2 + experiment.deviatoric_axial_strain()[0],
             #               ':' + colors[(p, q)], lw=2)
@@ -74,21 +86,29 @@ def main():
             ax2.semilogx(cycles, -model_1.volumetric_strain() + experiment.volumetric_strain[0],
                          '--' + colors[(p, q)], lw=2)
 
-            # ax2.semilogx(cycles, -model_2.volumetric_strain() + experiment.volumetric_strain[0],
-            #              ':' + colors[(p, q)], lw=2)
             ax2.yaxis.set_label_coords(-0.12, 0.5)
+
     for fig in [0, 1]:
         plt.figure(fig)
         for (p, q), c in colors.items():
             plt.plot([-2, -1], [-1, -1], c, lw=2, label='$p_s={p}$ kPa, $q={q}$ kPa'.format(p=p, q=q))
         plt.plot([-2, -1], [-1, -1], 'k', lw=2, label='Experiment')
         plt.plot([-2, -1], [-1, -1], '--k', lw=2, label='Model')
-        # plt.plot([-2, -1], [-1, -1], ':k', lw=2, label='All Frequencies')
         plt.legend(ncol=3, bbox_to_anchor=(-1.35, -0.2), loc='upper left', columnspacing=0.7, handletextpad=0.5)
     plt.figure(0)
-    plt.savefig('../../Figures/axial_strain.png')
+    plt.savefig('../../Figures/axial_strain.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
     plt.figure(1)
-    plt.savefig('../../Figures/volumetric_strain.png')
+    plt.savefig('../../Figures/volumetric_strain.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
+
+    plt.figure(2)
+    plt.xlabel('Belastningscykler', fontsize=24)
+    plt.ylabel(r'Permanent T{\"o}jning', fontsize=24)
+    plt.ylim(0., 0.25)
+    plt.semilogx([1, 10], [-1, -1], '-k', lw=2, label="Exp.")
+    plt.semilogx([1, 10], [-1, -1], '--k', lw=2, label="Sim.")
+    plt.legend(loc='best')
+    plt.tight_layout()
+    plt.savefig("projektblad.png")
     plt.show()
 
 

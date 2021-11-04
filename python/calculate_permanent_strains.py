@@ -6,6 +6,9 @@ import subprocess
 
 import numpy as np
 
+from abaqus_python.abaqus_interface import ABQInterface
+from abaqus_python.common import TemporaryDirectory
+
 from material_model.material_model import MaterialModel
 from multiprocesser.multiprocesser import multi_processer
 from common import abq
@@ -13,7 +16,9 @@ from write_data_to_odb import write_data_to_odb
 from calculate_permanent_deformations import DeformationCalculator
 from abaqus_functions.utilities import BoundaryCondition
 from material_model.model_parameters import get_parameters
-from common import create_temp_dir_name
+
+
+abq = ABQInterface("abq2018")
 
 
 def evaluate_permanent_strain_for_gp(material_parameters, cycles, static_stress_state, cyclic_stress_state):
@@ -35,24 +40,17 @@ def calculate_permanent_strains(stress_odb_file_name, strain_odb_file_name, cycl
         cycles = np.array(cycles)
     cycles = np.array(cycles)
 
-    work_directory = create_temp_dir_name(strain_odb_file_name)
-    os.makedirs(work_directory)
+    with TemporaryDirectory(strain_odb_file_name) as work_directory:
+        if not os.path.isfile(strain_odb_file_name):
+            abq.create_empty_odb(strain_odb_file_name, stress_odb_file_name)
 
-    if not os.path.isfile(strain_odb_file_name):
-        os.chdir('abaqus_functions')
-        job = subprocess.Popen(abq + ' python create_empty_odb.py ' + strain_odb_file_name + ' ' + stress_odb_file_name,
+        static_pickle_file = work_directory + '/static_stresses.pkl'
+        cyclic_pickle_file = work_directory + '/cyclic_stresses.pkl'
+        job = subprocess.Popen(abq + ' python write_stress_state_pickles.py ' + stress_odb_file_name + ' '
+                               + static_pickle_file + ' ' + cyclic_pickle_file,
                                shell=True)
         job.wait()
         os.chdir('..')
-
-    os.chdir('abaqus_functions')
-    static_pickle_file = work_directory + '/static_stresses.pkl'
-    cyclic_pickle_file = work_directory + '/cyclic_stresses.pkl'
-    job = subprocess.Popen(abq + ' python write_stress_state_pickles.py ' + stress_odb_file_name + ' '
-                           + static_pickle_file + ' ' + cyclic_pickle_file,
-                           shell=True)
-    job.wait()
-    os.chdir('..')
 
     with open(static_pickle_file, 'rb') as static_pickle:
         static_data = pickle.load(static_pickle, encoding='latin1')

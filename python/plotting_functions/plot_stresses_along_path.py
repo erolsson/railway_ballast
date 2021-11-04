@@ -7,7 +7,7 @@ import matplotlib.patches as patches
 import matplotlib.gridspec as gridspec
 import matplotlib.style
 
-from plotting_functions.get_data_from_path import get_data_from_path
+from abaqus_python_interface import ABQInterface
 from comparison_of_models import get_path_points_for_fem_simulation
 
 matplotlib.style.use('classic')
@@ -20,8 +20,9 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
 
 odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
 figure_directory = os.path.expanduser('~/railway_ballast/Figures/')
+abq = ABQInterface("abq2018")
 
-
+""""
 def get_tensor_from_path(odb_file_name, path_points, field_id, step_name=None, frame_number=None):
     components = ['11', '22', '33', '12', '13', '23']
     data = np.zeros((path_points.shape[0], 6))
@@ -31,6 +32,7 @@ def get_tensor_from_path(odb_file_name, path_points, field_id, step_name=None, f
                                     component=field_id + component)
         data[:, i] = stress
     return data
+"""
 
 
 def mises(tensor):
@@ -47,6 +49,7 @@ def main():
     plt.xlim(0, 4.3)
     plt.ylim(0, 30)
     ax1.yaxis.set_label_coords(-0.12, 0.5)
+    plt.text(0.07, 0.92, r'\bf{(a)}', transform=ax1.transAxes)
     plt.tight_layout()
 
     ax2 = plt.subplot(gs[0:2, 1:2])
@@ -55,6 +58,7 @@ def main():
     plt.xlim(0, 4.3)
     plt.ylim(0, 150)
     ax2.yaxis.set_label_coords(-0.12, 0.5)
+    plt.text(0.07, 0.92, r'\bf{(b)}', transform=ax2.transAxes)
     plt.tight_layout()
 
     plt.figure(1, figsize=(12, 9))
@@ -65,6 +69,7 @@ def main():
     plt.xlim(0, 5)
     plt.ylim(0, 30)
     ax3.yaxis.set_label_coords(-0.12, 0.5)
+    plt.text(0.07, 0.92, r'\bf{(a)}', transform=ax3.transAxes)
     plt.tight_layout()
 
     ax4 = plt.subplot(gs[0:2, 1:2])
@@ -75,26 +80,28 @@ def main():
     ax4.yaxis.set_label_coords(-0.12, 0.5)
     rect = patches.Rectangle((0, 0), 0.265/2, height=150, ec='gray', fc='gray', alpha=0.5)
     ax4.add_patch(rect)
+    plt.text(0.07, 0.92, r'\bf{(b)}', transform=ax4.transAxes)
     sleeper_cc = 0.65
     while sleeper_cc < 3 + 0.265/2:
         rect = patches.Rectangle((sleeper_cc - 0.265/2, 0), 0.265, height=150, ec='gray', fc='gray', alpha=0.5)
         sleeper_cc += 0.65
         ax4.add_patch(rect)
+    plt.text(0.02, 0.92, r'\bf{(b)}', transform=plt.axes().transAxes)
     plt.tight_layout()
     axes = [ax1, ax2, ax3, ax4]
 
     for j, (rail_fixture, line) in enumerate(zip(['slab', 'sleepers'], ['--', '-'])):
-        for geometry in ['low', 'high']:
+        for geometry in ['high']:
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
             for load, c in zip([17.5, 22.5, 30.], ['g', 'r', 'b']):
                 odb_filename = (odb_directory + '/stresses_' + rail_fixture + '_' + geometry + '_'
                                 + str(load).replace('.', '_') + 't.odb')
                 if load == 22.5:
-                    static_stresses = get_tensor_from_path(odb_filename, path_points, 'S', step_name='gravity')
+                    static_stresses = abq.get_tensor_from_path(odb_filename, path_points, 'S', step_name='gravity')
                     static_pressure = -np.sum(static_stresses[:, :3], axis=1)/3
                     axes[0].plot(path_points[0, 1] - path_points[:, 1], static_pressure/1e3, 'k' + line, lw=2)
 
-                s = get_tensor_from_path(odb_filename, path_points, 'S', step_name='cyclic_stresses')
+                s = abq.get_tensor_from_path(odb_filename, path_points, 'S', step_name='cyclic_stresses')
                 von_mises = mises(s)
                 axes[1].plot(path_points[0, 1] - path_points[:, 1], von_mises/1e3, c + line, lw=2)
                 if geometry == 'high':
@@ -104,7 +111,7 @@ def main():
                     path_along = np.zeros((1000, 3))
                     path_along[:, 0:2] = path_points[np.argmax(von_mises), 0:2]
                     path_along[:, 2] = np.linspace(path_points[np.argmax(von_mises), 2], z_max, 1000)
-                    s = get_tensor_from_path(odb_filename, path_along, 'S', step_name='cyclic_stresses')
+                    s = abq.get_tensor_from_path(odb_filename, path_along, 'S', step_name='cyclic_stresses')
                     von_mises = mises(s)
                     axes[2 + j].plot(path_along[:, 2], von_mises/1e3, c + line, lw=2)
 
@@ -131,10 +138,10 @@ def main():
         leg = plt.legend(handles=lines, ncol=2, bbox_to_anchor=(-0.8, -0.2), loc='upper left')
         leg.get_texts()[3].set_color("white")
     plt.figure(0)
-    plt.savefig(figure_directory + 'stress_graphs.png')
+    plt.savefig(figure_directory + 'stress_graphs.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
 
     plt.figure(1)
-    plt.savefig(figure_directory + 'stresses_x.png')
+    plt.savefig(figure_directory + 'stresses_x.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
 
     plt.show()
 

@@ -6,8 +6,11 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import matplotlib.style
 
+from abaqus_python_interface import ABQInterface
+
 from comparison_of_models import get_path_points_for_fem_simulation
-from get_data_from_path import get_data_from_path
+
+abq = ABQInterface("abq2018")
 
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)
@@ -19,11 +22,12 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
 
 odb_directory = os.path.expanduser('~/railway_ballast/odbs')
 figure_directory = os.path.expanduser('~/railway_ballast/Figures/')
+
 frequency = 5
 
 
 def main():
-    cycles = [10**i for i in range(1, 7)]
+    cycles = [100, 1e4, 1e6]
 
     plt.figure(0, figsize=(12, 16))
     gs = gridspec.GridSpec(16, 2)
@@ -76,8 +80,8 @@ def main():
                     print('====================================================================================')
                     step_name = 'cycles_' + str(int(n))
                     try:
-                        up = get_data_from_path(path_points, odb_filename, 'UP', 'UP2', output_position='NODAL',
-                                                step_name=step_name)
+                        up = abq.get_data_from_path(odb_filename, path_points, 'UP', 'UP2', output_position='NODAL',
+                                                    step_name=step_name)
                         ax.plot(path_points[0, 1] - path_points[:, 1], -up*1000, c + line, lw=2)
                     except FileNotFoundError:
                         pass
@@ -90,14 +94,11 @@ def main():
         plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'\textbf{Load Cycles}')[0]
     ]
     for n, c, in zip(cycles, colors):
-        if n in [10000]:
-            lines.append(plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'white')[0])
         lines.append(plt.plot([0, -1], [-1, -1], c, lw=2, label=str(int(n)))[0])
 
-    leg = plt.legend(handles=lines, ncol=3, bbox_to_anchor=(-1.25, -0.2), loc='upper left')
-    leg.get_texts()[8].set_color("white")
+    plt.legend(handles=lines, ncol=2, bbox_to_anchor=(-1.0, -0.2), loc='upper left')
 
-    plt.savefig(figure_directory + 'deformation_graphs.png')
+    plt.savefig(figure_directory + 'deformation_graphs.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
     plt.show()
 
 

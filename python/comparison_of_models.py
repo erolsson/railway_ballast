@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 import matplotlib.style
 
 from finite_element_model.simulations import simulations
-from plotting_functions.get_data_from_path import get_data_from_path
 
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)

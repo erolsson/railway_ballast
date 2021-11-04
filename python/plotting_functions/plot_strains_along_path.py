@@ -6,8 +6,9 @@ import matplotlib.gridspec as gridspec
 import matplotlib.pyplot as plt
 import matplotlib.style
 
+from abaqus_python_interface import ABQInterface
 from comparison_of_models import get_path_points_for_fem_simulation
-from plot_stresses_along_path import get_tensor_from_path, mises
+from plot_stresses_along_path import mises
 
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)
@@ -19,6 +20,7 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
 
 odb_directory = os.path.expanduser('~/railway_ballast/odbs')
 figure_directory = os.path.expanduser('~/railway_ballast/Figures/')
+abq = ABQInterface("abq2018")
 frequency = 5
 
 
@@ -29,7 +31,8 @@ def main():
     plt.xlabel('Distance from ballast surface [m]', fontsize=24)
     plt.ylabel('Volumetric strain [-]', fontsize=24)
     plt.xlim(0, 4.3)
-    plt.ylim(-0.01, 0.01)
+    plt.ylim(-0.005, 0.01)
+    plt.text(0.07, 0.92, r'\bf{(a)}', transform=ax1.transAxes)
     ax1.yaxis.set_label_coords(-0.15, 0.5)
     plt.tight_layout()
 
@@ -38,11 +41,12 @@ def main():
     plt.ylabel('Deviatoric strain [-]', fontsize=24)
     plt.xlim(0, 4.3)
     plt.ylim(0, 0.08)
+    plt.text(0.07, 0.92, r'\bf{(b)}', transform=ax2.transAxes)
     ax2.yaxis.set_label_coords(-0.15, 0.5)
     plt.tight_layout()
 
     for rail_fixture, line in zip(['slab', 'sleepers'], ['--', '-']):
-        for geometry in ['low', 'high']:
+        for geometry in ['high']:
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
             for load, c in zip([17.5, 22.5, 30.], ['g', 'r', 'b']):
                 print('\n========================================================================================')
@@ -50,7 +54,7 @@ def main():
                 print('========================================================================================')
                 odb_filename = (odb_directory + '/results_' + rail_fixture + '_' + geometry + '_'
                                 + str(load).replace('.', '_') + 't_' + str(frequency) + 'Hz.odb')
-                ep = get_tensor_from_path(odb_filename, path_points, 'EP')
+                ep = abq.get_tensor_from_path(odb_filename, path_points, 'EP')
                 ep_eff = mises(ep)
                 ep_vol = -np.sum(ep[:, :3], axis=1)
                 ax1.plot(path_points[0, 1] - path_points[:, 1], ep_vol, line + c, lw=2)
@@ -68,7 +72,7 @@ def main():
     ]
     leg = plt.legend(handles=lines, ncol=2, bbox_to_anchor=(-0.8, -0.2), loc='upper left')
     leg.get_texts()[3].set_color("white")
-    plt.savefig(figure_directory + 'strain_graphs.png')
+    plt.savefig(figure_directory + 'strain_graphs.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
     plt.show()
 
 
