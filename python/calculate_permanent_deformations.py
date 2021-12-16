@@ -86,8 +86,9 @@ def calculate_permanent_deformations(stress_odb_file_name, strain_odb_file_name,
                            BoundaryCondition('Z_SYM_NODES', 'node_set', 3),
                            BoundaryCondition('Z1_NODES', 'node_set', 3)]
     print("Evaluating permanent deformations")
-    calculator = DeformationCalculator(strain_odb_file_name, boundary_conditions, step_name='cycles_' + str(cycles[0]),
-                                       instance_name=instance_name, set_name=element_set_name, strain_field_id='EP')
+    calculator = DeformationCalculator(strain_odb_file_name, boundary_conditions, abq=abq,
+                                       step_name='cycles_' + str(cycles[0]), instance_name=instance_name,
+                                       set_name=element_set_name, strain_field_id='EP')
 
     print("Writing permanent deformations to", strain_odb_file_name)
     for i, n in enumerate(cycles):
