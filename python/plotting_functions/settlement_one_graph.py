@@ -13,7 +13,7 @@ abq = ABQInterface("abq2018")
 matplotlib.style.use('classic')
 plt.rc('text', usetex=True)
 plt.rc('font', serif='Computer Modern Roman')
-plt.rcParams.update({'font.size': 36})
+plt.rcParams.update({'font.size': 24})
 plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}", r"\usepackage{xcolor}"]
 plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
@@ -37,11 +37,12 @@ def main():
             up = abq.get_data_from_path(odb_filename, path_points, 'UP', 'UP2', output_position='NODAL',
                                         step_name=step_name)
             settlement[k] = -up[0]*1000
-        plt.semilogx(cycles, settlement, '-' + c + sym, lw=3, ms=12, mew=2)
+        plt.semilogx(cycles, settlement, '-' + c + sym, lw=3, ms=12, mew=2, label=str(int(frequency)) + ' Hz')
     plt.xlabel('Belastningscykler')
     plt.ylabel(r'S{\"a}ttningar [mm]')
     plt.xlim(1, 1e6)
     plt.ylim(0, 50.)
+    plt.legend(loc='best', numpoints=1)
     plt.tight_layout()
     plt.savefig(figure_directory + 'one_graph_settlement.png')
     plt.show()

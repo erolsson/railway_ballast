@@ -545,8 +545,6 @@ class RailwayEmbankment:
 def main():
     sim_name = sys.argv[-2]
     load = float(sys.argv[-1])
-    # sim_name = 'sleepers_high'
-    # load = 30.
     simulation_to_run = simulations[sim_name]
     job_name = simulation_to_run.job_name + '_' + sim_name + '_' + str(load).replace('.', '_') + 't'
     embankment = RailwayEmbankment(simulation_to_run)

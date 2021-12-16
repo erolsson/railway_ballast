@@ -12,7 +12,7 @@ matplotlib.style.use('classic')
 plt.rc('text', usetex=True)
 plt.rc('font', serif='Computer Modern Roman')
 plt.rcParams.update({'font.size': 20})
-plt.rcParams['text.latex.preamble'] = [r"\usepackage{amsmath}"]
+plt.rcParams['text.latex.preamble'] = r"\usepackage{amsmath}"
 plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
                   'monospace': ['Computer Modern Typewriter']})
 
@@ -30,8 +30,6 @@ def main():
         experimental_data = sun_et_al_16.get_data(f=f)
         fig_idx = (i//2, i % 2)
         par1 = get_parameters(frequency=f)
-        print('b1', par1[6])
-        print('b2', np.exp(-abs(par1[7])))
         plt.figure(0)
         ax1 = plt.subplot(gs[5*fig_idx[0] + fig_idx[0]:5*fig_idx[0] + 5 + fig_idx[0], fig_idx[1]:fig_idx[1] + 1])
         ax1.text(2, 0.27, r'\bf{$\boldsymbol  f$=' + str(int(f)) + ' Hz}')
@@ -61,24 +59,6 @@ def main():
 
             ax1.semilogx(cycles, ea_1 + experiment.deviatoric_axial_strain()[0],
                          '--' + colors[(p, q)], lw=2)
-            if f == 5.:
-                plt.figure(2)
-                plt.semilogx(experiment.cycles, experiment.deviatoric_axial_strain(),
-                             '-r', lw=2)
-
-                plt.semilogx(cycles, ea_1 + experiment.deviatoric_axial_strain()[0],
-                             '--r', lw=2)
-
-            if f == 20.:
-                plt.figure(2)
-                plt.semilogx(experiment.cycles, experiment.deviatoric_axial_strain(),
-                             '-g', lw=2)
-
-                plt.semilogx(cycles, ea_1 + experiment.deviatoric_axial_strain()[0],
-                             '--g', lw=2)
-
-            # ax1 .semilogx(cycles, ea_2 + experiment.deviatoric_axial_strain()[0],
-            #               ':' + colors[(p, q)], lw=2)
 
             ax2.semilogx(experiment.cycles, experiment.volumetric_strain,
                          '-' + colors[(p, q)], lw=2)
@@ -99,16 +79,6 @@ def main():
     plt.savefig('../../Figures/axial_strain.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
     plt.figure(1)
     plt.savefig('../../Figures/volumetric_strain.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
-
-    plt.figure(2)
-    plt.xlabel('Belastningscykler', fontsize=24)
-    plt.ylabel(r'Permanent T{\"o}jning', fontsize=24)
-    plt.ylim(0., 0.25)
-    plt.semilogx([1, 10], [-1, -1], '-k', lw=2, label="Exp.")
-    plt.semilogx([1, 10], [-1, -1], '--k', lw=2, label="Sim.")
-    plt.legend(loc='best')
-    plt.tight_layout()
-    plt.savefig("projektblad.png")
     plt.show()
 
 

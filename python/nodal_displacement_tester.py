@@ -1,7 +1,7 @@
 from __future__ import division, print_function
 import os
 
-from calculate_permanent_deformations import DeformationCalculator
+from deformation_calculator import DeformationCalculator
 from abaqus_functions.utilities import BoundaryCondition
 from write_data_to_odb import write_data_to_odb
 from read_data_from_odb import read_data_from_odb
