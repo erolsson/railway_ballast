@@ -10,7 +10,7 @@ from deformation_calculator import DeformationCalculator
 from material_model.model_parameters import get_parameters
 from material_model.material_model import MaterialModel
 
-abq = ABQInterface("abq2018")
+abq = ABQInterface("abq2018", output=True)
 
 
 class BoundaryCondition(object):
@@ -55,10 +55,12 @@ def calculate_permanent_deformations(stress_odb_file_name, strain_odb_file_name,
     print("Performing calculations on the element set", element_set_name)
     print("Reading stress states from", stress_odb_file_name)
     static_stresses = abq.read_data_from_odb('S', stress_odb_file_name, step_name='gravity', set_name=element_set_name,
-                                             instance_name=instance_name)
+                                             instance_name=instance_name)/1e3
     loading_stresses = abq.read_data_from_odb('S', stress_odb_file_name, step_name='loading', set_name=element_set_name,
-                                              instance_name=instance_name)
+                                              instance_name=instance_name)/1e3
     cyclic_stresses = loading_stresses - static_stresses
+    print(np.min(static_stresses[:, 1]))
+    print(np.min(loading_stresses[:, 1]))
     print("Evaluating permanent strains")
     n = static_stresses.shape[0]
     permanent_strains = np.zeros((len(cycles), n, static_stresses.shape[1]))
@@ -106,10 +108,10 @@ def main():
     for f in frequencies:
         sim_name = 'sleepers_low_' + str(load).replace('.', '_') + 't'
         cycles = [1, 10, 100, 1000, 10000, 100000, 1000000]
-        stress_odb_filename = os.path.expanduser('~/railway_ballast/odbs/embankment_' + sim_name
-                                                 + '.odb')
+        stress_odb_filename = os.path.expanduser('~/hassan/embankment_' + sim_name
+                                                 + '_2018.odb')
 
-        strain_odb_filename = os.path.expanduser('~/railway_ballast/odbs/results_' + sim_name
+        strain_odb_filename = os.path.expanduser('~/hassan/results_' + sim_name
                                                  + '_' + str(int(f)) + 'Hz.odb')
         par = get_parameters(frequency=f)
         calculate_permanent_deformations(stress_odb_filename, strain_odb_filename, cycles, par)

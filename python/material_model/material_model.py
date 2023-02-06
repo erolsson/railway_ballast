@@ -75,6 +75,7 @@ class MaterialModel:
 
             e_f = solution_fric.y[:, -1]
             e_c = solution_comp.y[:, -1]
+            print(e_c, cyclic_stress, static_stress)
             if np.linalg.norm(e_f) > 1.:
                 e_f /= np.linalg.norm(e_f)
             self.frictional_strain[i, :] = e_f
