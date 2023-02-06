@@ -71,7 +71,7 @@ def main():
 
     plt.xlabel('Load Cycles [-]')
     plt.ylabel('Settlement [mm]')
-    fig.set_size_inches(12., 6., forward=True)
+    fig.set_size_inches(14., 6., forward=True)
     plt.xlim(1, 2e6)
     plt.ylim(0, 35.)
 
