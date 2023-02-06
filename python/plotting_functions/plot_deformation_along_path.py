@@ -98,7 +98,7 @@ def main():
 
     plt.legend(handles=lines, ncol=2, bbox_to_anchor=(-1.0, -0.2), loc='upper left')
 
-    plt.savefig(figure_directory + 'deformation_graphs.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
+    plt.savefig(figure_directory + 'deformation_graphs.png', dpi=600)
     plt.show()
 
 

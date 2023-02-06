@@ -48,8 +48,8 @@ def hettler(n, axle_load):
 def main():
     fig = plt.figure(0)
     cycles = np.array([float(10**i) for i in range(7)] + [2e6])
-    # plt.semilogx(cycles, thom_1(cycles, 0), 'g', lw=2)
-    # plt.semilogx(cycles, selig_2(cycles, 0), 'k', lw=2)
+    plt.semilogx(cycles, thom_1(cycles, 0), 'g', lw=2)
+    plt.semilogx(cycles, selig_2(cycles, 0), 'k', lw=2)
     path_points = get_path_points_for_fem_simulation('sleepers_high')
 
     for load, line in zip([17.5, 22.5, 30.], [':', '-', '--']):
@@ -94,16 +94,16 @@ def main():
         plt.plot([1., 1.], [-1, -2], 'w', lw=3, label='white', ms=12, mew=2)[0],
         plt.plot([1., 1.], [-1, -2], 'w', lw=3, label=r'\textbf{Empirical models}', ms=12, mew=2)[0],
         plt.plot([1., 1.], [-1, -2], 'm', lw=2, label=r'Hettler', alpha=0.5)[0],
-        # plt.plot([1., 1.], [-1, -2], 'k', lw=2, label=r'Selig and Waters [16]', alpha=0.5)[0],
+        plt.plot([1., 1.], [-1, -2], 'k', lw=2, label=r'Selig and Waters [16]', alpha=0.5)[0],
         plt.plot([1., 1.], [-1, -2], 'c', lw=2, label=r'Shenton', alpha=0.5)[0],
-        # plt.plot([1., 1.], [-1, -2], 'g', lw=2, label=r'Thom and Oakley [18]', alpha=0.5)[0],
+        plt.plot([1., 1.], [-1, -2], 'g', lw=2, label=r'Thom and Oakley [18]', alpha=0.5)[0],
 
     ]
 
     legend = ax.legend(handles=labels, loc='upper left', bbox_to_anchor=(1., 1.035), numpoints=1)
     legend.get_texts()[3].set_color("white")
     plt.gca().add_artist(legend)
-    plt.savefig(figure_directory + '/empirical_models_seminar.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
+    plt.savefig(figure_directory + '/empirical_models.png', dpi=600)
     plt.show()
 
 

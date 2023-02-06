@@ -76,9 +76,9 @@ def main():
         plt.plot([-2, -1], [-1, -1], '--k', lw=2, label='Model')
         plt.legend(ncol=3, bbox_to_anchor=(-1.35, -0.2), loc='upper left', columnspacing=0.7, handletextpad=0.5)
     plt.figure(0)
-    plt.savefig('../../Figures/axial_strain.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
+    plt.savefig('../../Figures/axial_strain.png', dpi=600)
     plt.figure(1)
-    plt.savefig('../../Figures/volumetric_strain.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
+    plt.savefig('../../Figures/volumetric_strain.png', dpi=600)
     plt.show()
 
 

@@ -72,7 +72,7 @@ def main():
     ]
     leg = plt.legend(handles=lines, ncol=2, bbox_to_anchor=(-0.8, -0.2), loc='upper left')
     leg.get_texts()[3].set_color("white")
-    plt.savefig(figure_directory + 'strain_graphs.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
+    plt.savefig(figure_directory + 'strain_graphs.png', dpi=600)
     plt.show()
 
 

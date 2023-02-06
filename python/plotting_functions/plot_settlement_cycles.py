@@ -142,7 +142,7 @@ def main():
     # leg.get_texts()[2].set_color("white")
     # leg.get_texts()[6].set_color("white")
     plt.ioff()
-    plt.savefig(figure_directory + '/settlement_cycles.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
+    plt.savefig(figure_directory + '/settlement_cycles.png', dpi=600)
 
     plt.figure(1)
     lines = fig_lines[1]
@@ -154,7 +154,7 @@ def main():
 
     plt.legend(handles=lines, ncol=2, bbox_to_anchor=(-1.0, -0.2), loc='upper left',  numpoints=1)
     plt.ioff()
-    plt.savefig(figure_directory + '/settlement_cycles_precomp.tif', dpi=600, pil_kwargs={"compression": "tiff_lzw"})
+    plt.savefig(figure_directory + '/settlement_cycles_precomp.png', dpi=600)
 
     plt.show()
 
