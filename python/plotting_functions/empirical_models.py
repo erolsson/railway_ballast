@@ -71,13 +71,13 @@ def main():
 
     plt.xlabel('Load Cycles [-]')
     plt.ylabel('Settlement [mm]')
-    fig.set_size_inches(14., 6., forward=True)
+    fig.set_size_inches(13., 6., forward=True)
     plt.xlim(1, 2e6)
     plt.ylim(0, 35.)
 
     ax = plt.subplot(111)
     box = ax.get_position()
-    ax.set_position([0.07, 0.12, 0.55, box.height])
+    ax.set_position([0.07, 0.12, 0.53, box.height])
     load_labels = [
         plt.plot([1., 1.], [-1, -2], 'w', label=r'\textbf{Loads}')[0],
         plt.plot([1., 1.], [-1, -2], ':k', lw=2, label='17.5 t')[0],
