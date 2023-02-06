@@ -66,7 +66,7 @@ def main():
              ma='left', fontweight='bold')
 
     colors = ['r', 'b', 'g', 'k', 'c', 'm']
-    """
+
     for j, rail_fixture in enumerate(['slab', 'sleepers']):
         for i, geometry in enumerate(['low', 'high']):
             path_points = get_path_points_for_fem_simulation(rail_fixture + '_' + geometry)
@@ -85,7 +85,7 @@ def main():
                         ax.plot(path_points[0, 1] - path_points[:, 1], -up*1000, c + line, lw=2)
                     except FileNotFoundError:
                         pass
-    """
+
     lines = [
         plt.plot([0, -1], [-1, -1], 'w', lw=2, label=r'\textbf{Axle load}')[0],
         plt.plot([0, -1], [-1, -1], ':k', lw=2, label='17.5 t')[0],
