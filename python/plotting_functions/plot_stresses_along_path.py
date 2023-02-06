@@ -86,7 +86,6 @@ def main():
         rect = patches.Rectangle((sleeper_cc - 0.265/2, 0), 0.265, height=150, ec='gray', fc='gray', alpha=0.5)
         sleeper_cc += 0.65
         ax4.add_patch(rect)
-    plt.text(0.02, 0.92, r'\bf{(b)}', transform=plt.axes().transAxes)
     plt.tight_layout()
     axes = [ax1, ax2, ax3, ax4]
 
@@ -96,6 +95,7 @@ def main():
             for load, c in zip([17.5, 22.5, 30.], ['g', 'r', 'b']):
                 odb_filename = (odb_directory + '/stresses_' + rail_fixture + '_' + geometry + '_'
                                 + str(load).replace('.', '_') + 't.odb')
+
                 if load == 22.5:
                     static_stresses = abq.get_tensor_from_path(odb_filename, path_points, 'S', step_name='gravity')
                     static_pressure = -np.sum(static_stresses[:, :3], axis=1)/3
@@ -114,7 +114,6 @@ def main():
                     s = abq.get_tensor_from_path(odb_filename, path_along, 'S', step_name='cyclic_stresses')
                     von_mises = mises(s)
                     axes[2 + j].plot(path_along[:, 2], von_mises/1e3, c + line, lw=2)
-
     plt.subplot(axes[2])
     plt.text(0.3, 0.85, r'\noindent \textbf{High Embankment\\Concrete Slab}', transform=axes[2].transAxes,
              ma='left', fontweight='bold')
@@ -122,6 +121,7 @@ def main():
     plt.subplot(axes[3])
     plt.text(0.3, 0.85, r'\noindent \textbf{High Embankment\\Sleepers}', transform=axes[3].transAxes,
              ma='left', fontweight='bold')
+
 
     for fig in [0, 1]:
         plt.figure(fig)
