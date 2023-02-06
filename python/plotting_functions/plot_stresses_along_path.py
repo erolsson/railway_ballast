@@ -20,7 +20,7 @@ plt.rc('font', **{'family': 'serif', 'serif': ['Computer Modern Roman'],
 
 odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
 figure_directory = os.path.expanduser('~/railway_ballast/Figures/')
-abq = ABQInterface("abq2018", output=True)
+abq = ABQInterface("abq2018")
 
 """"
 def get_tensor_from_path(odb_file_name, path_points, field_id, step_name=None, frame_number=None):
