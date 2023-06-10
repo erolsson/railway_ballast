@@ -38,12 +38,12 @@ def calc_deviator(strain, n, p, par):
 
 def main():
     fig = plt.figure(0)
-    frequencies = [5, 10, 20, 40]
+    frequencies = [5, 10]
 
     lines = [':', '--', '-']
     colors = ['r', 'b', 'g', 'k']
-    cycles = 1000000
-    pressures = np.linspace(0, 60, 100)
+    cycles = 1e4
+    pressures = np.linspace(0, 60)
     strain_levels = [0.01, 0.05, 0.1]
     n = np.exp(np.linspace(0, np.log(cycles)))
 
@@ -66,23 +66,25 @@ def main():
         plt.plot([1., 1.], [-1, -2], 'w', label=r'\textbf{Frequencies}')[0],
         plt.plot([1., 1.], [-1, -2], 'r', lw=2, label=r'$f=5$ Hz')[0],
         plt.plot([1., 1.], [-1, -2], 'b', lw=2, label=r'$f=10$ Hz')[0],
-        plt.plot([1., 1.], [-1, -2], 'g', lw=2, label=r'$f=20$ Hz')[0],
-        plt.plot([1., 1.], [-1, -2], 'k', lw=2, label=r'$f=40$ Hz')[0]
+        # plt.plot([1., 1.], [-1, -2], 'g', lw=2, label=r'$f=20$ Hz')[0],
+        # plt.plot([1., 1.], [-1, -2], 'k', lw=2, label=r'$f=40$ Hz')[0]
     ]
     plt.xlim(0, 60)
-    plt.ylim(0, 350)
+    plt.ylim(0)
     ax = plt.subplot(111)
     box = ax.get_position()
     ax.set_position([0.1, 0.12, 0.55, box.height])
 
     plt.xlabel('Static pressure, $p_s$ [kPa]')
     plt.ylabel(r'Deviatoric von Mises stress, $q$ [kPa]')
+    plt.text(0.05, 0.92, r'\bf(b)  $\boldsymbol{N=' + str(int(cycles)) + '}$', transform=ax.transAxes)
+    plt.text(0.05, 0.85, r'$\boldsymbol{N=' + str(int(cycles)) + '}$', transform=ax.transAxes)
     fig.set_size_inches(12., 6.25, forward=True)
 
     legend = ax.legend(handles=labels, loc='upper left', bbox_to_anchor=(1., 1.035), numpoints=1)
-    legend.get_texts()[4].set_color("white")
+    # legend.get_texts()[4].set_color("white")
     plt.gca().add_artist(legend)
-    plt.savefig(figure_directory + '/strain_yield_surface.png')
+    plt.savefig(figure_directory + '/strain_yield_surface_1e6.png')
     plt.show()
 
 

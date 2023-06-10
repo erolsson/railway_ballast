@@ -93,10 +93,10 @@ def main():
         plt.plot([1., 1.], [-1, -2], 'bo', lw=3, label='10 Hz', ms=12, mew=2)[0],
         plt.plot([1., 1.], [-1, -2], 'w', lw=3, label='white', ms=12, mew=2)[0],
         plt.plot([1., 1.], [-1, -2], 'w', lw=3, label=r'\textbf{Empirical models}', ms=12, mew=2)[0],
-        plt.plot([1., 1.], [-1, -2], 'm', lw=2, label=r'Hettler (1984)', alpha=0.5)[0],
-        plt.plot([1., 1.], [-1, -2], 'k', lw=2, label=r'Selig and Waters (1994)', alpha=0.5)[0],
-        plt.plot([1., 1.], [-1, -2], 'c', lw=2, label=r'Shenton (1985)', alpha=0.5)[0],
-        plt.plot([1., 1.], [-1, -2], 'g', lw=2, label=r'Thom and Oakley (2006)', alpha=0.5)[0],
+        plt.plot([1., 1.], [-1, -2], 'm', lw=2, label=r'Hettler [27]', alpha=0.5)[0],
+        plt.plot([1., 1.], [-1, -2], 'k', lw=2, label=r'Selig and Waters [28]', alpha=0.5)[0],
+        plt.plot([1., 1.], [-1, -2], 'c', lw=2, label=r'Shenton [3]', alpha=0.5)[0],
+        plt.plot([1., 1.], [-1, -2], 'g', lw=2, label=r'Thom and Oakley [29]', alpha=0.5)[0],
 
     ]
 
