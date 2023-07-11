@@ -1,5 +1,6 @@
 import glob
 import os
+import pathlib
 import re
 
 from numbers import Number
@@ -8,20 +9,21 @@ import numpy as np
 
 
 class Experiment:
-    def __init__(self, p, q, f, filename, num_points=100):
+    def __init__(self, p, q, f, filename_axial, filename_volumetric=None, num_points=100):
         self.p = p
         self.q = q
         self.f = f
 
         # Reading axial data
-        data = np.genfromtxt(filename, delimiter=',')
+        data = np.genfromtxt(filename_axial, delimiter=',')
         idx = np.argsort(data[:, 0])
         data = data[idx, :]
         axial_cycles = np.log(data[:, 0])
         axial_strain = data[:, 1]
 
-        volumetric_filename = 'volumetric_strain_' + filename.lstrip('axial_strain_')
-        data = np.genfromtxt(volumetric_filename, delimiter=',')
+        if filename_volumetric is None:
+            filename_volumetric = 'volumetric_strain_' + filename_axial.lstrip('axial_strain_')
+        data = np.genfromtxt(filename_volumetric, delimiter=',')
         idx = np.argsort(data[:, 0])
         data = data[idx, :]
         volumetric_cycles = np.log(data[:, 0])
@@ -53,7 +55,7 @@ class ExperimentalResults:
             match = re.search(regex_str, filename)
             if match:
                 self.data.append(Experiment(p=float(match.group(1)), q=float(match.group(2)), f=float(match.group(3)),
-                                            filename=match.group(0)))
+                                            filename_axial=match.group(0)))
         os.chdir(curr_dir)
 
     def get_data(self, p=None, q=None, f=None):
@@ -77,6 +79,14 @@ class ExperimentalResults:
 sun_et_al_16 = ExperimentalResults()
 sun_et_al_16.read(os.path.expanduser('~/railway_ballast/experimental_data/sun_et_al_16/'))
 
+fouled_folder = pathlib.Path('~/railway_ballast/experimental_data/tennakoon_indraratna_14/').expanduser()
+fouled = {
+    0: Experiment(10, 230, 20, fouled_folder / 'axial_0_vci.csv', fouled_folder / 'vol_0_vci.csv'),
+    10: Experiment(10, 230, 20, fouled_folder / 'axial_10_vci.csv', fouled_folder / 'vol_10_vci.csv'),
+    25: Experiment(10, 230, 20, fouled_folder / 'axial_25_vci.csv', fouled_folder / 'vol_25_vci.csv'),
+    50: Experiment(10, 230, 20, fouled_folder / 'axial_50_vci.csv', fouled_folder / 'vol_50_vci.csv'),
+    80: Experiment(10, 230, 20, fouled_folder / 'axial_80_vci.csv', fouled_folder / 'vol_80_vci.csv')
+}
 
 def main():
     from collections import namedtuple

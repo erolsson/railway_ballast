@@ -38,11 +38,13 @@ def main():
         plt.ylabel('Deviatoric axial strain')
         plt.figure(1)
         ax2 = plt.subplot(gs[5*fig_idx[0] + fig_idx[0]:5*fig_idx[0] + 5 + fig_idx[0], fig_idx[1]:fig_idx[1] + 1])
-        ax2.text(2, y_lim_vol[i][0] + 0.27/0.30*(y_lim_vol[i][1] - y_lim_vol[i][0]),
-                 r'\bf{$\boldsymbol f$=' + str(int(f)) + ' Hz}')
+        # ax2.text(2, y_lim_vol[i][0] + 0.27/0.30*(y_lim_vol[i][1] - y_lim_vol[i][0]),
+        #          r'\bf{$\boldsymbol f$=' + str(int(f)) + ' Hz}')
+        ax2.text(2, -0.03 + 0.27*0.19/0.3, r'\bf{$\boldsymbol f$=' + str(int(f)) + ' Hz}')
         plt.xlabel('Cycles')
         plt.ylabel('Volumetric strain')
-        plt.ylim(*y_lim_vol[i])
+        # plt.ylim(*y_lim_vol[i])
+        plt.ylim(-0.03, 0.16)
 
         for experiment in experimental_data:
             p = experiment.p
