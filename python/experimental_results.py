@@ -28,7 +28,6 @@ class Experiment:
         data = data[idx, :]
         volumetric_cycles = np.log(data[:, 0])
         volumetric_strain = data[:, 1]
-
         self.cycles = np.linspace(np.max([axial_cycles[0], volumetric_cycles[0]]),
                                   np.min([axial_cycles[-1], volumetric_cycles[-1]]), num_points)
 

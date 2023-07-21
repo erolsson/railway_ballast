@@ -26,13 +26,23 @@ def residual(fitting_parameters, par, parameters_to_fit, experiments, residual_f
                 for experiment in experiments]
     simulations = multi_processer(job_list, delay=0.)
     res = 0
+    static_stress = -30*np.array([1, 1, 1, 0, 0, 0])
+    cyclic_stress = -320*np.array([1, 0, 0, 0, 0, 0])
+    model = MaterialModel(material_parameters=par)
+    model.update(np.array([1, 1e5]), cyclic_stress, static_stress)
+    inst_e = -model.deviatoric_strain()[-1, 0]
     for sim in simulations:
         r, e_sim, e_exp, p, q, f = sim
+
         res += r
         print("\tf = " + str(f) + ",\t p = " + str(p) + " , q = " + str(q) + ": e_exp = " + str(e_exp) + "\t e_sim = "
               + str(e_sim) + "\t r = " + str(r))
+    if inst_e < 0.8:
+        print("Strain at problematic load", inst_e)
+        res += (0.8 - inst_e)**2*100
     print(fitting_parameters)
     print(res)
+
     return res
 
 
@@ -45,7 +55,9 @@ def calc_deviatoric_residual_for_data_experiment(par, experiment):
     model.update(experiment.cycles, cyclic_stress, static_stress)
     model_e = -model.deviatoric_strain()[:, 0]
     idx = np.logical_and(e_exp < 0.3, abs(e_exp) != 0)
-    r = np.sqrt(np.sum((1 - model_e[idx]/e_exp[idx])**2*np.log(experiment.cycles[idx])/e_exp.shape[0])/e_exp.shape[0])
+    e_corr = 0 + model_e
+    e_corr[e_corr > 0.3] = 0.3
+    r = np.sqrt(np.sum((e_corr[idx] - e_exp[idx])**2))
     return r, round(model_e[-1] + e0, 4), round(e_exp[-1] + e0, 4), experiment.p, experiment.q, experiment.f
 
 
@@ -65,18 +77,21 @@ def calc_volumetric_residual_for_data_experiment(par, experiment):
 
 
 def main():
-    f = 20
+    f = 40
     frequencies = [f]
-    parameters_to_fit = [2]
+    parameters_to_fit = [0, 1, 2, 3, 4, 5]
     fitting_dataset = sun_et_al_16.get_data(f=frequencies)
-    par = np.array(get_parameters(f, common=False))
+    par = np.array(get_parameters(40, common=False))
 
     print(par)
     for i in range(50):
-        par[parameters_to_fit] = fmin(residual, [par[parameters_to_fit]],
+        old_par = par[parameters_to_fit]
+        par[parameters_to_fit] = fmin(residual, [old_par],
                                       args=(par, parameters_to_fit, fitting_dataset,
                                             calc_deviatoric_residual_for_data_experiment), maxfun=1e6,
                                       maxiter=1e6)
+        if np.sum((1 - par[parameters_to_fit]/old_par)**2) < 1e-3:
+            break
         print(par[parameters_to_fit])
 
 
