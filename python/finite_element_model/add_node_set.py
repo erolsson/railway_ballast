@@ -24,9 +24,9 @@ if __name__ == '__main__':
     odb_directory = os.path.expanduser('~/railway_ballast/odbs/')
     add_node_set_to_odb(odb_directory + 'embankment_sleepers_low_17_5t.odb', 'ballast_bottom_nodes',
                         y_min=7-1e-3, y_max=7+1e-3)
-    add_node_set_to_odb(odb_directory + 'embankment_sleepers_high_17_5t.odb',
-                        'ballast_bottom_nodes', y_min=7-1e-3, y_max=7+1e-3)
+    add_node_set_to_odb(odb_directory + 'embankment_sleepers_high_17_5t.odb', 'ballast_bottom_nodes',
+                        y_min=7-1e-3, y_max=7+1e-3)
     add_node_set_to_odb(odb_directory + 'embankment_slab_low_17_5t.odb', 'ballast_bottom_nodes',
                         y_min=7 - 1e-3, y_max=7 + 1e-3)
-    add_node_set_to_odb(odb_directory + 'embankment_slab_high_17_5t.odb',
-                        'ballast_bottom_nodes', y_min=7 - 1e-3, y_max=7 + 1e-3)
+    add_node_set_to_odb(odb_directory + 'embankment_slab_high_17_5t.odb', 'ballast_bottom_nodes',
+                        y_min=7 - 1e-3, y_max=7 + 1e-3)

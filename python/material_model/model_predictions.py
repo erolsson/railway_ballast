@@ -65,7 +65,8 @@ def main():
             ax2.semilogx(experiment.cycles, experiment.volumetric_strain,
                          '-' + colors[(p, q)], lw=2)
 
-            ax2.semilogx(cycles, -model_1.volumetric_strain() + experiment.volumetric_strain[0],
+            ax2.semilogx(cycles[abs(ea_1) < 0.3],
+                         -model_1.volumetric_strain()[abs(ea_1) < 0.3] + experiment.volumetric_strain[0],
                          '--' + colors[(p, q)], lw=2)
 
             ax2.yaxis.set_label_coords(-0.12, 0.5)

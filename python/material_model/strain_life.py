@@ -75,9 +75,9 @@ def main():
     box = ax.get_position()
     ax.set_position([0.1, 0.12, 0.55, box.height])
 
-    plt.xlabel('Static pressure, $p_s$ [kPa]')
-    plt.ylabel(r'Deviatoric von Mises stress, $q$ [kPa]')
-    plt.text(0.05, 0.92, r'\bf(b)  $\boldsymbol{N=' + str(int(cycles)) + '}$', transform=ax.transAxes)
+    plt.xlabel('Static pressure, $p_s$ [kPa]', fontsize=24)
+    plt.ylabel(r'Deviatoric von Mises stress, $q$ [kPa]', fontsize=24)
+    plt.text(0.05, 0.92, r'\bf(b)  $\boldsymbol{N=' + '500 000' + '}$', transform=ax.transAxes)
     # plt.text(0.05, 0.85, r'$\boldsymbol{N=' + str(int(cycles)) + '}$', transform=ax.transAxes)
     fig.set_size_inches(12., 6.25, forward=True)
 

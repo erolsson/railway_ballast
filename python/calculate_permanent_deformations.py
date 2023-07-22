@@ -108,10 +108,9 @@ def main():
     for f in frequencies:
         sim_name = 'sleepers_low_' + str(load).replace('.', '_') + 't'
         cycles = [1, 10, 100, 1000, 10000, 100000, 1000000]
-        stress_odb_filename = os.path.expanduser('~/hassan/embankment_' + sim_name
-                                                 + '_2018.odb')
+        stress_odb_filename = os.path.expanduser('~/railway_ballast/old_stress_odbs/stresses_' + sim_name + '.odb')
 
-        strain_odb_filename = os.path.expanduser('~/hassan/results_' + sim_name
+        strain_odb_filename = os.path.expanduser('~/railway_ballast/results_' + sim_name
                                                  + '_' + str(int(f)) + 'Hz.odb')
         par = get_parameters(frequency=f)
         calculate_permanent_deformations(stress_odb_filename, strain_odb_filename, cycles, par)

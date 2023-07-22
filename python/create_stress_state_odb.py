@@ -11,7 +11,7 @@ ballast_element_set = 'EMBANKMENT_INSTANCE_BALLAST_ELEMENTS'
 
 
 def main():
-    loads = [17.5]
+    loads = [17.5, 22.5, 30.]
     for geometry in ['low', 'high']:
         for rail_fixture in ['sleepers', 'slab']:
             for load in loads:

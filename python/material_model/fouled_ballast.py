@@ -66,7 +66,7 @@ def axial_residual(calibration_parameters, experiment):
     idx = np.logical_and(e_exp < 0.3, abs(e_exp) != 0)
     r = np.sqrt(np.sum((1 - model_e[idx]/e_exp[idx])**2*np.log(experiment.cycles[idx])/e_exp.shape[0])/e_exp.shape[0])
     # print(r, calibration_parameters)
-    return r*1
+    return r
 
 
 def volumetric_residual(calibration_parameters, old_parameters, experiment):
@@ -81,9 +81,7 @@ def volumetric_residual(calibration_parameters, old_parameters, experiment):
     diff = (model_e - e_exp)**2
     max_idx = np.argmax(diff)
     r = np.sqrt(np.sum(diff))
-
-    print(r, model_e[-1], e_exp[-1], experiment.cycles[max_idx], model_e[max_idx], e_exp[max_idx])
-    return r*1000
+    return r
 
 
 def determine_axial_parameters(experiment):
