@@ -37,9 +37,9 @@ def residual(fitting_parameters, par, parameters_to_fit, experiments, residual_f
         res += r
         print("\tf = " + str(f) + ",\t p = " + str(p) + " , q = " + str(q) + ": e_exp = " + str(e_exp) + "\t e_sim = "
               + str(e_sim) + "\t r = " + str(r))
-    if inst_e < 0.8:
-        print("Strain at problematic load", inst_e)
-        res += (0.8 - inst_e)**2*100
+    # if inst_e < 0.8:
+    #     print("Strain at problematic load", inst_e)
+    #     res += (0.8 - inst_e)**2*100
     print(fitting_parameters)
     print(res)
 
@@ -77,18 +77,18 @@ def calc_volumetric_residual_for_data_experiment(par, experiment):
 
 
 def main():
-    f = 40
+    f = 20
     frequencies = [f]
-    parameters_to_fit = [0, 1, 2, 3, 4, 5]
+    parameters_to_fit = range(6, 12)
     fitting_dataset = sun_et_al_16.get_data(f=frequencies)
-    par = np.array(get_parameters(40, common=False))
+    par = np.array(get_parameters(20, common=False))
 
     print(par)
     for i in range(50):
         old_par = par[parameters_to_fit]
         par[parameters_to_fit] = fmin(residual, [old_par],
                                       args=(par, parameters_to_fit, fitting_dataset,
-                                            calc_deviatoric_residual_for_data_experiment), maxfun=1e6,
+                                            calc_volumetric_residual_for_data_experiment), maxfun=1e6,
                                       maxiter=1e6)
         if np.sum((1 - par[parameters_to_fit]/old_par)**2) < 1e-3:
             break

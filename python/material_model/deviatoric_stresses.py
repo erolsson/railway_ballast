@@ -26,7 +26,7 @@ figure_directory = os.path.expanduser('~/railway_ballast/Figures/')
 def main():
     fig = plt.figure(0)
     frequencies = [5, 10, 20, 40]
-    pressures = [30, 60]
+    pressures = [15, 60]
     lines = ['--', '-']
     sym = ['s', 'o']
     colors = ['r', 'b', 'g', 'k']
@@ -42,7 +42,7 @@ def main():
                 parameters = get_parameters(f, common=False)
                 model = MaterialModel(parameters)
                 model.update(n, cyclic_stress, static_stress)
-                strain[i] = -model.deviatoric_strain()[-1, 0]
+                strain[i] = -model.strain()[-1, 0]
 
             plt.plot(deviatoric_stresses, strain, line + c, lw=2)
             data_sets = sun_et_al_16.get_data(p=p, f=f)
